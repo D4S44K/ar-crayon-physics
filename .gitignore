@@ -1,0 +1,4 @@
+.venv/
+phys_py/result/
+fpga/obj/
+*.pyc
