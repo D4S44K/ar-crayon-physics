@@ -1,7 +1,7 @@
 from my_types import *
 
 
-def draw_circle(canvas, center_x, center_y, r):
+def draw_circle(canvas, center_x, center_y, r, fill=False):
     rsq_down = r * r
     rsq_up = (r + 1) * (r + 1)
     for hcount in range(
@@ -14,8 +14,12 @@ def draw_circle(canvas, center_x, center_y, r):
                 continue
             df_x = hcount - center_x
             df_y = vcount - center_y
-            if rsq_down <= df_x * df_x + df_y * df_y <= rsq_up:
-                canvas.set_pixel(hcount, vcount, 1)
+            if fill:
+                if df_x * df_x + df_y * df_y <= rsq_up:
+                    canvas.set_pixel(hcount, vcount, 1)
+            else:
+                if rsq_down <= df_x * df_x + df_y * df_y <= rsq_up:
+                    canvas.set_pixel(hcount, vcount, 1)
 
 
 def render_objects(objects):
@@ -23,7 +27,7 @@ def render_objects(objects):
     for obj in objects:
         # print(f"Rendering object {obj.index}")
         if obj.shape_type == 0:
-            draw_circle(canvas, obj.pos[0], obj.pos[1], obj.size_1)
+            draw_circle(canvas, obj.pos[0], obj.pos[1], obj.size_1, obj.static)
         else:
             raise ValueError("Unsupported shape type")
     # print("Rendering done\n")

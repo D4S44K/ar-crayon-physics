@@ -4,7 +4,7 @@ from PIL import Image
 WIDTH = 640
 HEIGHT = 360
 PATH = "./result/"
-ELAS = 0.7
+ELAS = 0.95
 FLOAT_EPS = 1 / 2**13
 
 
@@ -32,8 +32,8 @@ class PhyiscalObject:
     ):
         # index: [4:0]
         # shape_type: [2:0]
-        # size_1: [9:0]
-        # size_2: [9:0]
+        # size_1: [15:0] (16bit float)
+        # size_2: [15:0] (16bit float)
         # mass: [7:0]
 
         # static: [0]
@@ -99,7 +99,7 @@ class ResultVideo:
     def add_frame(self, frame):
         self.frames.append(frame)
 
-    def export_as_gif(self, duration=100):
+    def export_as_gif(self, duration=50):
         if not self.frames:
             print("No frames to export")
             return
@@ -117,6 +117,6 @@ class ResultVideo:
             save_all=True,
             append_images=pil_frames[1:],
             duration=duration,
-            loop=1,
+            loop=0,
         )
         print(f"Exported {filename}.gif")
