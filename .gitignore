@@ -2,3 +2,4 @@
 phys_py/result/
 fpga/obj/
 *.pyc
+.DS_Store
