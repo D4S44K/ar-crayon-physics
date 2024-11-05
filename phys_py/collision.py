@@ -164,8 +164,8 @@ def circle_line_collision(circle, line, rv_x, rv_y):
     sdist_now = (ln_a * df_x + ln_b * df_y) / ln_len
     sdist_1s = (ln_a * (df_x + rv_x) + ln_b * (df_y + rv_y)) / ln_len
 
-    neg_btw = (sdist_now < -circle.r) != (sdist_1s < -circle.r)
-    pos_btw = (sdist_now > circle.r) != (sdist_1s > circle.r)
+    neg_btw = (sdist_now < -circle.r) and (sdist_1s >= -circle.r)
+    pos_btw = (sdist_now > circle.r) and (sdist_1s <= circle.r)
     if not neg_btw and not pos_btw:
         return False, 1.0
 
@@ -175,12 +175,11 @@ def circle_line_collision(circle, line, rv_x, rv_y):
     else:
         col_t = (sdist_now - circle.r) * ln_len / rv_dot
     # check if collision is in range of segment
-    # parallel vector: (B, -A)
-    ln_end_p = (line.y2 - line.y1) * ln_b - (line.x2 - line.x1) * ln_a
-    col_p = (df_x + rv_x * col_t - line.x1) * ln_b - (
-        df_y + rv_y * col_t - line.y1
-    ) * ln_a
-    if col_p > 0 == ln_end_p > 0:
+    # parallel vector: (-B, A)
+    # ln_end_p = -(line.x2 - line.x1) * ln_b + (line.y2 - line.y1) * ln_a # is equal to ln_sq
+    col_p = -(df_x + rv_x * col_t) * ln_b + (df_y + rv_y * col_t) * ln_a
+
+    if (col_p > 0) == (col_p > ln_sq):
         return False, 1.0
 
     return True, col_t

@@ -4,7 +4,7 @@ from PIL import Image, ImageDraw
 WIDTH = 640
 HEIGHT = 360
 PATH = "./result/"
-ELAS = 0.9
+ELAS = 0.7
 FLOAT_EPS = 1 / 2**13
 GRAVITY = 1.0
 MAX_COL_ITER = 64
