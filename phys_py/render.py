@@ -33,8 +33,9 @@ def draw_line(canvas, start_x, start_y, end_x, end_y):
         canvas.set_pixel(int(x), vcount, 1)
 
 
-def render_objects(objects):
-    canvas = DrawFrame("test")
+def render_objects(objects, frame_idx):
+    canvas = DrawFrame(f"frame_{frame_idx}")
+    canvas.write_text(10, 10, f"Frame {frame_idx}")
     for obj in objects:
         # print(f"Rendering object {obj.index}")
         if obj.shape_type == 0:

@@ -1,4 +1,4 @@
-from PIL import Image
+from PIL import Image, ImageDraw
 
 
 WIDTH = 640
@@ -131,6 +131,7 @@ class DrawFrame:
     def __init__(self, name):
         self.name = name
         self.image = Image.new("1", (WIDTH, HEIGHT), 0)
+        self.draw = ImageDraw.Draw(self.image)
 
     def __str__(self):
         return f"DrawFrame {self.name}"
@@ -140,6 +141,9 @@ class DrawFrame:
 
     def get_pixel(self, x, y):
         return self.image.getpixel((x, y))
+
+    def write_text(self, x, y, text):
+        self.draw.text((x, y), text, fill=1)
 
     def export(self, filename="output.png"):
         self.image.save(PATH + filename)

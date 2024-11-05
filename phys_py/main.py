@@ -1,7 +1,12 @@
 from my_types import *
 from render import render_objects
-from simulate import update_pos_vel, update_collision_vel, update_acc
-from collision import when_does_collide
+from simulate import (
+    update_pos_vel,
+    update_collision_vel,
+    update_acc,
+    debug_sim_time_update,
+)
+from collision import when_does_collide, debug_col_time_update
 
 
 def main():
@@ -33,18 +38,30 @@ def main():
     )
     print(obj4)
 
-    # line from 20, 50 to 60, 320
+    # line on left
     obj5 = PhyiscalObject(
-        5, 2, 60.0, 275.0, 1000.0, (20.0, 50.0), (0.0, 0.0), static=True
+        5, 2, 60.0, 280.0, 1000.0, (20.0, 250.0), (0.0, 0.0), static=True
     )
     print(obj5)
 
-    obj_list = [obj0, obj1, obj2, obj3, obj4, obj5]
+    # line from 100, 150 to 140, 100
+    obj6 = PhyiscalObject(
+        6, 2, 260.0, 100.0, 1000.0, (300.0, 150.0), (0.0, 0.0), static=True
+    )
+    print(obj6)
+
+    # line on the right top
+    obj7 = PhyiscalObject(
+        7, 2, 620.0, 100.0, 1000.0, (500.0, 100.0), (0.0, 0.0), static=True
+    )
+    print(obj7)
+
+    obj_list = [obj0, obj1, obj2, obj3, obj4, obj5, obj7]
 
     for fr in range(120):
         if fr % 10 == 0:
             print(f"Frame {fr}")
-        frame = render_objects(obj_list)
+        frame = render_objects(obj_list, fr)
         video.add_frame(frame)
 
         left_time = 1.0
@@ -61,7 +78,7 @@ def main():
                         )
                         if does_collide and 0 <= t < time_step:  # min time to collide
                             print(
-                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t}, {does_collide}"
+                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t} after {debug_col_time_update(0)}, {does_collide}"
                             )
                             time_step = t
                             collide_pair = (i, j)
@@ -78,9 +95,12 @@ def main():
                 )
                 # print(f"left_time = {left_time}, wil do time_step = {time_step}")
             left_time -= time_step
+            debug_col_time_update(time_step)
+            debug_sim_time_update(time_step)
             iterations += 1
 
         update_acc(obj_list)
+        # video.export_as_gif()
 
     video.export_as_gif()
 
