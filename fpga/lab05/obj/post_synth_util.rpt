@@ -1,0 +1,76 @@
+Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
+---------------------------------------------------------------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
+| Date         : Thu Nov  7 20:56:27 2024
+| Host         : eecs-digital-26 running 64-bit Ubuntu 24.04.1 LTS
+| Command      : report_utilization -file obj/post_synth_util.rpt -hierarchical -hierarchical_depth 4
+| Design       : top_level
+| Device       : xc7s50csga324-1
+| Speed File   : -1
+| Design State : Synthesized
+---------------------------------------------------------------------------------------------------------------------------------------------
+
+Utilization Design Information
+
+Table of Contents
+-----------------
+1. Utilization by Hierarchy
+
+1. Utilization by Hierarchy
+---------------------------
+
++----------------------------------------------+---------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+|                   Instance                   |                       Module                      | Total LUTs | Logic LUTs | LUTRAMs | SRLs | FFs | RAMB36 | RAMB18 | DSP Blocks |
++----------------------------------------------+---------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+| top_level                                    |                                             (top) |       1154 |       1080 |       0 |   74 | 870 |     40 |     10 |          8 |
+|   (top_level)                                |                                             (top) |          0 |          0 |       0 |    0 |  95 |      0 |      0 |          1 |
+|   blue_ser                                   |                                   tmds_serializer |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   ch_red_pipeline_ps8                        |                          pipeline__parameterized7 |          5 |          4 |       0 |    1 |   1 |      0 |      0 |          0 |
+|   com_m                                      |                                    center_of_mass |        240 |        240 |       0 |    0 | 298 |      0 |      0 |          0 |
+|     (com_m)                                  |                                    center_of_mass |         82 |         82 |       0 |    0 | 124 |      0 |      0 |          0 |
+|     x_div                                    |                                           divider |         78 |         78 |       0 |    0 |  88 |      0 |      0 |          0 |
+|     y_div                                    |                                        divider_12 |         80 |         80 |       0 |    0 |  86 |      0 |      0 |          0 |
+|   com_sprite_m                               |                                      image_sprite |         18 |         17 |       0 |    1 |   1 |     16 |      1 |          0 |
+|     image                                    |                 xilinx_single_port_ram_read_first |          8 |          8 |       0 |    0 |   0 |     16 |      0 |          0 |
+|     in_sprite_delayed_ps10                   |                          pipeline__parameterized4 |         10 |          9 |       0 |    1 |   1 |      0 |      0 |          0 |
+|     palette                                  | xilinx_single_port_ram_read_first__parameterized0 |          0 |          0 |       0 |    0 |   0 |      0 |      1 |          0 |
+|   crw                                        |                                  camera_registers |        106 |        106 |       0 |    0 | 104 |      0 |      0 |          0 |
+|     (crw)                                    |                                  camera_registers |          8 |          8 |       0 |    0 |  42 |      0 |      0 |          0 |
+|     aia                                      |                                    addr_increment |          8 |          8 |       0 |    0 |   9 |      0 |      0 |          0 |
+|     sccb_c                                   |                                        i2c_master |         90 |         90 |       0 |    0 |  53 |      0 |      0 |          0 |
+|   fb_blue_pipeline_ps1                       |                                          pipeline |          5 |          5 |       0 |    0 |  15 |      0 |      0 |          0 |
+|   fb_blue_pipeline_ps2                       |                          pipeline__parameterized5 |          0 |          0 |       0 |    0 |   5 |      0 |      0 |          0 |
+|   fb_green_pipeline_ps1                      |                                        pipeline_0 |          6 |          0 |       0 |    6 |   6 |      0 |      0 |          0 |
+|   fb_green_pipeline_ps2                      |                        pipeline__parameterized5_1 |          0 |          0 |       0 |    0 |   6 |      0 |      0 |          0 |
+|   fb_red_pipeline_ps1                        |                                        pipeline_2 |          0 |          0 |       0 |    0 |  15 |      0 |      0 |          0 |
+|   fb_red_pipeline_ps2                        |                        pipeline__parameterized5_3 |          0 |          0 |       0 |    0 |   5 |      0 |      0 |          0 |
+|   frame_buffer                               |                                     blk_mem_gen_0 |        122 |        122 |       0 |    0 |  20 |     24 |      8 |          0 |
+|     (frame_buffer)                           |                                     blk_mem_gen_0 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|     U0                                       |                   blk_mem_gen_0blk_mem_gen_v8_4_8 |        122 |        122 |       0 |    0 |  20 |     24 |      8 |          0 |
+|       (U0)                                   |                   blk_mem_gen_0blk_mem_gen_v8_4_8 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|       inst_blk_mem_gen                       |             blk_mem_gen_0blk_mem_gen_v8_4_8_synth |        122 |        122 |       0 |    0 |  20 |     24 |      8 |          0 |
+|         gnbram.gnativebmg.native_blk_mem_gen |                      blk_mem_gen_0blk_mem_gen_top |        122 |        122 |       0 |    0 |  20 |     24 |      8 |          0 |
+|   green_ser                                  |                                 tmds_serializer_4 |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   hcount_pipeline_ps3                        |                          pipeline__parameterized0 |         60 |         38 |       0 |   22 |  22 |      0 |      0 |          0 |
+|   img_blue_pipeline_ps9                      |                        pipeline__parameterized5_5 |        101 |         93 |       0 |    8 |  16 |      0 |      0 |          0 |
+|   img_green_pipeline_ps9                     |                        pipeline__parameterized5_6 |         94 |         86 |       0 |    8 |  16 |      0 |      0 |          0 |
+|   img_red_pipeline_ps9                       |                        pipeline__parameterized5_7 |         97 |         89 |       0 |    8 |  16 |      0 |      0 |          0 |
+|   mcs                                        |                                    channel_select |         14 |         14 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   mssc                                       |                                         lab05_ssc |         35 |         35 |       0 |    0 |  25 |      0 |      0 |          0 |
+|   mt                                         |                                         threshold |          0 |          0 |       0 |    0 |   1 |      0 |      0 |          0 |
+|   nolabel_line105                            |                                 pixel_reconstruct |         44 |         44 |       0 |    0 |  62 |      0 |      0 |          0 |
+|   red_ser                                    |                                 tmds_serializer_8 |          1 |          1 |       0 |    0 |   1 |      0 |      0 |          0 |
+|   registers                                  | xilinx_single_port_ram_read_first__parameterized1 |          6 |          6 |       0 |    0 |   0 |      0 |      1 |          0 |
+|   rgbtoycrcb_m                               |                                      rgb_to_ycrcb |         43 |         43 |       0 |    0 |  40 |      0 |      0 |          7 |
+|   selected_channel_pipeline_ps5              |                          pipeline__parameterized6 |         19 |         19 |       0 |    0 |   8 |      0 |      0 |          0 |
+|   tmds_blue                                  |                                      tmds_encoder |          8 |          8 |       0 |    0 |  14 |      0 |      0 |          0 |
+|   tmds_green                                 |                                    tmds_encoder_9 |          7 |          7 |       0 |    0 |  14 |      0 |      0 |          0 |
+|   tmds_red                                   |                                   tmds_encoder_10 |          7 |          7 |       0 |    0 |  14 |      0 |      0 |          0 |
+|   vcount_pipeline_ps3                        |                          pipeline__parameterized1 |         56 |         36 |       0 |   20 |  20 |      0 |      0 |          0 |
+|   vsg                                        |                                     video_sig_gen |         62 |         62 |       0 |    0 |  22 |      0 |      0 |          0 |
+|   wizard_hdmi                                |                                   cw_hdmi_clk_wiz |          0 |          0 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   wizard_migcam                              |                                   cw_fast_clk_wiz |          1 |          1 |       0 |    0 |   0 |      0 |      0 |          0 |
+|   y_pipeline_ps6                             |                       pipeline__parameterized6_11 |          0 |          0 |       0 |    0 |   8 |      0 |      0 |          0 |
++----------------------------------------------+---------------------------------------------------+------------+------------+---------+------+-----+--------+--------+------------+
+
+
