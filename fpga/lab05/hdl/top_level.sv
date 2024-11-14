@@ -241,6 +241,21 @@ module top_level
   logic [9:0] y_com, y_com_calc; //long term y_com and output from module, resp
   logic new_com; //used to know when to update x_com and y_com ...
 
+  //channel select module (select which of six color channels to mask) FOR COM_2:
+  logic [2:0] channel_sel_2;
+  logic [7:0] selected_channel_2; //selected channels
+  //selected_channel could contain any of the six color channels depend on selection
+
+  //threshold module (apply masking threshold) FOR COM_2:
+  logic [7:0] lower_threshold_2;
+  logic [7:0] upper_threshold_2;
+  logic mask_2; //Whether or not thresholded pixel is 1 or 0
+
+  //Center of Mass variables FOR COM_2 (tally all mask=1 pixels for a frame and calculate their center of mass)fb_red
+  logic [10:0] x_com_2, x_com_calc_2; //long term x_com and output from module, resp
+  logic [9:0] y_com_2, y_com_calc_2; //long term y_com and output from module, resp
+  logic new_com_2; //used to know when to update x_com and y_com ...
+
   //take lower 8 of full outputs.
   // treat cr and cb as signed numbers, invert the MSB to get an unsigned equivalent ( [-128,128) maps to [0,256) )
   assign y = y_full[7:0];
@@ -282,6 +297,8 @@ module top_level
   );
 
   assign channel_sel = sw[3:1];
+
+  assign channel_sel_2 = 3'b110;
   // * 3'b000: green
   // * 3'b001: red
   // * 3'b010: blue
@@ -303,10 +320,23 @@ module top_level
      .channel_out(selected_channel)
   );
 
+  channel_select mcs_2(
+     .sel_in(channel_sel_2),
+     .r_in(fb_red_delayed_ps1),    //TODO: needs to use pipelined signal (PS1)
+     .g_in(fb_green_delayed_ps1),  //TODO: needs to use pipelined signal (PS1)
+     .b_in(fb_blue_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
+     .y_in(y),
+     .cr_in(cr),
+     .cb_in(cb),
+     .channel_out(selected_channel_2)
+  );
+
   //threshold values used to determine what value  passes:
   assign lower_threshold = {sw[11:8],4'b0};
   assign upper_threshold = {sw[15:12],4'b0};
 
+  assign lower_threshold_2 = {4'b1010,4'b0};
+  assign upper_threshold_2 = {4'b1111,4'b0};
   //Thresholder: Takes in the full selected channedl and
   //based on upper and lower bounds provides a binary mask bit
   // * 1 if selected channel is within the bounds (inclusive)
@@ -318,6 +348,15 @@ module top_level
      .lower_bound_in(lower_threshold),
      .upper_bound_in(upper_threshold),
      .mask_out(mask) //single bit if pixel within mask.
+  );
+
+  threshold mt_2(
+     .clk_in(clk_pixel),
+     .rst_in(sys_rst_pixel),
+     .pixel_in(selected_channel_2),
+     .lower_bound_in(lower_threshold_2),
+     .upper_bound_in(upper_threshold_2),
+     .mask_out(mask_2) //single bit if pixel within mask.
   );
 
 
@@ -370,15 +409,36 @@ module top_level
     .y_out(y_com_calc),
     .valid_out(new_com)
   );
+
+  center_of_mass com_m_2(
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst_pixel),
+    .x_in(hcount_delayed_ps3),  //TODO: needs to use pipelined signal! (PS3)
+    .y_in(vcount_delayed_ps3), //TODO: needs to use pipelined signal! (PS3)
+    .valid_in(mask_2), //aka threshold
+    .tabulate_in((nf_hdmi)),
+    .x_out(x_com_calc_2),
+    .y_out(y_com_calc_2),
+    .valid_out(new_com_2)
+  );
   //grab logic for above
   //update center of mass x_com, y_com based on new_com signal
   always_ff @(posedge clk_pixel)begin
     if (sys_rst_pixel)begin
       x_com <= 0;
       y_com <= 0;
-    end if(new_com)begin
+    end
+    else if(new_com)begin
       x_com <= x_com_calc;
       y_com <= y_com_calc;
+    end
+    if (sys_rst_pixel)begin
+      x_com_2 <= 0;
+      y_com_2 <= 0;
+    end
+    else if(new_com_2)begin
+      x_com_2 <= x_com_calc_2;
+      y_com_2 <= y_com_calc_2;
     end
   end
 
@@ -430,9 +490,9 @@ module top_level
   //0 cycle latency
   //TODO: Should be using output of (PS3)
   always_comb begin
-    ch_red   = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com))?8'hFF:8'h00;
-    ch_green = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com))?8'hFF:8'h00;
-    ch_blue  = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com))?8'hFF:8'h00;
+    ch_red   = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
+    ch_green = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
+    ch_blue  = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
   end
 
 
