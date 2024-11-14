@@ -144,14 +144,9 @@ module top_level
     //we want to down sample the data from the camera by a factor of four in both
     //the x and y dimensions! TO DO
     if (camera_valid) begin
-      // only write to memory if both hcount and vcount are divisible by 4
-      if ((camera_hcount[1:0] == 2'b00) && (camera_vcount[1:0] == 2'b00)) begin
-        addra <= (camera_hcount >> 2) + ((camera_vcount >> 2) * 320); // scale down by 4
-        camera_mem <= camera_pixel;
-        valid_camera_mem <= 1; // Enable memory write
-      end else begin
-        valid_camera_mem <= 0; // Disable memory write
-      end
+      addra <= (camera_hcount) + ((camera_vcount) * 320);
+      camera_mem <= camera_pixel;
+      valid_camera_mem <= 1; // Enable memory write
     end else begin
       valid_camera_mem <= 0;
     end
@@ -296,7 +291,7 @@ module top_level
     .delayed_signal(fb_blue_delayed_ps1)
   );
 
-  assign channel_sel = sw[3:1];
+  assign channel_sel = 3'b101;
 
   assign channel_sel_2 = 3'b110;
   // * 3'b000: green
@@ -332,8 +327,8 @@ module top_level
   );
 
   //threshold values used to determine what value  passes:
-  assign lower_threshold = {sw[11:8],4'b0};
-  assign upper_threshold = {sw[15:12],4'b0};
+  assign lower_threshold = {4'b1010,4'b0};
+  assign upper_threshold = {4'b1111,4'b0};
 
   assign lower_threshold_2 = {4'b1010,4'b0};
   assign upper_threshold_2 = {4'b1111,4'b0};
@@ -467,16 +462,32 @@ module top_level
 
   // TODO: image sprite using hdmi hcount/vcount, x_com y_com to draw image or nothing
   //bring in an instance of your popcat image sprite! remember the correct mem files too!
-  image_sprite #(
+  // image_sprite #(
+  //   .WIDTH(256),
+  //   .HEIGHT(256))
+  //   com_sprite_m (
+  //   .pixel_clk_in(clk_pixel),
+  //   .rst_in(sys_rst_pixel),
+  //   .hcount_in(hcount_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
+  //   .vcount_in(vcount_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
+  //   .x_in(x_com>128 ? x_com-128 : 0),
+  //   .y_in(y_com>128 ? y_com-128 : 0),
+  //   .red_out(img_red),
+  //   .green_out(img_green),
+  //   .blue_out(img_blue));
+
+
+  draw_rectangle #(
     .WIDTH(256),
-    .HEIGHT(256))
-    com_sprite_m (
-    .pixel_clk_in(clk_pixel),
-    .rst_in(sys_rst_pixel),
-    .hcount_in(hcount_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
-    .vcount_in(vcount_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
-    .x_in(x_com>128 ? x_com-128 : 0),
-    .y_in(y_com>128 ? y_com-128 : 0),
+    .HEIGHT(256),
+    .COLOR(24'hFF_FF_FF))
+    rectangle (
+    .hcount_in(hcount_delayed_ps1),
+    .vcount_in(vcount_delayed_ps1),
+    .x_in_1(x_com),
+    .y_in_1(y_com),
+    .x_in_2(x_com_2),
+    .y_in_2(y_com_2),
     .red_out(img_red),
     .green_out(img_green),
     .blue_out(img_blue));
