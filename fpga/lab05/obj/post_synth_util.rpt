@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-| Date         : Thu Nov 14 16:17:00 2024
-| Host         : eecs-digital-17 running 64-bit Ubuntu 24.04.1 LTS
+| Date         : Thu Nov 14 16:34:50 2024
+| Host         : eecs-digital-25 running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file obj/post_synth_util.rpt -hierarchical -hierarchical_depth 4
 | Design       : top_level
 | Device       : xc7s50csga324-1
@@ -22,7 +22,7 @@ Table of Contents
 +----------------------------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
 |                   Instance                   |                 Module                | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
 +----------------------------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
-| top_level                                    |                                 (top) |       1328 |       1268 |       0 |   60 | 1079 |     24 |      9 |          9 |
+| top_level                                    |                                 (top) |       1376 |       1316 |       0 |   60 | 1079 |     24 |      9 |          9 |
 |   (top_level)                                |                                 (top) |          0 |          0 |       0 |    0 |  100 |      0 |      0 |          2 |
 |   blue_ser                                   |                       tmds_serializer |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
 |   ch_red_pipeline_ps8                        |              pipeline__parameterized6 |         81 |         80 |       0 |    1 |    1 |      0 |      0 |          0 |
@@ -50,8 +50,8 @@ Table of Contents
 |       inst_blk_mem_gen                       | blk_mem_gen_0blk_mem_gen_v8_4_8_synth |        122 |        122 |       0 |    0 |   20 |     24 |      8 |          0 |
 |         gnbram.gnativebmg.native_blk_mem_gen |          blk_mem_gen_0blk_mem_gen_top |        122 |        122 |       0 |    0 |   20 |     24 |      8 |          0 |
 |   green_ser                                  |                     tmds_serializer_4 |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
-|   hcount_pipeline_ps3                        |              pipeline__parameterized0 |         43 |         21 |       0 |   22 |   22 |      0 |      0 |          0 |
-|   img_blue_pipeline_ps9                      |            pipeline__parameterized4_5 |        167 |        166 |       0 |    1 |    1 |      0 |      0 |          0 |
+|   hcount_pipeline_ps3                        |              pipeline__parameterized0 |         58 |         36 |       0 |   22 |   22 |      0 |      0 |          0 |
+|   img_blue_pipeline_ps9                      |            pipeline__parameterized4_5 |        177 |        176 |       0 |    1 |    1 |      0 |      0 |          0 |
 |   mssc                                       |                             lab05_ssc |         23 |         23 |       0 |    0 |   25 |      0 |      0 |          0 |
 |   mt                                         |                             threshold |          0 |          0 |       0 |    0 |    1 |      0 |      0 |          0 |
 |   mt_2                                       |                           threshold_6 |          0 |          0 |       0 |    0 |    1 |      0 |      0 |          0 |
@@ -64,7 +64,7 @@ Table of Contents
 |   tmds_blue                                  |                          tmds_encoder |          8 |          8 |       0 |    0 |   14 |      0 |      0 |          0 |
 |   tmds_green                                 |                        tmds_encoder_8 |         11 |         11 |       0 |    0 |   14 |      0 |      0 |          0 |
 |   tmds_red                                   |                        tmds_encoder_9 |         10 |         10 |       0 |    0 |   14 |      0 |      0 |          0 |
-|   vcount_pipeline_ps3                        |              pipeline__parameterized1 |         31 |         11 |       0 |   20 |   20 |      0 |      0 |          0 |
+|   vcount_pipeline_ps3                        |              pipeline__parameterized1 |         54 |         34 |       0 |   20 |   20 |      0 |      0 |          0 |
 |   vsg                                        |                         video_sig_gen |         64 |         64 |       0 |    0 |   22 |      0 |      0 |          0 |
 |   wizard_hdmi                                |                       cw_hdmi_clk_wiz |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
 |   wizard_migcam                              |                       cw_fast_clk_wiz |          1 |          1 |       0 |    0 |    0 |      0 |      0 |          0 |

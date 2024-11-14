@@ -10,13 +10,13 @@ module draw_rectangle #(
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
 
-  logic x_1;
-  logic y_1;
+  logic[10:0] x_1;
+  logic[9:0] y_1;
   assign x_1 = (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
   assign y_1 = (y_in_1 <= y_in_2) ? y_in_1 : y_in_2;
 
-  logic x_2;
-  logic y_2;
+  logic[10:0] x_2;
+  logic[9:0] y_2;
   assign x_2 = (x_in_1 >= x_in_2) ? x_in_1 : x_in_2;
   assign y_2 = (y_in_1 >= y_in_2) ? y_in_1 : y_in_2;
 

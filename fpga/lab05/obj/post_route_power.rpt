@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-| Date             : Thu Nov 14 16:17:19 2024
-| Host             : eecs-digital-17 running 64-bit Ubuntu 24.04.1 LTS
+| Date             : Thu Nov 14 16:35:07 2024
+| Host             : eecs-digital-25 running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file obj/post_route_power.rpt
 | Design           : top_level
 | Device           : xc7s50csga324-1
@@ -30,7 +30,7 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.477        |
+| Total On-Chip Power (W)  | 0.478        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
 | Dynamic (W)              | 0.403        |
@@ -52,22 +52,22 @@ Table of Contents
 +-------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                 | Power (W) | Used     | Available | Utilization (%) |
 +-------------------------+-----------+----------+-----------+-----------------+
-| Clocks                  |     0.012 |       10 |       --- |             --- |
-| Slice Logic             |     0.010 |     3209 |       --- |             --- |
-|   LUT as Logic          |     0.010 |     1199 |     32600 |            3.68 |
-|   CARRY4                |    <0.001 |      147 |      8150 |            1.80 |
+| Clocks                  |     0.011 |       10 |       --- |             --- |
+| Slice Logic             |     0.010 |     3277 |       --- |             --- |
+|   LUT as Logic          |     0.010 |     1240 |     32600 |            3.80 |
+|   CARRY4                |    <0.001 |      151 |      8150 |            1.85 |
 |   Register              |    <0.001 |     1071 |     65200 |            1.64 |
 |   LUT as Shift Register |    <0.001 |       40 |      9600 |            0.42 |
 |   F7/F8 Muxes           |    <0.001 |       27 |     32600 |            0.08 |
 |   Others                |     0.000 |      179 |       --- |             --- |
-| Signals                 |     0.012 |     2556 |       --- |             --- |
+| Signals                 |     0.013 |     2619 |       --- |             --- |
 | Block RAM               |     0.012 |     28.5 |        75 |           38.00 |
 | MMCM                    |     0.105 |        1 |         5 |           20.00 |
 | PLL                     |     0.101 |        1 |         5 |           20.00 |
 | DSPs                    |     0.005 |        9 |       120 |            7.50 |
 | I/O                     |     0.147 |       74 |       210 |           35.24 |
 | Static Power            |     0.074 |          |           |                 |
-| Total                   |     0.477 |          |           |                 |
+| Total                   |     0.478 |          |           |                 |
 +-------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -77,7 +77,7 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.068 |       0.057 |      0.011 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.069 |       0.057 |      0.011 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.124 |       0.112 |      0.013 |       NA    | Unspecified | NA         |
 | Vcco33    |       3.300 |     0.045 |       0.044 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -157,7 +157,7 @@ Table of Contents
 |   com_m                 |     0.001 |
 |   com_m_2               |     0.001 |
 |   crw                   |     0.004 |
-|     sccb_c              |     0.003 |
+|     sccb_c              |     0.002 |
 |   frame_buffer          |     0.014 |
 |     U0                  |     0.014 |
 |       inst_blk_mem_gen  |     0.014 |
