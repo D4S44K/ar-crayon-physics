@@ -90,14 +90,14 @@ class circle:
         return f"circle at ({self.x}, {self.y}) with radius {self.r}"
 
 
-class point:
-    def __init__(self, x, y):
-        self.t = 1
-        self.x = x
-        self.y = y
+# class point:
+#     def __init__(self, x, y):
+#         self.t = 1
+#         self.x = x
+#         self.y = y
 
-    def __str__(self):
-        return f"point at ({self.x}, {self.y})"
+#     def __str__(self):
+#         return f"point at ({self.x}, {self.y})"
 
 
 class line:
@@ -119,8 +119,10 @@ def get_my_parts(obj):  # return tuple
         # point_1 = point(obj.pos[0], obj.pos[1])
         pass
     elif obj.shape_type == 2:
-        point_1 = point(obj.pos[0], obj.pos[1])
-        point_2 = point(obj.size_1, obj.size_2)
+        # point_1 = point(obj.pos[0], obj.pos[1])
+        # point_2 = point(obj.size_1, obj.size_2)
+        point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
+        point_2 = circle(obj.size_1, obj.size_2, 0.0)
         line_ = line(point_1.x, point_1.y, point_2.x, point_2.y)
         return (point_1, point_2, line_)
     else:

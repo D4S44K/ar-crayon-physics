@@ -64,8 +64,10 @@ def when_does_collide(
             pass
         elif obj_b.shape_type == 2:
             (point_b1, point_b2, line_b) = get_my_parts(obj_b)
-            col0 = circle_point_collision(circle_a, point_b1, rv_x, rv_y)
-            col1 = circle_point_collision(circle_a, point_b2, rv_x, rv_y)
+            # col0 = circle_point_collision(circle_a, point_b1, rv_x, rv_y)
+            # col1 = circle_point_collision(circle_a, point_b2, rv_x, rv_y)
+            col0 = circle_circle_collision(circle_a, point_b1, rv_x, rv_y)
+            col1 = circle_circle_collision(circle_a, point_b2, rv_x, rv_y)
             col2 = circle_line_collision(circle_a, line_b, rv_x, rv_y)
             does_collide, t, b_part = merge_coll_info([col0, col1, col2])
             if do_swap:
@@ -82,38 +84,38 @@ def when_does_collide(
     raise ValueError(f"Unsupported shape type {obj_a.shape_type} or {obj_b.shape_type}")
 
 
-def circle_point_collision(circle, point, rv_x, rv_y):
-    # circle-point collision, uses sqrt -> simplify?
-    r_sum = circle.r
-    r_sum_sq = r_sum * r_sum
-    df_x = point.x - circle.x
-    df_y = point.y - circle.y
-    df_sq = df_x * df_x + df_y * df_y
+# def circle_point_collision(circle, point, rv_x, rv_y):
+#     # circle-point collision, uses sqrt -> simplify?
+#     r_sum = circle.r
+#     r_sum_sq = r_sum * r_sum
+#     df_x = point.x - circle.x
+#     df_y = point.y - circle.y
+#     df_sq = df_x * df_x + df_y * df_y
 
-    if -FLOAT_EPS < rv_x < FLOAT_EPS and -FLOAT_EPS < rv_y < FLOAT_EPS:
-        return False, 1.1
-    rv_sq = rv_x * rv_x + rv_y * rv_y
+#     if -FLOAT_EPS < rv_x < FLOAT_EPS and -FLOAT_EPS < rv_y < FLOAT_EPS:
+#         return False, 1.1
+#     rv_sq = rv_x * rv_x + rv_y * rv_y
 
-    # distance to go in rv's direction: rv_dist = dot(rv, df) / |rv|
-    # time to reach that distance: t = rv_dist / |rv| = dot(rv, df) / |rv|^2
-    dot_rv_df = rv_x * df_x + rv_y * df_y
-    min_dist_t = dot_rv_df / rv_sq  # INSTR: div
-    if min_dist_t < 0:  # wrong direction
-        return False, 1.2
+#     # distance to go in rv's direction: rv_dist = dot(rv, df) / |rv|
+#     # time to reach that distance: t = rv_dist / |rv| = dot(rv, df) / |rv|^2
+#     dot_rv_df = rv_x * df_x + rv_y * df_y
+#     min_dist_t = dot_rv_df / rv_sq  # INSTR: div
+#     if min_dist_t < 0:  # wrong direction
+#         return False, 1.2
 
-    # distance between centers at that time: min_dist^2 = |df|^2 - |rv_dist|^2
-    # do they overlap at that time: min_dist^2 <= r_sum^2
-    min_dist_sq = df_sq - dot_rv_df * dot_rv_df / rv_sq  # INSTR: div
-    if min_dist_sq > r_sum_sq + FLOAT_EPS:  # too far apart
-        return False, 1.3
+#     # distance between centers at that time: min_dist^2 = |df|^2 - |rv_dist|^2
+#     # do they overlap at that time: min_dist^2 <= r_sum^2
+#     min_dist_sq = df_sq - dot_rv_df * dot_rv_df / rv_sq  # INSTR: div
+#     if min_dist_sq > r_sum_sq + FLOAT_EPS:  # too far apart
+#         return False, 1.3
 
-    # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
-    # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
-    col_t = min_dist_t - sqrt(
-        max(0, r_sum_sq / rv_sq - min_dist_sq / rv_sq)
-    )  # INSTR: div, sqrt
+#     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
+#     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
+#     col_t = min_dist_t - sqrt(
+#         max(0, r_sum_sq / rv_sq - min_dist_sq / rv_sq)
+#     )  # INSTR: div, sqrt
 
-    return True, col_t
+#     return True, col_t
 
 
 def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
@@ -143,9 +145,7 @@ def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
 
     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
-    col_t = min_dist_t - sqrt(
-        r_sum_sq / rv_sq - min_dist_sq / rv_sq
-    )  # INSTR: div, sqrt
+    col_t = min_dist_t - sqrt((r_sum_sq - min_dist_sq) / rv_sq)  # INSTR: div, sqrt
 
     return True, col_t
 
@@ -162,7 +162,7 @@ def circle_line_collision(circle, line, rv_x, rv_y):
 
     # TODO reduce div... and consider /0 error
     sdist_now = (ln_a * df_x + ln_b * df_y) / ln_len
-    sdist_1s = (ln_a * (df_x + rv_x) + ln_b * (df_y + rv_y)) / ln_len
+    sdist_1s = (ln_a * (df_x + rv_x) + ln_b * (df_y + rv_y)) / ln_len  # Can be skipped?
 
     neg_btw = (sdist_now < -circle.r) and (sdist_1s >= -circle.r)
     pos_btw = (sdist_now > circle.r) and (sdist_1s <= circle.r)

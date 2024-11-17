@@ -58,17 +58,21 @@ def update_collision_vel(obj_i, obj_j, ip_idx, jp_idx):
     rv_y = obj_a.vel[1] - obj_b.vel[1]
 
     if obj_a.shape_type == 0:
+        a_part_list = get_my_parts(obj_a)
+        a_part = a_part_list[ap_idx]
         if obj_b.shape_type == 0:
-            circle_circle_vel(obj_a, obj_b, rv_x, rv_y)
+            b_part_list = get_my_parts(obj_b)
+            b_part = b_part_list[bp_idx]
+            circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
         elif obj_b.shape_type == 1:
             pass
         elif obj_b.shape_type == 2:
             b_part_list = get_my_parts(obj_b)
             b_part = b_part_list[bp_idx]
-            if b_part.t == 1:
-                circle_point_vel(obj_a, obj_b, b_part, rv_x, rv_y)
+            if b_part.t == 0:
+                circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
             else:
-                circle_line_vel(obj_a, obj_b, b_part, rv_x, rv_y)
+                circle_line_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
     elif obj_a.shape_type == 1:
         pass
     elif obj_a.shape_type == 2:
@@ -85,11 +89,13 @@ def get_mass_coeff(obj_a, obj_b):
     return m_scale_1, m_scale_2
 
 
-def circle_circle_vel(obj_a, obj_b, rv_x, rv_y):
+def circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y):
     # circle-circle collision, uses sqrt and div
     # Assume they collided right now
-    df_x = obj_a.pos[0] - obj_b.pos[0]
-    df_y = obj_a.pos[1] - obj_b.pos[1]
+    # df_x = obj_a.pos[0] - obj_b.pos[0]
+    # df_y = obj_a.pos[1] - obj_b.pos[1]
+    df_x = a_part.x - b_part.x
+    df_y = a_part.y - b_part.y
     df_sq = df_x * df_x + df_y * df_y
 
     dot_rv_df = rv_x * df_x + rv_y * df_y
@@ -115,30 +121,30 @@ def circle_circle_vel(obj_a, obj_b, rv_x, rv_y):
     )
 
 
-def circle_point_vel(obj_a, obj_b, point_b, rv_x, rv_y):
-    df_x = obj_a.pos[0] - point_b.x
-    df_y = obj_a.pos[1] - point_b.y
-    df_sq = df_x * df_x + df_y * df_y
+# def circle_point_vel(obj_a, obj_b, point_b, rv_x, rv_y):
+#     df_x = obj_a.pos[0] - point_b.x
+#     df_y = obj_a.pos[1] - point_b.y
+#     df_sq = df_x * df_x + df_y * df_y
 
-    dot_rv_df = rv_x * df_x + rv_y * df_y
+#     dot_rv_df = rv_x * df_x + rv_y * df_y
 
-    unit_dist_x = ELAS * df_x * dot_rv_df / df_sq
-    unit_dist_y = ELAS * df_y * dot_rv_df / df_sq
+#     unit_dist_x = ELAS * df_x * dot_rv_df / df_sq
+#     unit_dist_y = ELAS * df_y * dot_rv_df / df_sq
 
-    m_scale_1, m_scale_2 = get_mass_coeff(obj_a, obj_b)
+#     m_scale_1, m_scale_2 = get_mass_coeff(obj_a, obj_b)
 
-    obj_a.vel = (
-        obj_a.vel[0] - m_scale_1 * unit_dist_x,
-        obj_a.vel[1] - m_scale_1 * unit_dist_y,
-    )
+#     obj_a.vel = (
+#         obj_a.vel[0] - m_scale_1 * unit_dist_x,
+#         obj_a.vel[1] - m_scale_1 * unit_dist_y,
+#     )
 
-    obj_b.vel = (
-        obj_b.vel[0] + m_scale_2 * unit_dist_x,
-        obj_b.vel[1] + m_scale_2 * unit_dist_y,
-    )
+#     obj_b.vel = (
+#         obj_b.vel[0] + m_scale_2 * unit_dist_x,
+#         obj_b.vel[1] + m_scale_2 * unit_dist_y,
+#     )
 
 
-def circle_line_vel(obj_a, obj_b, line_b, rv_x, rv_y):
+def circle_line_vel(obj_a, a_part, obj_b, line_b, rv_x, rv_y):
     ln_a = line_b.y2 - line_b.y1
     ln_b = line_b.x1 - line_b.x2  # always positive
     ln_sq = ln_a * ln_a + ln_b * ln_b
