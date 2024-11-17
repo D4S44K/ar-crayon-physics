@@ -11,16 +11,27 @@ global_j = 0
 debug_info_list = []
 
 
+def my_sqrt(x):
+    if x < 0:
+        print(f"WARN: sqrt({x})")
+        return 0
+    return sqrt(x)
+
+
 def merge_coll_info(c_list):
     does_col = False
     c_time = 1.0
-    c_idx = -1
-    for i, c in enumerate(c_list):
-        if c[0] and 0 <= c[1] < c_time:
+    ap_idx = -1
+    bp_idx = -1
+
+    for hit, col_t, ai, bi in c_list:
+        if hit and 0 <= col_t < c_time:
             does_col = True
-            c_time = c[1]
-            c_idx = i
-    return does_col, c_time, c_idx
+            c_time = col_t
+            ap_idx = ai
+            bp_idx = bi
+
+    return does_col, c_time, ap_idx, bp_idx
 
 
 def debug_col_time_update(time_diff):
@@ -38,50 +49,49 @@ def debug_set(obj_i, obj_j):
     df.to_csv("result/debug_col.csv")
 
 
-def when_does_collide(
-    obj_i, obj_j
+def get_earliest_collision(
+    obj_a, obj_b
 ):  # return (does_collide, (time_to_collide, i_part, j_part))
-    debug_set(obj_i, obj_j)
-    if obj_i.static and obj_j.static:
+    debug_set(obj_a, obj_b)
+    if obj_a.static and obj_b.static:
         return False, (1.0, 0, 0)
-    do_swap = obj_i.shape_type > obj_j.shape_type
-    if do_swap:
-        obj_a, obj_b = obj_j, obj_i
-    else:
-        obj_a, obj_b = obj_i, obj_j
     # always a.type <= b.type
 
     rv_x = obj_a.vel[0] - obj_b.vel[0]  # a goes to b
     rv_y = obj_a.vel[1] - obj_b.vel[1]
 
-    if obj_a.shape_type == 0:
-        (circle_a,) = get_my_parts(obj_a)
-        if obj_b.shape_type == 0:
-            (circle_b,) = get_my_parts(obj_b)
-            does_collide, t = circle_circle_collision(circle_a, circle_b, rv_x, rv_y)
-            return does_collide, (t, 0, 0)
-        elif obj_b.shape_type == 1:
-            pass
-        elif obj_b.shape_type == 2:
-            (point_b1, point_b2, line_b) = get_my_parts(obj_b)
-            # col0 = circle_point_collision(circle_a, point_b1, rv_x, rv_y)
-            # col1 = circle_point_collision(circle_a, point_b2, rv_x, rv_y)
-            col0 = circle_circle_collision(circle_a, point_b1, rv_x, rv_y)
-            col1 = circle_circle_collision(circle_a, point_b2, rv_x, rv_y)
-            col2 = circle_line_collision(circle_a, line_b, rv_x, rv_y)
-            does_collide, t, b_part = merge_coll_info([col0, col1, col2])
-            if do_swap:
-                return does_collide, (t, b_part, 0)
-            else:
-                return does_collide, (t, 0, b_part)
-    elif obj_a.shape_type == 1:  # rectangle
-        pass
-    elif obj_a.shape_type == 2:  # line
-        if obj_b.shape_type == 2:
-            # return
-            pass
+    a_parts = get_my_parts(obj_a)
+    b_parts = get_my_parts(obj_b)
 
-    raise ValueError(f"Unsupported shape type {obj_a.shape_type} or {obj_b.shape_type}")
+    col_info_list = []
+    for ap_idx, a_part in enumerate(a_parts):
+        for bp_idx, b_part in enumerate(b_parts):
+            hit, col_t = get_collision(a_part, b_part, rv_x, rv_y)
+            col_info_list.append((hit, col_t, ap_idx, bp_idx))
+    does_collide, t, ap_idx, bp_idx = merge_coll_info(col_info_list)
+
+    return does_collide, (t, ap_idx, bp_idx)
+
+
+def get_collision(part_a, part_b, rv_x, rv_y):
+    if part_a.t == 0:
+        if part_b.t == 0:
+            return circle_circle_collision(part_a, part_b, rv_x, rv_y)
+        elif part_b.t == 1:
+            raise ValueError("No point")
+        elif part_b.t == 2:
+            return circle_line_collision(part_a, part_b, rv_x, rv_y)
+    elif part_a.t == 1:
+        raise ValueError("No point")
+    elif part_a.t == 2:
+        if part_b.t == 0:
+            return circle_line_collision(part_b, part_a, -rv_x, -rv_y)
+        elif part_b.t == 2:
+            return False, 1.0  # no line-line collision
+        else:
+            raise ValueError("No point")
+    else:
+        raise ValueError(f"Unsupported shape type {part_a.t} or {part_b.t}")
 
 
 # def circle_point_collision(circle, point, rv_x, rv_y):
@@ -145,7 +155,7 @@ def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
 
     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
-    col_t = min_dist_t - sqrt((r_sum_sq - min_dist_sq) / rv_sq)  # INSTR: div, sqrt
+    col_t = min_dist_t - my_sqrt((r_sum_sq - min_dist_sq) / rv_sq)  # INSTR: div, sqrt
 
     return True, col_t
 

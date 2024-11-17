@@ -23,14 +23,26 @@ def draw_circle(canvas, center_x, center_y, r, fill=False):
 
 
 def draw_line(canvas, start_x, start_y, end_x, end_y):
-    for hcount in range(int(start_x), int(end_x)):
-        y = start_y + (end_y - start_y) * (hcount - start_x) / (end_x - start_x)
-        canvas.set_pixel(hcount, int(y), 1)
-    sy = min(start_y, end_y)
-    ey = max(start_y, end_y)
-    for vcount in range(int(sy), int(ey)):
-        x = start_x + (end_x - start_x) * (vcount - start_y) / (end_y - start_y)
-        canvas.set_pixel(int(x), vcount, 1)
+    sx = int(start_x)
+    sy = int(start_y)
+    ex = int(end_x)
+    ey = int(end_y)
+    if sx != ex:
+        if sx > ex:
+            sx, ex = ex, sx
+            sy, ey = ey, sy
+        for hcount in range(sx, ex + 1):
+            y = sy + (ey - sy) * (hcount - sx) / (ex - sx)
+            if sy <= y <= ey or ey <= y <= sy:
+                canvas.set_pixel(hcount, int(y), 1)
+    if sy != ey:
+        if sy > ey:
+            sy, ey = ey, sy
+            sx, ex = ex, sx
+        for vcount in range(sy, ey + 1):
+            x = sx + (ex - sx) * (vcount - sy) / (ey - sy)
+            if sx <= x <= ex or ex <= x <= sx:
+                canvas.set_pixel(int(x), vcount, 1)
 
 
 def render_objects(objects, frame_idx):
@@ -41,12 +53,19 @@ def render_objects(objects, frame_idx):
         if obj.shape_type == 0:
             draw_circle(canvas, obj.pos[0], obj.pos[1], obj.size_1, obj.static)
         elif obj.shape_type == 1:
-            pass
+            sx = obj.pos[0]
+            sy = obj.pos[1]
+            ex = obj.pos[0] + obj.size_1
+            ey = obj.pos[1] + obj.size_2
+            draw_line(canvas, sx, sy, ex, sy)
+            draw_line(canvas, ex, sy, ex, ey)
+            draw_line(canvas, sx, ey, ex, ey)
+            draw_line(canvas, sx, ey, sx, sy)
         elif obj.shape_type == 2:
             start_x = obj.pos[0]
             start_y = obj.pos[1]
-            end_x = obj.size_1
-            end_y = obj.size_2
+            end_x = obj.pos[0] + obj.size_1
+            end_y = obj.pos[1] + obj.size_2
             draw_line(canvas, start_x, start_y, end_x, end_y)
         else:
             raise ValueError("Unsupported shape type")

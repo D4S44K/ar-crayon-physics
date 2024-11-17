@@ -117,12 +117,21 @@ def get_my_parts(obj):  # return tuple
         return (circle(obj.pos[0], obj.pos[1], obj.size_1),)
     elif obj.shape_type == 1:
         # point_1 = point(obj.pos[0], obj.pos[1])
-        pass
+        dx, dy = obj.size_1, obj.size_2
+        point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
+        point_2 = circle(obj.pos[0] + dx, obj.pos[1], 0.0)
+        point_3 = circle(obj.pos[0] + dx, obj.pos[1] + dy, 0.0)
+        point_4 = circle(obj.pos[0], obj.pos[1] + dy, 0.0)
+        line_1 = line(point_1.x, point_1.y, point_2.x, point_2.y)
+        line_2 = line(point_2.x, point_2.y, point_3.x, point_3.y)
+        line_3 = line(point_3.x, point_3.y, point_4.x, point_4.y)
+        line_4 = line(point_4.x, point_4.y, point_1.x, point_1.y)
+        return (point_1, point_2, point_3, point_4, line_1, line_2, line_3, line_4)
     elif obj.shape_type == 2:
         # point_1 = point(obj.pos[0], obj.pos[1])
         # point_2 = point(obj.size_1, obj.size_2)
         point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
-        point_2 = circle(obj.size_1, obj.size_2, 0.0)
+        point_2 = circle(obj.pos[0] + obj.size_1, obj.pos[1] + obj.size_2, 0.0)
         line_ = line(point_1.x, point_1.y, point_2.x, point_2.y)
         return (point_1, point_2, line_)
     else:
@@ -138,7 +147,12 @@ class DrawFrame:
     def __str__(self):
         return f"DrawFrame {self.name}"
 
-    def set_pixel(self, x, y, value):
+    def set_pixel(self, x, y, value, check=True):
+        if check:
+            if x < 0 or x >= WIDTH:
+                return
+            if y < 0 or y >= HEIGHT:
+                return
         self.image.putpixel((x, y), value)
 
     def get_pixel(self, x, y):

@@ -43,40 +43,33 @@ def update_acc(objects):
             obj.acc = (0.0, GRAVITY)
 
 
-def update_collision_vel(obj_i, obj_j, ip_idx, jp_idx):
-    debug_set(obj_i, obj_j)
+def update_collision_vel(obj_a, obj_b, ap_idx, bp_idx):
+    debug_set(obj_a, obj_b)
 
-    do_swap = obj_i.shape_type > obj_j.shape_type
-    if do_swap:
-        obj_a, obj_b = obj_j, obj_i
-        ap_idx, bp_idx = jp_idx, ip_idx
-    else:
-        obj_a, obj_b = obj_i, obj_j
-        ap_idx, bp_idx = ip_idx, jp_idx
-    # always a.type <= b.type
     rv_x = obj_a.vel[0] - obj_b.vel[0]  # a goes to b
     rv_y = obj_a.vel[1] - obj_b.vel[1]
 
-    if obj_a.shape_type == 0:
-        a_part_list = get_my_parts(obj_a)
-        a_part = a_part_list[ap_idx]
-        if obj_b.shape_type == 0:
-            b_part_list = get_my_parts(obj_b)
-            b_part = b_part_list[bp_idx]
+    a_part_list = get_my_parts(obj_a)
+    a_part = a_part_list[ap_idx]
+    b_part_list = get_my_parts(obj_b)
+    b_part = b_part_list[bp_idx]
+
+    if a_part.t == 0:
+        if b_part.t == 0:
             circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
-        elif obj_b.shape_type == 1:
-            pass
-        elif obj_b.shape_type == 2:
-            b_part_list = get_my_parts(obj_b)
-            b_part = b_part_list[bp_idx]
-            if b_part.t == 0:
-                circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
-            else:
-                circle_line_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
-    elif obj_a.shape_type == 1:
-        pass
-    elif obj_a.shape_type == 2:
-        pass
+        elif b_part.t == 1:
+            raise ValueError("No point")
+        elif b_part.t == 2:
+            circle_line_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y)
+    elif a_part.t == 1:
+        raise ValueError("No point")
+    elif a_part.t == 2:
+        if b_part.t == 0:
+            circle_line_vel(obj_b, b_part, obj_a, a_part, -rv_x, -rv_y)
+        elif b_part.t == 2:
+            raise ValueError("No line-line collision")
+        else:
+            raise ValueError("No point")
 
 
 def get_mass_coeff(obj_a, obj_b):

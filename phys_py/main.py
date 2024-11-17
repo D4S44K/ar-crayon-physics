@@ -6,7 +6,7 @@ from simulate import (
     update_acc,
     debug_sim_time_update,
 )
-from collision import when_does_collide, debug_col_time_update
+from collision import get_earliest_collision, debug_col_time_update
 
 
 def main():
@@ -15,7 +15,7 @@ def main():
     video = ResultVideo("test")
 
     # circle at 30, 20 with radius 10
-    obj0 = PhyiscalObject(0, 0, 10.0, 0.0, 1.0, (300.0, 60.0), (3.5, -2.0))
+    obj0 = PhyiscalObject(0, 0, 10.0, 0.0, 1.0, (300.0, 60.0), (-3.2, -2.0))
     print(obj0)
 
     # circle at 100, 200 with radius 50
@@ -34,29 +34,41 @@ def main():
 
     # line from 500, 320 to 620, 240
     obj4 = PhyiscalObject(
-        4, 2, 620.0, 240.0, 1000.0, (500.0, 320.0), (0.0, 0.0), static=True
+        4, 2, 120.0, -80.0, 1000.0, (450.0, 320.0), (0.0, 0.0), static=True
     )
     print(obj4)
 
     # line on left
     obj5 = PhyiscalObject(
-        5, 2, 60.0, 280.0, 1000.0, (20.0, 250.0), (0.0, 0.0), static=True
+        5, 2, 30.0, 30.0, 1000.0, (20.0, 250.0), (0.0, 0.0), static=True
     )
     print(obj5)
 
     # line from 100, 150 to 140, 100
     obj6 = PhyiscalObject(
-        6, 2, 260.0, 100.0, 1000.0, (300.0, 150.0), (0.0, 0.0), static=True
+        6, 2, 40.0, 50.0, 1000.0, (260.0, 100.0), (0.0, 0.0), static=True
     )
     print(obj6)
 
     # line on the right top
     obj7 = PhyiscalObject(
-        7, 2, 620.0, 100.0, 1000.0, (500.0, 100.0), (0.0, 0.0), static=True
+        7, 2, 120.0, 0.0, 1000.0, (500.0, 100.0), (0.0, 0.0), static=True
     )
     print(obj7)
 
-    obj_list = [obj0, obj1, obj2, obj3, obj4, obj5, obj7]
+    # rect
+    obj8 = PhyiscalObject(
+        8, 1, 100.0, 30.0, 50.0, (250.0, 100.0), (0.0, 0.0), static=False
+    )
+    print(obj8)
+
+    # moving line
+    obj9 = PhyiscalObject(
+        9, 2, 50.0, 30.0, 0.5, (200.0, 40.0), (0.0, -10.0), static=False
+    )
+    print(obj9)
+
+    obj_list = [obj0, obj1, obj2, obj3, obj4, obj5, obj7, obj8, obj9]
 
     for fr in range(120):
         if fr % 10 == 0:
@@ -73,7 +85,7 @@ def main():
             if iterations < MAX_COL_ITER - 1:
                 for i in range(len(obj_list)):
                     for j in range(i + 1, len(obj_list)):
-                        does_collide, (t, i_part, j_part) = when_does_collide(
+                        does_collide, (t, i_part, j_part) = get_earliest_collision(
                             obj_list[i], obj_list[j]
                         )
                         if does_collide and 0 <= t < time_step:  # min time to collide
