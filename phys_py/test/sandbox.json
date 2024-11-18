@@ -1,0 +1,62 @@
+{
+  "name": "sandbox",
+  "CoR": 0.7,
+  "gravity": 1.0,
+  "frame_count": 90,
+  "objects": [
+    {
+      "shape_type": "line",
+      "mass": 10.0,
+      "position": [200.0, 200.0],
+      "velocity": [-5.0, -10.0],
+      "static": false,
+      "params": [30.0, 15.0],
+      "skip": false
+    },
+    {
+      "shape_type": "circle",
+      "mass": 25.0,
+      "position": [420.0, 200.0],
+      "velocity": [-5.0, 0.0],
+      "static": false,
+      "params": [30.0],
+      "skip": false
+    },
+    {
+      "shape_type": "circle",
+      "mass": 1000.0,
+      "position": [320.0, 300.0],
+      "velocity": [0.0, 0.0],
+      "static": true,
+      "params": [30.0],
+      "skip": false
+    },
+    {
+      "shape_type": "circle",
+      "mass": 1000.0,
+      "position": [90.0, 210.0],
+      "velocity": [0.0, 0.0],
+      "static": true,
+      "params": [15.0],
+      "skip": false
+    },
+    {
+      "shape_type": "rect",
+      "mass": 1000.0,
+      "position": [120.0, 300.0],
+      "velocity": [0.0, 0.0],
+      "static": true,
+      "params": [32.0, 80.0],
+      "skip": false
+    },
+    {
+      "shape_type": "rect",
+      "mass": 50.0,
+      "position": [500.0, 200.0],
+      "velocity": [-15.0, 0.0],
+      "static": false,
+      "params": [120.0, 15.0],
+      "skip": false
+    }
+  ]
+}

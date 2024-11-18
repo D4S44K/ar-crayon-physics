@@ -51,12 +51,12 @@ def render_objects(objects, frame_idx):
     for obj in objects:
         # print(f"Rendering object {obj.index}")
         if obj.shape_type == 0:
-            draw_circle(canvas, obj.pos[0], obj.pos[1], obj.size_1, obj.static)
+            draw_circle(canvas, obj.pos[0], obj.pos[1], obj.params[0], obj.static)
         elif obj.shape_type == 1:
             sx = obj.pos[0]
             sy = obj.pos[1]
-            ex = obj.pos[0] + obj.size_1
-            ey = obj.pos[1] + obj.size_2
+            ex = obj.pos[0] + obj.params[0]
+            ey = obj.pos[1] + obj.params[1]
             draw_line(canvas, sx, sy, ex, sy)
             draw_line(canvas, ex, sy, ex, ey)
             draw_line(canvas, sx, ey, ex, ey)
@@ -64,8 +64,8 @@ def render_objects(objects, frame_idx):
         elif obj.shape_type == 2:
             start_x = obj.pos[0]
             start_y = obj.pos[1]
-            end_x = obj.pos[0] + obj.size_1
-            end_y = obj.pos[1] + obj.size_2
+            end_x = obj.pos[0] + obj.params[0]
+            end_y = obj.pos[1] + obj.params[1]
             draw_line(canvas, start_x, start_y, end_x, end_y)
         else:
             raise ValueError("Unsupported shape type")

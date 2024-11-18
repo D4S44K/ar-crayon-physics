@@ -26,17 +26,15 @@ class PhyiscalObject:
         self,
         index,
         shape_type,
-        size_1,
-        size_2,
         mass,
         position,
         velocity,
         static=False,
+        params=(),
     ):
         # index: [4:0]
         # shape_type: [2:0]
-        # size_1: [15:0] (16bit float)
-        # size_2: [15:0] (16bit float)
+        # params: [47:0] (16bit float x3, max)
         # mass: [7:0]
 
         # static: [0]
@@ -47,8 +45,7 @@ class PhyiscalObject:
             return None
         self.index = index
         self.shape_type = shape_type
-        self.size_1 = size_1
-        self.size_2 = size_2
+        self.params = params
 
         self.static = static
         self.mass = mass
@@ -62,11 +59,11 @@ class PhyiscalObject:
     def __str__(self):
         res = f"Object {self.index:02d} : "
         if self.shape_type == 0:
-            res += f"cicle, radius = {self.size_1}, "
+            res += f"cicle, radius = {self.params[0]}, "
         elif self.shape_type == 1:
-            res += f"rectangle, size = {2*self.size_1}x{2*self.size_2}, "
+            res += f"rectangle, size = {self.params[0]}x{self.params[1]}, "
         elif self.shape_type == 2:
-            res += f"line, vector = ({self.size_1}, {self.size_2}), "
+            res += f"line, vector = ({self.params[0]}, {self.params[1]}), "
         else:
             raise ValueError("Unknown shape type")
         res += f"mass = {self.mass}, "
@@ -114,10 +111,10 @@ class line:
 
 def get_my_parts(obj):  # return tuple
     if obj.shape_type == 0:
-        return (circle(obj.pos[0], obj.pos[1], obj.size_1),)
+        return (circle(obj.pos[0], obj.pos[1], obj.params[0]),)
     elif obj.shape_type == 1:
         # point_1 = point(obj.pos[0], obj.pos[1])
-        dx, dy = obj.size_1, obj.size_2
+        dx, dy = obj.params[0], obj.params[1]
         point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
         point_2 = circle(obj.pos[0] + dx, obj.pos[1], 0.0)
         point_3 = circle(obj.pos[0] + dx, obj.pos[1] + dy, 0.0)
@@ -128,10 +125,8 @@ def get_my_parts(obj):  # return tuple
         line_4 = line(point_4.x, point_4.y, point_1.x, point_1.y)
         return (point_1, point_2, point_3, point_4, line_1, line_2, line_3, line_4)
     elif obj.shape_type == 2:
-        # point_1 = point(obj.pos[0], obj.pos[1])
-        # point_2 = point(obj.size_1, obj.size_2)
         point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
-        point_2 = circle(obj.pos[0] + obj.size_1, obj.pos[1] + obj.size_2, 0.0)
+        point_2 = circle(obj.pos[0] + obj.params[0], obj.pos[1] + obj.params[1], 0.0)
         line_ = line(point_1.x, point_1.y, point_2.x, point_2.y)
         return (point_1, point_2, line_)
     else:
