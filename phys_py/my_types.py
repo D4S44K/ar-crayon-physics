@@ -61,7 +61,7 @@ class PhyiscalObject:
         if self.shape_type == 0:
             res += f"cicle, radius = {self.params[0]}, "
         elif self.shape_type == 1:
-            res += f"rectangle, size = {self.params[0]}x{self.params[1]}, "
+            res += f"rectangle, vector = ({self.params[0]}, {self.params[1]}),  (?, {self.params[2]}), "
         elif self.shape_type == 2:
             res += f"line, vector = ({self.params[0]}, {self.params[1]}), "
         else:
@@ -114,11 +114,14 @@ def get_my_parts(obj):  # return tuple
         return (circle(obj.pos[0], obj.pos[1], obj.params[0]),)
     elif obj.shape_type == 1:
         # point_1 = point(obj.pos[0], obj.pos[1])
-        dx, dy = obj.params[0], obj.params[1]
-        point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
-        point_2 = circle(obj.pos[0] + dx, obj.pos[1], 0.0)
-        point_3 = circle(obj.pos[0] + dx, obj.pos[1] + dy, 0.0)
-        point_4 = circle(obj.pos[0], obj.pos[1] + dy, 0.0)
+        px, py = obj.pos[0], obj.pos[1]
+        dx1, dy1 = obj.params[0], obj.params[1]
+        dy2 = obj.params[2]
+        dx2 = -dy1 / dx1 * dy2
+        point_1 = circle(px, py, 0.0)
+        point_2 = circle(px + dx1, py + dy1, 0.0)
+        point_3 = circle(px + dx1 + dx2, py + dy1 + dy2, 0.0)
+        point_4 = circle(px + dx2, py + dy2, 0.0)
         line_1 = line(point_1.x, point_1.y, point_2.x, point_2.y)
         line_2 = line(point_2.x, point_2.y, point_3.x, point_3.y)
         line_3 = line(point_3.x, point_3.y, point_4.x, point_4.y)

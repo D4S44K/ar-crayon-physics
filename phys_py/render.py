@@ -53,14 +53,17 @@ def render_objects(objects, frame_idx):
         if obj.shape_type == 0:
             draw_circle(canvas, obj.pos[0], obj.pos[1], obj.params[0], obj.static)
         elif obj.shape_type == 1:
-            sx = obj.pos[0]
-            sy = obj.pos[1]
-            ex = obj.pos[0] + obj.params[0]
-            ey = obj.pos[1] + obj.params[1]
-            draw_line(canvas, sx, sy, ex, sy)
-            draw_line(canvas, ex, sy, ex, ey)
-            draw_line(canvas, sx, ey, ex, ey)
-            draw_line(canvas, sx, ey, sx, sy)
+            dx1, dy1 = obj.params[0], obj.params[1]
+            dy2 = obj.params[2]
+            dx2 = -dy1 / dx1 * dy2
+            px1, py1 = obj.pos[0], obj.pos[1]
+            px2, py2 = px1 + dx1, py1 + dy1
+            px3, py3 = px2 + dx2, py2 + dy2
+            px4, py4 = px1 + dx2, py1 + dy2
+            draw_line(canvas, px1, py1, px2, py2)
+            draw_line(canvas, px2, py2, px3, py3)
+            draw_line(canvas, px3, py3, px4, py4)
+            draw_line(canvas, px4, py4, px1, py1)
         elif obj.shape_type == 2:
             start_x = obj.pos[0]
             start_y = obj.pos[1]
