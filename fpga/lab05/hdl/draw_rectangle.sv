@@ -18,7 +18,7 @@ module draw_rectangle #(
   logic[10:0] x_2;
   logic[9:0] y_2;
 
-  logic in_sprite;
+  logic in_rect;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
@@ -34,12 +34,12 @@ module draw_rectangle #(
         y_2 <= (y_in_1 >= y_in_2) ? y_in_1 : y_in_2;
 
         // stage 2
-        in_sprite <= ((hcount_in >= x_1 && hcount_in < x_2) &&
+        in_rect <= ((hcount_in >= x_1 && hcount_in < x_2) &&
                       (vcount_in >= y_1 && vcount_in < y_2));
     end
   end
 
-  assign red_out =    in_sprite ? COLOR[23:16] : 0;
-  assign green_out =  in_sprite ? COLOR[15:8] : 0;
-  assign blue_out =   in_sprite ? COLOR[7:0] : 0;
+  assign red_out =    in_rect ? COLOR[23:16] : 0;
+  assign green_out =  in_rect ? COLOR[15:8] : 0;
+  assign blue_out =   in_rect ? COLOR[7:0] : 0;
 endmodule

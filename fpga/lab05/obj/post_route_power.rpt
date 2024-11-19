@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 -------------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version     : Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-| Date             : Mon Nov 18 15:58:05 2024
-| Host             : eecs-digital-12 running 64-bit Ubuntu 24.04.1 LTS
+| Date             : Mon Nov 18 21:37:18 2024
+| Host             : eecs-digital-05 running 64-bit Ubuntu 24.04.1 LTS
 | Command          : report_power -file obj/post_route_power.rpt
 | Design           : top_level
 | Device           : xc7s50csga324-1
@@ -30,14 +30,14 @@ Table of Contents
 ----------
 
 +--------------------------+--------------+
-| Total On-Chip Power (W)  | 0.476        |
+| Total On-Chip Power (W)  | 0.475        |
 | Design Power Budget (W)  | Unspecified* |
 | Power Budget Margin (W)  | NA           |
-| Dynamic (W)              | 0.402        |
+| Dynamic (W)              | 0.401        |
 | Device Static (W)        | 0.074        |
 | Effective TJA (C/W)      | 4.9          |
-| Max Ambient (C)          | 82.6         |
-| Junction Temperature (C) | 27.4         |
+| Max Ambient (C)          | 82.7         |
+| Junction Temperature (C) | 27.3         |
 | Confidence Level         | Low          |
 | Setting File             | ---          |
 | Simulation Activity File | ---          |
@@ -52,22 +52,22 @@ Table of Contents
 +-------------------------+-----------+----------+-----------+-----------------+
 | On-Chip                 | Power (W) | Used     | Available | Utilization (%) |
 +-------------------------+-----------+----------+-----------+-----------------+
-| Clocks                  |     0.011 |       10 |       --- |             --- |
-| Slice Logic             |     0.009 |     3519 |       --- |             --- |
-|   LUT as Logic          |     0.009 |     1275 |     32600 |            3.91 |
-|   CARRY4                |    <0.001 |      176 |      8150 |            2.16 |
-|   Register              |    <0.001 |     1152 |     65200 |            1.77 |
+| Clocks                  |     0.012 |       10 |       --- |             --- |
+| Slice Logic             |     0.008 |     3868 |       --- |             --- |
+|   LUT as Logic          |     0.008 |     1424 |     32600 |            4.37 |
+|   CARRY4                |    <0.001 |      230 |      8150 |            2.82 |
+|   Register              |    <0.001 |     1189 |     65200 |            1.82 |
 |   LUT as Shift Register |    <0.001 |       41 |      9600 |            0.43 |
-|   F7/F8 Muxes           |    <0.001 |       27 |     32600 |            0.08 |
-|   Others                |     0.000 |      185 |       --- |             --- |
-| Signals                 |     0.012 |     2637 |       --- |             --- |
+|   F7/F8 Muxes           |    <0.001 |       29 |     32600 |            0.09 |
+|   Others                |     0.000 |      187 |       --- |             --- |
+| Signals                 |     0.010 |     2837 |       --- |             --- |
 | Block RAM               |     0.012 |     28.5 |        75 |           38.00 |
 | MMCM                    |     0.105 |        1 |         5 |           20.00 |
 | PLL                     |     0.101 |        1 |         5 |           20.00 |
-| DSPs                    |     0.005 |        9 |       120 |            7.50 |
-| I/O                     |     0.147 |       74 |       210 |           35.24 |
+| DSPs                    |     0.007 |       11 |       120 |            9.17 |
+| I/O                     |     0.145 |       74 |       210 |           35.24 |
 | Static Power            |     0.074 |          |           |                 |
-| Total                   |     0.476 |          |           |                 |
+| Total                   |     0.475 |          |           |                 |
 +-------------------------+-----------+----------+-----------+-----------------+
 
 
@@ -77,9 +77,9 @@ Table of Contents
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
 | Source    | Voltage (V) | Total (A) | Dynamic (A) | Static (A) | Powerup (A) | Budget (A)  | Margin (A) |
 +-----------+-------------+-----------+-------------+------------+-------------+-------------+------------+
-| Vccint    |       1.000 |     0.067 |       0.056 |      0.011 |       NA    | Unspecified | NA         |
+| Vccint    |       1.000 |     0.068 |       0.057 |      0.011 |       NA    | Unspecified | NA         |
 | Vccaux    |       1.800 |     0.124 |       0.112 |      0.013 |       NA    | Unspecified | NA         |
-| Vcco33    |       3.300 |     0.045 |       0.044 |      0.001 |       NA    | Unspecified | NA         |
+| Vcco33    |       3.300 |     0.044 |       0.043 |      0.001 |       NA    | Unspecified | NA         |
 | Vcco25    |       2.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco18    |       1.800 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
 | Vcco15    |       1.500 |     0.000 |       0.000 |      0.000 |       NA    | Unspecified | NA         |
@@ -148,26 +148,26 @@ Table of Contents
 3.1 By Hierarchy
 ----------------
 
-+---------------------------------+-----------+
-| Name                            | Power (W) |
-+---------------------------------+-----------+
-| top_level                       |     0.402 |
-|   IOBUF_sda                     |     0.003 |
-|   ch_red_pipeline_ps8           |     0.006 |
-|   circle                        |     0.003 |
-|   circle_blue_pipeline_ps9      |     0.002 |
-|   com_m                         |     0.001 |
-|   com_m_2                       |     0.001 |
-|   crw                           |     0.004 |
-|     sccb_c                      |     0.002 |
-|   frame_buffer                  |     0.014 |
-|     U0                          |     0.014 |
-|       inst_blk_mem_gen          |     0.014 |
-|   nolabel_line105               |     0.001 |
-|   rgbtoycrcb_m                  |     0.004 |
-|   selected_channel_pipeline_ps5 |     0.002 |
-|   wizard_hdmi                   |     0.105 |
-|   wizard_migcam                 |     0.102 |
-+---------------------------------+-----------+
++--------------------------+-----------+
+| Name                     | Power (W) |
++--------------------------+-----------+
+| top_level                |     0.401 |
+|   IOBUF_sda              |     0.003 |
+|   circle                 |     0.003 |
+|   com_m                  |     0.002 |
+|   com_m_2                |     0.001 |
+|   crw                    |     0.004 |
+|     sccb_c               |     0.003 |
+|   fb_green_pipeline_ps2  |     0.002 |
+|   frame_buffer           |     0.014 |
+|     U0                   |     0.014 |
+|       inst_blk_mem_gen   |     0.014 |
+|   line                   |     0.005 |
+|   nolabel_line105        |     0.001 |
+|   rect_blue_pipeline_ps9 |     0.002 |
+|   rgbtoycrcb_m           |     0.004 |
+|   wizard_hdmi            |     0.105 |
+|   wizard_migcam          |     0.102 |
++--------------------------+-----------+
 
 

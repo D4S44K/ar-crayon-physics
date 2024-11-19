@@ -506,22 +506,22 @@ module top_level
     .blue_out(circle_blue));
 
 
-  // draw_line #(
-  //   .WIDTH(256),
-  //   .HEIGHT(256),
-  //   .COLOR(24'hFF_FF_FF))
-  //   line (
-  //   .clk_in(clk_pixel),
-  //   .rst_in(sys_rst_pixel),
-  //   .hcount_in(hcount_delayed_ps1),
-  //   .vcount_in(vcount_delayed_ps1),
-  //   .x_in_1(x_com),
-  //   .y_in_1(y_com),
-  //   .x_in_2(x_com_2),
-  //   .y_in_2(y_com_2),
-  //   .red_out(line_red),
-  //   .green_out(line_green),
-  //   .blue_out(line_blue));
+  draw_line #(
+    .WIDTH(256),
+    .HEIGHT(256),
+    .COLOR(24'hFF_FF_FF))
+    line (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst_pixel),
+    .hcount_in(hcount_delayed_ps1),
+    .vcount_in(vcount_delayed_ps1),
+    .x_in_1(x_com),
+    .y_in_1(y_com),
+    .x_in_2(x_com_2),
+    .y_in_2(y_com_2),
+    .red_out(line_red),
+    .green_out(line_green),
+    .blue_out(line_blue));
 
 
 
@@ -713,6 +713,36 @@ module top_level
     .delayed_signal(circle_blue_delayed_ps9)
   );
 
+  logic [7:0] line_red_delayed_ps9;
+  pipeline #(
+    .WIDTH(8), .STAGES(4))
+    line_red_pipeline_ps9(
+    .clk_pixel(clk_pixel),
+    .signal(line_red),
+    //.stages(4),
+    .delayed_signal(line_red_delayed_ps9)
+  );
+
+  logic [7:0] line_green_delayed_ps9;
+  pipeline #(
+    .WIDTH(8), .STAGES(4))
+    line_green_pipeline_ps9(
+    .clk_pixel(clk_pixel),
+    .signal(line_green),
+    //.stages(4),
+    .delayed_signal(line_green_delayed_ps9)
+  );
+
+  logic [7:0] line_blue_delayed_ps9;
+  pipeline #(
+    .WIDTH(8), .STAGES(4))
+    line_blue_pipeline_ps9(
+    .clk_pixel(clk_pixel),
+    .signal(line_blue),
+    //.stages(4),
+    .delayed_signal(line_blue_delayed_ps9)
+  );
+
   video_mux mvm(
     .bg_in(display_choice), //choose background
     .target_in(target_choice), //choose target
@@ -723,6 +753,7 @@ module top_level
     .crosshair_in({ch_red_delayed_ps8, ch_green_delayed_ps8, ch_blue_delayed_ps8}), //TODO: needs (PS8)
     .rect_pixel_in({rect_red_delayed_ps9, rect_green_delayed_ps9, rect_blue_delayed_ps9}), //TODO: needs (PS9) maybe?
     .circle_pixel_in({circle_red_delayed_ps9, circle_green_delayed_ps9, circle_blue_delayed_ps9}),
+    .line_pixel_in({line_red_delayed_ps9, line_green_delayed_ps9, line_blue_delayed_ps9}),
     .pixel_out({red,green,blue}) //output to tmds
   );
 

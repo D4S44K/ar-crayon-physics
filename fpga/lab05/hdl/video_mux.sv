@@ -10,6 +10,7 @@ module video_mux (
   input wire thresholded_pixel_in, //
   input wire [23:0] rect_pixel_in,
   input wire [23:0] circle_pixel_in,
+  input wire [23:0] line_pixel_in,
   input wire crosshair_in,
   output logic [23:0] pixel_out
 );
@@ -31,7 +32,8 @@ module video_mux (
   always_comb begin
     case (bg_in)
       2'b00: l_1 = camera_pixel_in;
-      2'b01: l_1 = {channel_in, channel_in, channel_in};
+      // 2'b01: l_1 = {channel_in, channel_in, channel_in};
+      2'b01: l_1 = (thresholded_pixel_in !=0)?24'hFFFFFF:24'h000000;
       2'b10: l_1 = (thresholded_pixel_in !=0)?24'hFFFFFF:24'h000000;
       2'b11: l_1 = (thresholded_pixel_in !=0)?24'hFFFFFF:24'h000000;
     endcase
@@ -41,7 +43,7 @@ module video_mux (
   always_comb begin
     case (target_in)
       2'b00: l_2 = l_1;
-      2'b01: l_2 = crosshair_in? 24'h00FF00:l_1;
+      2'b01: l_2 = (line_pixel_in >0)?line_pixel_in:l_1;
       2'b10: l_2 = (rect_pixel_in >0)?rect_pixel_in:l_1;
       2'b11: l_2 = (circle_pixel_in >0)?circle_pixel_in:l_1;
     endcase

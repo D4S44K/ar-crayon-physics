@@ -25,7 +25,7 @@ module draw_circle #(
   logic[10:0] x_diff;
   logic[9:0] y_diff;
 
-  logic in_sprite;
+  logic in_circle;
 
   logic[31:0] x_prod;
   logic[31:0] y_prod;
@@ -59,11 +59,11 @@ module draw_circle #(
         radius_prod <= (radius * radius);
 
         // stage 5
-        in_sprite <= (x_prod + y_prod <= radius_prod);
+        in_circle <= (x_prod + y_prod <= radius_prod);
     end
   end
 
-  assign red_out =    in_sprite ? COLOR[23:16] : 0;
-  assign green_out =  in_sprite ? COLOR[15:8] : 0;
-  assign blue_out =   in_sprite ? COLOR[7:0] : 0;
+  assign red_out =    in_circle ? COLOR[23:16] : 0;
+  assign green_out =  in_circle ? COLOR[15:8] : 0;
+  assign blue_out =   in_circle ? COLOR[7:0] : 0;
 endmodule
