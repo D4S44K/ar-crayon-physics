@@ -8,94 +8,153 @@
 :vpi_module "/opt/homebrew/Cellar/icarus-verilog/12.0/lib/ivl/v2005_math.vpi";
 :vpi_module "/opt/homebrew/Cellar/icarus-verilog/12.0/lib/ivl/va_math.vpi";
 :vpi_module "/opt/homebrew/Cellar/icarus-verilog/12.0/lib/ivl/v2009.vpi";
-S_0x137609890 .scope package, "$unit" "$unit" 2 1;
+S_0x15bf05ba0 .scope package, "$unit" "$unit" 2 1;
  .timescale -9 -12;
-S_0x13760bdb0 .scope module, "draw_rectangle" "draw_rectangle" 3 1;
+S_0x15bf0bad0 .scope module, "sqrt" "sqrt" 3 4;
  .timescale -9 -12;
-    .port_info 0 /INPUT 11 "hcount_in";
-    .port_info 1 /INPUT 10 "vcount_in";
-    .port_info 2 /INPUT 11 "x_in_1";
-    .port_info 3 /INPUT 10 "y_in_1";
-    .port_info 4 /INPUT 11 "x_in_2";
-    .port_info 5 /INPUT 10 "y_in_2";
-    .port_info 6 /OUTPUT 8 "red_out";
-    .port_info 7 /OUTPUT 8 "green_out";
-    .port_info 8 /OUTPUT 8 "blue_out";
-P_0x13760b5f0 .param/l "COLOR" 0 3 2, C4<111111111111111111111111>;
-P_0x13760b630 .param/l "HEIGHT" 0 3 2, +C4<00000000000000000000000010000000>;
-P_0x13760b670 .param/l "WIDTH" 0 3 2, +C4<00000000000000000000000010000000>;
-L_0x13761db10 .functor AND 1, L_0x13761d990, L_0x13761da30, C4<1>, C4<1>;
-L_0x13761de00 .functor AND 1, L_0x13761dc00, L_0x13761dce0, C4<1>, C4<1>;
-L_0x13761def0 .functor AND 1, L_0x13761db10, L_0x13761de00, C4<1>, C4<1>;
-v0x13760a190_0 .net *"_ivl_0", 0 0, L_0x13761d0d0;  1 drivers
-v0x13761bb50_0 .net *"_ivl_12", 0 0, L_0x13761d750;  1 drivers
-v0x13761bbf0_0 .net *"_ivl_16", 0 0, L_0x13761d990;  1 drivers
-v0x13761bc80_0 .net *"_ivl_18", 0 0, L_0x13761da30;  1 drivers
-v0x13761bd20_0 .net *"_ivl_21", 0 0, L_0x13761db10;  1 drivers
-v0x13761be00_0 .net *"_ivl_22", 0 0, L_0x13761dc00;  1 drivers
-v0x13761bea0_0 .net *"_ivl_24", 0 0, L_0x13761dce0;  1 drivers
-v0x13761bf40_0 .net *"_ivl_27", 0 0, L_0x13761de00;  1 drivers
-L_0x108040010 .functor BUFT 1, C4<11111111>, C4<0>, C4<0>, C4<0>;
-v0x13761bfe0_0 .net/2u *"_ivl_30", 7 0, L_0x108040010;  1 drivers
-L_0x108040058 .functor BUFT 1, C4<00000000>, C4<0>, C4<0>, C4<0>;
-v0x13761c0f0_0 .net/2u *"_ivl_32", 7 0, L_0x108040058;  1 drivers
-L_0x1080400a0 .functor BUFT 1, C4<11111111>, C4<0>, C4<0>, C4<0>;
-v0x13761c1a0_0 .net/2u *"_ivl_36", 7 0, L_0x1080400a0;  1 drivers
-L_0x1080400e8 .functor BUFT 1, C4<00000000>, C4<0>, C4<0>, C4<0>;
-v0x13761c250_0 .net/2u *"_ivl_38", 7 0, L_0x1080400e8;  1 drivers
-v0x13761c300_0 .net *"_ivl_4", 0 0, L_0x13761d290;  1 drivers
-L_0x108040130 .functor BUFT 1, C4<11111111>, C4<0>, C4<0>, C4<0>;
-v0x13761c3a0_0 .net/2u *"_ivl_42", 7 0, L_0x108040130;  1 drivers
-L_0x108040178 .functor BUFT 1, C4<00000000>, C4<0>, C4<0>, C4<0>;
-v0x13761c450_0 .net/2u *"_ivl_44", 7 0, L_0x108040178;  1 drivers
-v0x13761c500_0 .net *"_ivl_8", 0 0, L_0x13761d4d0;  1 drivers
-v0x13761c5a0_0 .net "blue_out", 7 0, L_0x13761e310;  1 drivers
-v0x13761c730_0 .net "green_out", 7 0, L_0x13761e1b0;  1 drivers
-o0x108008370 .functor BUFZ 11, C4<zzzzzzzzzzz>; HiZ drive
-v0x13761c7c0_0 .net "hcount_in", 10 0, o0x108008370;  0 drivers
-v0x13761c870_0 .net "in_sprite", 0 0, L_0x13761def0;  1 drivers
-v0x13761c910_0 .net "red_out", 7 0, L_0x13761e000;  1 drivers
-o0x108008400 .functor BUFZ 10, C4<zzzzzzzzzz>; HiZ drive
-v0x13761c9c0_0 .net "vcount_in", 9 0, o0x108008400;  0 drivers
-v0x13761ca70_0 .net "x_1", 10 0, L_0x13761d170;  1 drivers
-v0x13761cb20_0 .net "x_2", 10 0, L_0x13761d570;  1 drivers
-o0x108008490 .functor BUFZ 11, C4<zzzzzzzzzzz>; HiZ drive
-v0x13761cbd0_0 .net "x_in_1", 10 0, o0x108008490;  0 drivers
-o0x1080084c0 .functor BUFZ 11, C4<zzzzzzzzzzz>; HiZ drive
-v0x13761cc80_0 .net "x_in_2", 10 0, o0x1080084c0;  0 drivers
-v0x13761cd30_0 .net "y_1", 9 0, L_0x13761d350;  1 drivers
-v0x13761cde0_0 .net "y_2", 9 0, L_0x13761d7f0;  1 drivers
-o0x108008550 .functor BUFZ 10, C4<zzzzzzzzzz>; HiZ drive
-v0x13761ce90_0 .net "y_in_1", 9 0, o0x108008550;  0 drivers
-o0x108008580 .functor BUFZ 10, C4<zzzzzzzzzz>; HiZ drive
-v0x13761cf40_0 .net "y_in_2", 9 0, o0x108008580;  0 drivers
-L_0x13761d0d0 .cmp/ge 11, o0x1080084c0, o0x108008490;
-L_0x13761d170 .functor MUXZ 11, o0x1080084c0, o0x108008490, L_0x13761d0d0, C4<>;
-L_0x13761d290 .cmp/ge 10, o0x108008580, o0x108008550;
-L_0x13761d350 .functor MUXZ 10, o0x108008580, o0x108008550, L_0x13761d290, C4<>;
-L_0x13761d4d0 .cmp/ge 11, o0x108008490, o0x1080084c0;
-L_0x13761d570 .functor MUXZ 11, o0x1080084c0, o0x108008490, L_0x13761d4d0, C4<>;
-L_0x13761d750 .cmp/ge 10, o0x108008550, o0x108008580;
-L_0x13761d7f0 .functor MUXZ 10, o0x108008580, o0x108008550, L_0x13761d750, C4<>;
-L_0x13761d990 .cmp/ge 11, o0x108008370, L_0x13761d170;
-L_0x13761da30 .cmp/gt 11, L_0x13761d570, o0x108008370;
-L_0x13761dc00 .cmp/ge 10, o0x108008400, L_0x13761d350;
-L_0x13761dce0 .cmp/gt 10, L_0x13761d7f0, o0x108008400;
-L_0x13761e000 .functor MUXZ 8, L_0x108040058, L_0x108040010, L_0x13761def0, C4<>;
-L_0x13761e1b0 .functor MUXZ 8, L_0x1080400e8, L_0x1080400a0, L_0x13761def0, C4<>;
-L_0x13761e310 .functor MUXZ 8, L_0x108040178, L_0x108040130, L_0x13761def0, C4<>;
-S_0x13760bf20 .scope module, "cocotb_iverilog_dump" "cocotb_iverilog_dump" 4 1;
+    .port_info 0 /INPUT 1 "clk_in";
+    .port_info 1 /INPUT 1 "rst_in";
+    .port_info 2 /INPUT 32 "input_val";
+    .port_info 3 /OUTPUT 32 "result";
+P_0x15bf05fd0 .param/l "FRACTIONAL_BITS" 0 3 5, +C4<00000000000000000000000000001011>;
+P_0x15bf06010 .param/l "INTEGER_BITS" 0 3 5, +C4<00000000000000000000000000010100>;
+v0x15bf10af0_0 .var "check", 0 0;
+o0x160040040 .functor BUFZ 1, C4<z>; HiZ drive
+v0x15bf20790_0 .net "clk_in", 0 0, o0x160040040;  0 drivers
+v0x15bf20830_0 .var "closest_result", 31 0;
+v0x15bf208d0_0 .var "high", 31 0;
+o0x1600400d0 .functor BUFZ 32, C4<zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz>; HiZ drive
+v0x15bf20980_0 .net "input_val", 31 0, o0x1600400d0;  0 drivers
+v0x15bf20a70_0 .var "low", 31 0;
+v0x15bf20b20_0 .var "mid", 31 0;
+v0x15bf20bd0_0 .var "mid_calc", 0 0;
+v0x15bf20c70_0 .var "result", 31 0;
+o0x1600401c0 .functor BUFZ 1, C4<z>; HiZ drive
+v0x15bf20d80_0 .net "rst_in", 0 0, o0x1600401c0;  0 drivers
+v0x15bf20e20_0 .var "square", 31 0;
+v0x15bf20ed0_0 .var "square_calc", 0 0;
+E_0x15bf0bdb0 .event posedge, v0x15bf20790_0;
+S_0x15bf0bc40 .scope module, "cocotb_iverilog_dump" "cocotb_iverilog_dump" 4 1;
  .timescale -9 -12;
-    .scope S_0x13760bf20;
+    .scope S_0x15bf0bad0;
 T_0 ;
-    %vpi_call/w 4 3 "$dumpfile", "/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/sim_build/draw_rectangle.fst" {0 0 0};
-    %vpi_call/w 4 4 "$dumpvars", 32'sb00000000000000000000000000000000, S_0x13760bdb0 {0 0 0};
-    %end;
+    %wait E_0x15bf0bdb0;
+    %load/vec4 v0x15bf20d80_0;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.0, 8;
+    %pushi/vec4 0, 0, 32;
+    %assign/vec4 v0x15bf20a70_0, 0;
+    %load/vec4 v0x15bf20980_0;
+    %assign/vec4 v0x15bf208d0_0, 0;
+    %pushi/vec4 0, 0, 32;
+    %assign/vec4 v0x15bf20c70_0, 0;
+    %pushi/vec4 0, 0, 32;
+    %assign/vec4 v0x15bf20830_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+    %pushi/vec4 1, 0, 1;
+    %assign/vec4 v0x15bf20bd0_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf20ed0_0, 0;
+    %jmp T_0.1;
+T_0.0 ;
+    %load/vec4 v0x15bf20bd0_0;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.2, 8;
+    %load/vec4 v0x15bf20a70_0;
+    %load/vec4 v0x15bf208d0_0;
+    %add;
+    %ix/load 4, 1, 0;
+    %flag_set/imm 4, 0;
+    %shiftr 4;
+    %assign/vec4 v0x15bf20b20_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf20bd0_0, 0;
+    %pushi/vec4 1, 0, 1;
+    %assign/vec4 v0x15bf20ed0_0, 0;
+    %jmp T_0.3;
+T_0.2 ;
+    %load/vec4 v0x15bf20ed0_0;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.4, 8;
+    %load/vec4 v0x15bf20b20_0;
+    %load/vec4 v0x15bf20b20_0;
+    %mul;
+    %ix/load 4, 11, 0;
+    %flag_set/imm 4, 0;
+    %shiftr 4;
+    %assign/vec4 v0x15bf20e20_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf20ed0_0, 0;
+    %pushi/vec4 1, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+    %jmp T_0.5;
+T_0.4 ;
+    %load/vec4 v0x15bf10af0_0;
+    %flag_set/vec4 8;
+    %jmp/0xz  T_0.6, 8;
+    %load/vec4 v0x15bf20a70_0;
+    %load/vec4 v0x15bf208d0_0;
+    %cmp/u;
+    %flag_or 5, 4;
+    %jmp/0xz  T_0.8, 5;
+    %load/vec4 v0x15bf20e20_0;
+    %load/vec4 v0x15bf20980_0;
+    %cmp/e;
+    %jmp/0xz  T_0.10, 4;
+    %load/vec4 v0x15bf20b20_0;
+    %assign/vec4 v0x15bf20c70_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+    %jmp T_0.11;
+T_0.10 ;
+    %load/vec4 v0x15bf20e20_0;
+    %load/vec4 v0x15bf20980_0;
+    %cmp/u;
+    %jmp/0xz  T_0.12, 5;
+    %load/vec4 v0x15bf20b20_0;
+    %addi 1, 0, 32;
+    %assign/vec4 v0x15bf20a70_0, 0;
+    %load/vec4 v0x15bf20b20_0;
+    %assign/vec4 v0x15bf20830_0, 0;
+    %pushi/vec4 1, 0, 1;
+    %assign/vec4 v0x15bf20bd0_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+    %jmp T_0.13;
+T_0.12 ;
+    %load/vec4 v0x15bf20b20_0;
+    %subi 1, 0, 32;
+    %assign/vec4 v0x15bf208d0_0, 0;
+    %pushi/vec4 1, 0, 1;
+    %assign/vec4 v0x15bf20bd0_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+T_0.13 ;
+T_0.11 ;
+    %jmp T_0.9;
+T_0.8 ;
+    %load/vec4 v0x15bf20830_0;
+    %assign/vec4 v0x15bf20c70_0, 0;
+    %pushi/vec4 0, 0, 1;
+    %assign/vec4 v0x15bf10af0_0, 0;
+T_0.9 ;
+T_0.6 ;
+T_0.5 ;
+T_0.3 ;
+T_0.1 ;
+    %jmp T_0;
     .thread T_0;
+    .scope S_0x15bf0bc40;
+T_1 ;
+    %vpi_call/w 4 3 "$dumpfile", "/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/sim_build/sqrt.fst" {0 0 0};
+    %vpi_call/w 4 4 "$dumpvars", 32'sb00000000000000000000000000000000, S_0x15bf0bad0 {0 0 0};
+    %end;
+    .thread T_1;
 # The file index is used to find the file name in the following table.
 :file_names 5;
     "N/A";
     "<interactive>";
     "-";
-    "/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/fpga/lab05/hdl/draw_rectangle.sv";
+    "/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/fpga/lab05/hdl/sqrt.sv";
     "/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/sim_build/cocotb_iverilog_dump.v";

@@ -1,8 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1731951240" />
-    <testcase name="test_draw_rectangle" classname="test_draw_rectangle" file="/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/fpga/lab05/sim/test_draw_rectangle.py" lineno="9" time="0.0011470317840576172" sim_time_ns="0.001" ratio_time="0.8718154229889836">
-      <failure message="Test failed with RANDOM_SEED=1731951240" />
-    </testcase>
+    <property name="random_seed" value="1732074982" />
+    <testcase name="test_sqrt" classname="test_sqrt" file="/Users/danielvargas/Desktop/MIT/6.205/ar-crayon-physics/fpga/lab05/sim/test_sqrt.py" lineno="16" time="0.014673948287963867" sim_time_ns="6340.001" ratio_time="432058.28966974834" />
   </testsuite>
 </testsuites>

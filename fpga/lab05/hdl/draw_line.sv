@@ -58,8 +58,8 @@ module draw_line #(
             slope_mul_1 <= vcount_diff * x_diff;
             slope_mul_2 <= hcount_diff * y_diff;
 
-            within_500_greater <= (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0;
-            within_500_less <= (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0;
+            within_500_greater <= (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 300 <= slope_mul_2 : 0;
+            within_500_less <= (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 300 >= slope_mul_2 : 0;
             in_line <= within_500_greater || within_500_less;
         end
         else begin
