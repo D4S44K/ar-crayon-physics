@@ -2,6 +2,9 @@ from my_types import *
 
 
 def draw_circle(canvas, center_x, center_y, r, fill=False):
+    center_x = center_x.get_float()
+    center_y = center_y.get_float()
+    r = r.get_float()
     rsq_down = r * r
     rsq_up = (r + 1) * (r + 1)
     for hcount in range(
@@ -23,10 +26,10 @@ def draw_circle(canvas, center_x, center_y, r, fill=False):
 
 
 def draw_line(canvas, start_x, start_y, end_x, end_y):
-    sx = int(start_x)
-    sy = int(start_y)
-    ex = int(end_x)
-    ey = int(end_y)
+    sx = int(start_x.get_float())
+    sy = int(start_y.get_float())
+    ex = int(end_x.get_float())
+    ey = int(end_y.get_float())
     if sx != ex:
         if sx > ex:
             sx, ex = ex, sx
@@ -49,13 +52,15 @@ def render_objects(objects, frame_idx):
     canvas = DrawFrame(f"frame_{frame_idx}")
     canvas.write_text(10, 10, f"Frame {frame_idx}")
     for obj in objects:
+        if not obj.active:
+            continue
         # print(f"Rendering object {obj.index}")
         if obj.shape_type == 0:
             draw_circle(canvas, obj.pos[0], obj.pos[1], obj.params[0], obj.static)
         elif obj.shape_type == 1:
             dx1, dy1 = obj.params[0], obj.params[1]
             dy2 = obj.params[2]
-            dx2 = -dy1 / dx1 * dy2
+            dx2 = (-dy1 / dx1 * dy2).to_sfix16()
             px1, py1 = obj.pos[0], obj.pos[1]
             px2, py2 = px1 + dx1, py1 + dy1
             px3, py3 = px2 + dx2, py2 + dy2

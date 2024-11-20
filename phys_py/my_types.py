@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+from primitives import SFIX16, SFIX32
 
 
 WIDTH = 640
@@ -43,18 +44,19 @@ class PhyiscalObject:
         if index >= 32:
             print("Index out of range")
             return None
+        self.active = True
         self.index = index
         self.shape_type = shape_type
-        self.params = params
+        self.params = [SFIX16(p) for p in params]
 
         self.static = static
-        self.mass = mass
-        self.pos = position
-        self.vel = velocity
+        self.mass = SFIX16(mass)
+        self.pos = (SFIX16(position[0]), SFIX16(position[1]))
+        self.vel = (SFIX16(velocity[0]), SFIX16(velocity[1]))
         if self.static:
-            self.acc = (0.0, 0.0)
+            self.acc = (SFIX16(0.0), SFIX16(0.0))
         else:
-            self.acc = (0.0, GRAVITY)
+            self.acc = (SFIX16(0.0), SFIX16(GRAVITY))
 
     def __str__(self):
         res = f"Object {self.index:02d} : "
@@ -67,12 +69,12 @@ class PhyiscalObject:
         else:
             raise ValueError("Unknown shape type")
         res += f"mass = {self.mass}, "
-        res += f"position = ({self.pos[0]:8.3f}, {self.pos[1]:8.3f}), "
+        res += f"position = ({self.pos[0]}, {self.pos[1]}), "
         if self.static:
             res += "static"
         else:
-            res += f"velocity = ({self.vel[0]:8.3f}, {self.vel[1]:8.3f}), "
-            res += f"acceleration = ({self.acc[0]:8.3f}, {self.acc[1]:8.3f})"
+            res += f"velocity = ({self.vel[0]}, {self.vel[1]}), "
+            res += f"acceleration = ({self.acc[0]}, {self.acc[1]})"
         return res
 
 
@@ -117,19 +119,21 @@ def get_my_parts(obj):  # return tuple
         px, py = obj.pos[0], obj.pos[1]
         dx1, dy1 = obj.params[0], obj.params[1]
         dy2 = obj.params[2]
-        dx2 = -dy1 / dx1 * dy2
-        point_1 = circle(px, py, 0.0)
-        point_2 = circle(px + dx1, py + dy1, 0.0)
-        point_3 = circle(px + dx1 + dx2, py + dy1 + dy2, 0.0)
-        point_4 = circle(px + dx2, py + dy2, 0.0)
+        dx2 = (-dy1 / dx1 * dy2).to_sfix16()
+        point_1 = circle(px, py, SFIX16(0.0))
+        point_2 = circle(px + dx1, py + dy1, SFIX16(0.0))
+        point_3 = circle(px + dx1 + dx2, py + dy1 + dy2, SFIX16(0.0))
+        point_4 = circle(px + dx2, py + dy2, SFIX16(0.0))
         line_1 = line(point_1.x, point_1.y, point_2.x, point_2.y)
         line_2 = line(point_2.x, point_2.y, point_3.x, point_3.y)
         line_3 = line(point_3.x, point_3.y, point_4.x, point_4.y)
         line_4 = line(point_4.x, point_4.y, point_1.x, point_1.y)
         return (point_1, point_2, point_3, point_4, line_1, line_2, line_3, line_4)
     elif obj.shape_type == 2:
-        point_1 = circle(obj.pos[0], obj.pos[1], 0.0)
-        point_2 = circle(obj.pos[0] + obj.params[0], obj.pos[1] + obj.params[1], 0.0)
+        point_1 = circle(obj.pos[0], obj.pos[1], SFIX16(0.0))
+        point_2 = circle(
+            obj.pos[0] + obj.params[0], obj.pos[1] + obj.params[1], SFIX16(0.0)
+        )
         line_ = line(point_1.x, point_1.y, point_2.x, point_2.y)
         return (point_1, point_2, line_)
     else:

@@ -6,6 +6,7 @@ from simulate import (
     update_collision_vel,
     update_acc,
     debug_sim_time_update,
+    check_inactive,
 )
 from collision import get_earliest_collision, debug_col_time_update
 
@@ -20,21 +21,25 @@ def main():
         frame = render_objects(obj_list, fr)
         video.add_frame(frame)
 
-        left_time = 1.0
+        left_time = SFIX32(1.0)
         iterations = 0
-        while left_time > FLOAT_EPS and iterations < MAX_COL_ITER:
+        while left_time > 0.0 and iterations < MAX_COL_ITER:
             collide_pair = (-1, -1)
             collide_parts = (-1, -1)
             time_step = left_time
             if iterations < MAX_COL_ITER - 1:
                 for i in range(len(obj_list)):
+                    if not obj_list[i].active:
+                        continue
                     for j in range(i + 1, len(obj_list)):
+                        if not obj_list[j].active:
+                            continue
                         does_collide, (t, i_part, j_part) = get_earliest_collision(
                             obj_list[i], obj_list[j]
                         )
-                        if does_collide and 0 <= t < time_step:  # min time to collide
+                        if does_collide and 0.0 <= t < time_step:  # min time to collide
                             print(
-                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t} after {debug_col_time_update(0)}, {does_collide}"
+                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t} after {debug_col_time_update(SFIX32(0.0))}, {does_collide}"
                             )
                             time_step = t
                             collide_pair = (i, j)
@@ -55,6 +60,7 @@ def main():
             debug_sim_time_update(time_step)
             iterations += 1
 
+        check_inactive(obj_list)
         update_acc(obj_list)
         # video.export_as_gif()
 
