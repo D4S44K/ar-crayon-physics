@@ -39,7 +39,7 @@ def main():
                         )
                         if does_collide and 0.0 <= t < time_step:  # min time to collide
                             print(
-                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t} after {debug_col_time_update(SFIX32(0.0))}, {does_collide}"
+                                f"Collision between {i}({i_part}) and {j}({j_part}) in {t.get_float()} after {debug_col_time_update(SFIX32(0.0))}"
                             )
                             time_step = t
                             collide_pair = (i, j)
@@ -59,6 +59,12 @@ def main():
             debug_col_time_update(time_step)
             debug_sim_time_update(time_step)
             iterations += 1
+
+        if left_time > 0.0:
+            print(f"!!! Skipping to next frame: {left_time.get_float()}")
+            update_pos_vel(obj_list, left_time)
+            debug_col_time_update(left_time)
+            debug_sim_time_update(left_time)
 
         check_inactive(obj_list)
         update_acc(obj_list)

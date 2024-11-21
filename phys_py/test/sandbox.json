@@ -2,15 +2,15 @@
   "name": "sandbox",
   "CoR": 0.7,
   "gravity": 1.0,
-  "frame_count": 90,
+  "frame_count": 55,
   "objects": [
     {
       "shape_type": "line",
-      "mass": 10.0,
+      "mass": 15.0,
       "position": [200.0, 200.0],
       "velocity": [-5.0, -10.0],
       "static": false,
-      "params": [30.0, 15.0],
+      "params": [30.0, -15.0],
       "skip": false
     },
     {

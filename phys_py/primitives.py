@@ -137,10 +137,10 @@ class FixedPointDecimal:
 
     def __mul__(self, other):
         check_precision(self, other)
-        if self.total_bits() > 18 or other.total_bits() > 18:
-            raise ValueError(
-                f"total bits exceed 18 in either operand. ({self.total_bits()}, {other.total_bits()})"
-            )
+        # if self.total_bits() > 18 or other.total_bits() > 18:
+        #     raise ValueError(
+        #         f"total bits exceed 18 in either operand. ({self.total_bits()}, {other.total_bits()})"
+        #     )
         res_value = self.get_float() * other.get_float()
         res = FixedPointDecimal(res_value, self.signed, self.intb * 2, self.fracb * 2)
         return res

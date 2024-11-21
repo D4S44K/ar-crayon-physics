@@ -48,6 +48,7 @@ def check_inactive(objects):
             vert_out = obj.pos[1] >= ZERO.max_rep() or obj.pos[1] <= ZERO.min_rep()
             horz_out = obj.pos[0] >= ZERO.max_rep() or obj.pos[0] <= ZERO.min_rep()
             if vert_out or horz_out:
+                print(f"Object {obj.index} is out of bounds")
                 obj.active = False
 
 

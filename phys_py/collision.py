@@ -1,5 +1,5 @@
 from my_types import *
-from math import sqrt
+import math
 
 # https://en.wikipedia.org/wiki/Collision_response
 
@@ -15,7 +15,7 @@ def my_sqrt(x):
     if x < 0:
         print(f"WARN: sqrt({x})")
         return 0
-    return sqrt(x)
+    return math.sqrt(x)
 
 
 def merge_coll_info(c_list):
@@ -149,19 +149,23 @@ def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
 
     # distance between centers at that time: min_dist^2 = |df|^2 - |rv_dist|^2
     # do they overlap at that time: min_dist^2 <= r_sum^2
-    # EWW....
-    min_dist_sq = (
-        df_sq
-        - (
-            dot_rv_df.convert(True, 13, 4) * (dot_rv_df / rv_sq).convert(True, 13, 4)
-        ).to_sfix32()
-    )  # INSTR: div
+    # !! 32bit * 32bit -> 32bit
+    min_dist_sq = df_sq - (dot_rv_df * (dot_rv_df / rv_sq)).to_sfix32()  # INSTR: div
+    min_dist_sq = min_dist_sq.to_sfix32()
     if min_dist_sq > r_sum_sq:  # too far apart
         return False, SFIX32(1.3)
 
     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
     col_t = min_dist_t - ((r_sum_sq - min_dist_sq) / rv_sq).sqrt()  # INSTR: div, sqrt
+
+    print(
+        f"debug: rv {rv_x.get_float()}, {rv_y.get_float()}, df {df_x.get_float()}, {df_y.get_float()}"
+    )
+    print(f"debug: rv_sq {rv_sq.get_float()}, dot_rv_df {dot_rv_df.get_float()}")
+    print(
+        f"debug: col_t {col_t.get_float()}, min_dist_sq {min_dist_sq.get_float()}, min_dist_t {min_dist_t.get_float()}\n"
+    )
 
     return True, col_t
 
@@ -189,17 +193,22 @@ def circle_line_collision(circle, line, rv_x, rv_y):
         return False, SFIX32(1.0)
 
     rv_dot = -(rv_x * ln_a + rv_y * ln_b).to_sfix32()
+    # !! 32bit * 32bit -> 32bit
     if neg_btw:
-        col_t = (sdist_now + rad).to_sfix16() * (ln_len / rv_dot).to_sfix16()
+        col_t = (sdist_now + rad) * (ln_len / rv_dot)
     else:
-        col_t = (sdist_now - rad).to_sfix16() * (ln_len / rv_dot).to_sfix16()
+        col_t = (sdist_now - rad) * (ln_len / rv_dot)
     col_t = col_t.to_sfix32()
+    if col_t < 0.0 or col_t > 1.0:
+        return False, SFIX32(1.0)
     # check if collision is in range of segment
     # parallel vector: (-B, A)
     # ln_end_p = -(line.x2 - line.x1) * ln_b + (line.y2 - line.y1) * ln_a # is equal to ln_sq
+    # !! 32bit * 32bit -> 32bit, 16bit * 16bit -> 16bit
     col_p = (
-        -(df_x + rv_x) * ln_b + (df_y + rv_y) * ln_a
-    ).to_sfix16() * col_t.to_sfix16()
+        -(df_x + (rv_x * col_t.to_sfix16()).to_sfix16()) * ln_b
+        + (df_y + (rv_y * col_t.to_sfix16()).to_sfix16()) * ln_a
+    ).to_sfix32()
     col_p = col_p.to_sfix32()
 
     if (col_p > 0.0) == (col_p > ln_sq):
