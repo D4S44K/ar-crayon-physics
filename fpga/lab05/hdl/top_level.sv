@@ -439,12 +439,18 @@ module top_level
 
   //rectangle output:
   logic [7:0] rect_red, rect_green, rect_blue;
+  logic [10:0] rect_x1, rect_x2;
+  logic [9:0] rect_y1, rect_y2;
 
   //circle output:
   logic [7:0] circle_red, circle_green, circle_blue;
+  logic [10:0] circle_x1, circle_x2;
+  logic [9:0] circle_y1, circle_y2;
 
   //line output:
   logic [7:0] line_red, line_green, line_blue;
+  logic [10:0] line_x1, line_x2;
+  logic [9:0] line_y1, line_y2;
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
@@ -479,6 +485,11 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
+    .place_obj(btn[2]),
+    .rect_x1(rect_x1),
+    .rect_y1(rect_y1),
+    .rect_x2(rect_x2),
+    .rect_y2(rect_y2),
     .red_out(rect_red),
     .green_out(rect_green),
     .blue_out(rect_blue));
@@ -497,10 +508,11 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
-    // .x_in_1(500),
-    // .y_in_1(600),
-    // .x_in_2(700),
-    // .y_in_2(600),
+    .place_obj(btn[2]),
+    .circle_x1(circle_x1),
+    .circle_y1(circle_y1),
+    .circle_x2(circle_x2),
+    .circle_y2(circle_y2),
     .red_out(circle_red),
     .green_out(circle_green),
     .blue_out(circle_blue));
@@ -519,6 +531,11 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
+    .place_obj(btn[2]),
+    .line_x1(line_x1),
+    .line_y1(line_y1),
+    .line_x2(line_x2),
+    .line_y2(line_y2),
     .red_out(line_red),
     .green_out(line_green),
     .blue_out(line_blue));

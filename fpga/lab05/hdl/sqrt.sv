@@ -65,8 +65,4 @@ module sqrt #(
   end
 endmodule
 
-
-
-
-
 `default_nettype wire

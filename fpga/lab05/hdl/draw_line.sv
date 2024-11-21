@@ -8,6 +8,11 @@ module draw_line #(
   input wire [9:0]  y_in_1,
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
+  input wire place_obj,
+  output logic [10:0] line_x1,
+  output logic [9:0]  line_y1,
+  output logic [10:0] line_x2,
+  output logic [9:0]  line_y2,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
@@ -34,7 +39,7 @@ module draw_line #(
   logic within_500_less;
 
 
-  always_ff @(posedge clk_in or posedge rst_in) begin
+  always_ff @(posedge clk_in) begin
     if (rst_in) begin
         //   red_out <= 0;
         //   green_out <= 0;
@@ -42,14 +47,17 @@ module draw_line #(
     end else begin
         // stage 1
         x_1 <= (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
-        x_2 <= (x_in_1 >= x_in_2) ? x_in_1 : x_in_2;
+        x_2 <= (x_in_1 > x_in_2) ? x_in_1 : x_in_2;
 
         // stage 2
         y_1 <= (x_1 == x_in_1) ? y_in_1 : y_in_2;
         y_2 <= (x_2 == x_in_2) ? y_in_2 : y_in_1;
 
-
-        if ((hcount_in >= x_1 && hcount_in <= x_2)) begin
+        // && (vcount_in + 10 <= y_1 || vcount_in >= y_1 + 10)
+        // if ((hcount_in + 100 >= x_2 && hcount_in <= x_2 + 100)) begin
+        //     in_line <= 0;
+        // end
+        else if ((hcount_in >= x_1 && hcount_in <= x_2)) begin
             hcount_diff <= hcount_in - x_1;
             x_diff <= x_2 - x_1;
             vcount_diff <= vcount_in - y_1;
@@ -58,12 +66,19 @@ module draw_line #(
             slope_mul_1 <= vcount_diff * x_diff;
             slope_mul_2 <= hcount_diff * y_diff;
 
-            within_500_greater <= (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 300 <= slope_mul_2 : 0;
-            within_500_less <= (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 300 >= slope_mul_2 : 0;
+            within_500_greater <= (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0;
+            within_500_less <= (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0;
             in_line <= within_500_greater || within_500_less;
         end
         else begin
             in_line <= 0;
+        end
+
+        if (place_obj) begin
+          line_x1 <= x_in_1;
+          line_y1 <= y_in_1;
+          line_x2 <= x_in_2;
+          line_y2 <= y_in_2;
         end
     end
   end

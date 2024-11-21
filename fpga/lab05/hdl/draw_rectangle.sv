@@ -8,6 +8,11 @@ module draw_rectangle #(
   input wire [9:0]  y_in_1,
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
+  input wire place_obj,
+  output logic [10:0] rect_x1,
+  output logic [9:0]  rect_y1,
+  output logic [10:0] rect_x2,
+  output logic [9:0]  rect_y2,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
@@ -36,6 +41,13 @@ module draw_rectangle #(
         // stage 2
         in_rect <= ((hcount_in >= x_1 && hcount_in < x_2) &&
                       (vcount_in >= y_1 && vcount_in < y_2));
+
+        if (place_obj) begin
+          rect_x1 <= x_in_1;
+          rect_y1 <= y_in_1;
+          rect_x2 <= x_in_2;
+          rect_y2 <= y_in_2;
+        end
     end
   end
 

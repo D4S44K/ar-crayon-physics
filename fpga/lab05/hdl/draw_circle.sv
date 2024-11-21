@@ -8,6 +8,11 @@ module draw_circle #(
   input wire [9:0]  y_in_1,
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
+  input wire place_obj,
+  output logic [10:0] circle_x1,
+  output logic [9:0]  circle_y1,
+  output logic [10:0] circle_x2,
+  output logic [9:0]  circle_y2,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
@@ -60,6 +65,13 @@ module draw_circle #(
 
         // stage 5
         in_circle <= (x_prod + y_prod <= radius_prod);
+
+        if (place_obj) begin
+          circle_x1 <= x_in_1;
+          circle_y1 <= y_in_1;
+          circle_x2 <= x_in_2;
+          circle_y2 <= y_in_2;
+        end
     end
   end
 
