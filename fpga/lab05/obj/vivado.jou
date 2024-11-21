@@ -3,22 +3,22 @@
 # SW Build 5076996 on Wed May 22 18:36:09 MDT 2024
 # IP Build 5075265 on Wed May 22 21:45:21 MDT 2024
 # SharedData Build 5076995 on Wed May 22 18:29:18 MDT 2024
-# Start of session at: Wed Nov 20 21:03:29 2024
-# Process ID: 2990
-# Current directory: /home/fpga/worker_place/temp/temp/12129d39e8864f4fbd6dc3e08c539f07/ar-crayon-physics/fpga/lab05
+# Start of session at: Wed Nov 20 21:21:22 2024
+# Process ID: 19243
+# Current directory: /home/fpga/worker_place/temp/temp/cd74d718a91a4b06aab4c105f7f729f6/ar-crayon-physics/fpga/lab05
 # Command line: vivado -mode batch -source build.tcl
-# Log file: /home/fpga/worker_place/temp/temp/12129d39e8864f4fbd6dc3e08c539f07/ar-crayon-physics/fpga/lab05/vivado.log
-# Journal file: /home/fpga/worker_place/temp/temp/12129d39e8864f4fbd6dc3e08c539f07/ar-crayon-physics/fpga/lab05/vivado.jou
-# Running On        :eecs-digital-18
+# Log file: /home/fpga/worker_place/temp/temp/cd74d718a91a4b06aab4c105f7f729f6/ar-crayon-physics/fpga/lab05/vivado.log
+# Journal file: /home/fpga/worker_place/temp/temp/cd74d718a91a4b06aab4c105f7f729f6/ar-crayon-physics/fpga/lab05/vivado.jou
+# Running On        :eecs-digital-23
 # Platform          :Ubuntu
 # Operating System  :Ubuntu 24.04.1 LTS
 # Processor Detail  :13th Gen Intel(R) Core(TM) i7-13700
-# CPU Frequency     :4057.373 MHz
+# CPU Frequency     :3424.115 MHz
 # CPU Physical cores:16
 # CPU Logical cores :24
 # Host memory       :33324 MB
 # Swap memory       :8589 MB
 # Total Virtual     :41914 MB
-# Available Virtual :40819 MB
+# Available Virtual :40823 MB
 #-----------------------------------------------------------
 source build.tcl

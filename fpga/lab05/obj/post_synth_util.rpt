@@ -1,8 +1,8 @@
 Copyright 1986-2022 Xilinx, Inc. All Rights Reserved. Copyright 2022-2024 Advanced Micro Devices, Inc. All Rights Reserved.
 ---------------------------------------------------------------------------------------------------------------------------------------------
 | Tool Version : Vivado v.2024.1 (lin64) Build 5076996 Wed May 22 18:36:09 MDT 2024
-| Date         : Wed Nov 20 21:04:30 2024
-| Host         : eecs-digital-18 running 64-bit Ubuntu 24.04.1 LTS
+| Date         : Wed Nov 20 21:22:31 2024
+| Host         : eecs-digital-23 running 64-bit Ubuntu 24.04.1 LTS
 | Command      : report_utilization -file obj/post_synth_util.rpt -hierarchical -hierarchical_depth 4
 | Design       : top_level
 | Device       : xc7s50csga324-1
@@ -22,7 +22,7 @@ Table of Contents
 +----------------------------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
 |                   Instance                   |                 Module                | Total LUTs | Logic LUTs | LUTRAMs | SRLs |  FFs | RAMB36 | RAMB18 | DSP Blocks |
 +----------------------------------------------+---------------------------------------+------------+------------+---------+------+------+--------+--------+------------+
-| top_level                                    |                                 (top) |       1535 |       1474 |       0 |   61 | 1197 |     24 |      9 |         13 |
+| top_level                                    |                                 (top) |       1508 |       1447 |       0 |   61 | 1152 |     24 |      9 |         13 |
 |   (top_level)                                |                                 (top) |          0 |          0 |       0 |    0 |  100 |      0 |      0 |          2 |
 |   blue_ser                                   |                       tmds_serializer |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
 |   circle                                     |                           draw_circle |         68 |         68 |       0 |    0 |   53 |      0 |      0 |          3 |
@@ -51,9 +51,9 @@ Table of Contents
 |       inst_blk_mem_gen                       | blk_mem_gen_0blk_mem_gen_v8_4_8_synth |        122 |        122 |       0 |    0 |   20 |     24 |      8 |          0 |
 |         gnbram.gnativebmg.native_blk_mem_gen |          blk_mem_gen_0blk_mem_gen_top |        122 |        122 |       0 |    0 |   20 |     24 |      8 |          0 |
 |   green_ser                                  |                     tmds_serializer_5 |          0 |          0 |       0 |    0 |    0 |      0 |      0 |          0 |
-|   hcount_pipeline_ps3                        |              pipeline__parameterized0 |         75 |         53 |       0 |   22 |   22 |      0 |      0 |          0 |
-|   line                                       |                             draw_line |        135 |        135 |       0 |    0 |   45 |      0 |      0 |          4 |
-|   line_blue_pipeline_ps9                     |            pipeline__parameterized4_6 |          1 |          0 |       0 |    1 |    1 |      0 |      0 |          0 |
+|   hcount_pipeline_ps3                        |              pipeline__parameterized0 |         79 |         57 |       0 |   22 |   22 |      0 |      0 |          0 |
+|   line                                       |                             draw_line |         86 |         86 |       0 |    0 |    0 |      0 |      0 |          4 |
+|   line_blue_pipeline_ps9                     |            pipeline__parameterized4_6 |         17 |         16 |       0 |    1 |    1 |      0 |      0 |          0 |
 |   mssc                                       |                             lab05_ssc |         23 |         23 |       0 |    0 |   25 |      0 |      0 |          0 |
 |   mt                                         |                             threshold |          4 |          4 |       0 |    0 |    1 |      0 |      0 |          0 |
 |   mt_2                                       |                           threshold_7 |          0 |          0 |       0 |    0 |    1 |      0 |      0 |          0 |

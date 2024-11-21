@@ -39,48 +39,38 @@ module draw_line #(
   logic within_500_less;
 
 
-  always_ff @(posedge clk_in) begin
-    if (rst_in) begin
-        //   red_out <= 0;
-        //   green_out <= 0;
-        //   blue_out <= 0;
-    end else begin
+  always_comb begin
         // stage 1
-        x_1 <= (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
-        x_2 <= (x_in_1 > x_in_2) ? x_in_1 : x_in_2;
+        x_1 = (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
+        x_2 = (x_in_1 > x_in_2) ? x_in_1 : x_in_2;
 
         // stage 2
-        y_1 <= (x_1 == x_in_1) ? y_in_1 : y_in_2;
-        y_2 <= (x_2 == x_in_2) ? y_in_2 : y_in_1;
+        y_1 = (x_1 == x_in_1) ? y_in_1 : y_in_2;
+        y_2 = (x_2 == x_in_2) ? y_in_2 : y_in_1;
 
-        // && (vcount_in + 10 <= y_1 || vcount_in >= y_1 + 10)
-        // if ((hcount_in + 100 >= x_2 && hcount_in <= x_2 + 100)) begin
-        //     in_line <= 0;
-        // end
-        else if ((hcount_in >= x_1 && hcount_in <= x_2)) begin
-            hcount_diff <= hcount_in - x_1;
-            x_diff <= x_2 - x_1;
-            vcount_diff <= vcount_in - y_1;
-            y_diff <= y_2 - y_1;
+        if ((hcount_in >= x_1 && hcount_in <= x_2)) begin
+            hcount_diff = hcount_in - x_1;
+            x_diff = x_2 - x_1;
+            vcount_diff = vcount_in - y_1;
+            y_diff = y_2 - y_1;
 
-            slope_mul_1 <= vcount_diff * x_diff;
-            slope_mul_2 <= hcount_diff * y_diff;
+            slope_mul_1 = vcount_diff * x_diff;
+            slope_mul_2 = hcount_diff * y_diff;
 
-            within_500_greater <= (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0;
-            within_500_less <= (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0;
-            in_line <= within_500_greater || within_500_less;
+            within_500_greater = (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0;
+            within_500_less = (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0;
+            in_line = within_500_greater || within_500_less;
         end
         else begin
-            in_line <= 0;
+            in_line = 0;
         end
 
         if (place_obj) begin
-          line_x1 <= x_in_1;
-          line_y1 <= y_in_1;
-          line_x2 <= x_in_2;
-          line_y2 <= y_in_2;
+          line_x1 = x_in_1;
+          line_y1 = y_in_1;
+          line_x2 = x_in_2;
+          line_y2 = y_in_2;
         end
-    end
   end
 
   assign red_out   = in_line ? COLOR[23:16] : 0;
