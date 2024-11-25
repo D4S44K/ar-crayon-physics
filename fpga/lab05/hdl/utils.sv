@@ -6,6 +6,7 @@ module nth_smallest #(parameter MAX_NUM_SIZE = 32)
     input wire valid_in,
     input logic [1:0] index,
     output logic [MAX_NUM_SIZE-1:0] min_number,
+    output logic [1:0] num_of_mins,
     output logic valid_out
 );
 
@@ -23,6 +24,11 @@ logic [MAX_NUM_SIZE-1:0] first_3;
 logic [MAX_NUM_SIZE-1:0] second_3;
 logic [MAX_NUM_SIZE-1:0] third_3;
 logic [MAX_NUM_SIZE-1:0] fourth_3;
+
+logic one_is_min;
+logic two_is_min;
+logic three_is_min;
+logic four_is_min;
 always_comb begin
     if(valid_in) begin
         // ascending sort 1-2
@@ -51,6 +57,17 @@ always_comb begin
             2'b11 : min_number = fourth_3;
             default: min_number = 0;
         endcase
+
+        if(first_3 == min_number) one_is_min = 1;
+        else one_is_min = 0;
+        if(second_3 == min_number) two_is_min = 1;
+        else two_is_min = 0;
+        if(third_3 == min_number) three_is_min = 1;
+        else three_is_min = 0;
+        if(fourth_3 == min_number) four_is_min = 1;
+        else four_is_min = 0;
+        num_of_mins = one_is_min + two_is_min + three_is_min + four_is_min;
+
     end
     valid_out = valid_in;
 end

@@ -10,8 +10,16 @@ from cocotb.runner import get_runner
 async def test_nth_smallest(dut):
     """Cocotb test for nth_smallest module."""
     dut._log.info("nth_smallest test")
-    numbers = [0b0001000100, 0b1000110011, 0b0100010010, 0b0110101010]
-    sorted_numbers = sorted(numbers)
+    # # all numbers different
+    # numbers = [0b0001000100, 0b1000110011, 0b0100010010, 0b0110101010]
+    # sorted_numbers = [0b0001000100, 0b0100010010, 0b0110101010, 0b1000110011]
+    # two non-min numbers same
+    numbers = [0b0001000100, 0b1000110011, 0b0110101010, 0b0110101010]
+    sorted_numbers = [0b0001000100, 0b0110101010, 0b0110101010, 0b1000110011]
+    # # two min numbers same
+    # numbers = [0b0001000100, 0b1000110011, 0b0001000100, 0b0110101010]
+    # sorted_numbers = [0b0001000100, 0b0001000100, 0b0110101010, 0b1000110011]
+    # sorted_numbers = sorted(numbers)
     cocotb.start_soon(Clock(dut.clk_in, 10, units="ns").start())
 
     for index in range(4):
@@ -26,7 +34,8 @@ async def test_nth_smallest(dut):
         await FallingEdge(dut.clk_in)
         assert dut.valid_in.value == 1, f'expected valid out to be 1 because of combinational logic'
         assert dut.min_number.value == sorted_numbers[index], f'expected min_number to be {bin(sorted_numbers[index])}, got {dut.min_number.value}.'
-
+        print("numbers: ", numbers, "\nsorted: ", sorted_numbers, "\nmin_number: ", dut.min_number.value, "\nindex: ", index, "\nnum of mins: ", dut.num_of_mins.value)
+        # assert dut.num_of_mins == 1, f'all non-min numbers different'
 def is_runner():
     """nth smallest Tester."""
     hdl_toplevel_lang = os.getenv("HDL_TOPLEVEL_LANG", "verilog")
