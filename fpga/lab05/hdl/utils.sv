@@ -1,41 +1,56 @@
-module nth_smallest #(MAX_NUM_SIZE = 32, NUM_OF_NUMS = 4) 
+module nth_smallest #(parameter MAX_NUM_SIZE = 32) 
 (
-    input [MAX_OF_NUMS-1:0][MAX_NUM_SIZE-1:0] logic numbers,
+    input logic [MAX_NUM_SIZE-1:0] numbers [3:0],
+    // delete after testing
+    input wire clk_in,
     input wire valid_in,
-    input [$clog2(MAX_NUM_SIZE):0] index,
-    output [MAX_NUM_SIZE-1:0] logic min_number,
-    output wire valid_out
+    input logic [1:0] index,
+    output logic [MAX_NUM_SIZE-1:0] min_number,
+    output logic valid_out
 );
 
-/*
-    // given an array arr of length n, this code sorts it in place
-    // all indices run from 0 to n-1
-    for (k = 2; k <= n; k *= 2) // k is doubled every iteration
-        for (j = k/2; j > 0; j /= 2) // j is halved at every iteration, with truncation of fractional parts
-            for (i = 0; i < n; i++)
-                l = bitwiseXOR (i, j); // in C-like languages this is "i ^ j"
-                if (l > i)
-                    if (  (bitwiseAND (i, k) == 0) AND (arr[i] > arr[l])
-                       OR (bitwiseAND (i, k) != 0) AND (arr[i] < arr[l]) )
-                          swap the elements arr[i] and arr[l]
-*/
-logic [MAX_NUM_SIZE] temp;
+logic [MAX_NUM_SIZE-1:0] first_1;
+logic [MAX_NUM_SIZE-1:0] second_1;
+logic [MAX_NUM_SIZE-1:0] third_1;
+logic [MAX_NUM_SIZE-1:0] fourth_1;
+
+logic [MAX_NUM_SIZE-1:0] first_2;
+logic [MAX_NUM_SIZE-1:0] second_2;
+logic [MAX_NUM_SIZE-1:0] third_2;
+logic [MAX_NUM_SIZE-1:0] fourth_2; 
+
+logic [MAX_NUM_SIZE-1:0] first_3;
+logic [MAX_NUM_SIZE-1:0] second_3;
+logic [MAX_NUM_SIZE-1:0] third_3;
+logic [MAX_NUM_SIZE-1:0] fourth_3;
 always_comb begin
     if(valid_in) begin
-        for(int k = 0; k < NUM_OF_NUMS; k = k * 2) begin
-            for(int j = k >> 1; j > 0; j = j >> 1) begin
-                for(int i = 0; i < NUM_OF_NUMS; i = i + 1) begin
-                    if(i ^ j > i) begin
-                        if((i & k == 0 && numbers[i] > numbers[i ^ j]) || (i & k != 0) && (numbers[i] < numbers[i ^ j])) begin
-                            temp = numbers[i];
-                            numbers[i] = numbers[j];
-                            numbers[j] = numbers[i];
-                        end
-                    end
-                end
-            end
-        end
-        min_number = numbers[index];
+        // ascending sort 1-2
+        first_1 = (numbers[0] < numbers[1]) ? numbers[0] : numbers[1];
+        second_1 = (numbers[0] > numbers[1]) ? numbers[0] : numbers[1];
+        // descending sort 3-4
+        third_1 = (numbers[2] > numbers[3]) ? numbers[2] : numbers[3];
+        fourth_1 = (numbers[2] < numbers[3]) ? numbers[2] : numbers[3];
+        // ascending sort 1-3
+        first_2 = (first_1 < third_1) ? first_1 : third_1;
+        third_2 = (first_1 > third_1) ? first_1 : third_1;
+        // ascending sort 2-4
+        second_2 = (second_1 < fourth_1) ? second_1 : fourth_1;
+        fourth_2 = (second_1 > fourth_1) ? second_1 : fourth_1;
+        // ascending sort 1-2
+        first_3 = (first_2 < second_2) ? first_2 : second_2;
+        second_3 = (first_2 > second_2) ? first_2 : second_2;
+        // ascending sort 3-4
+        third_3 = (third_2 < fourth_2) ? third_2 : fourth_2;
+        fourth_3 = (third_2 > fourth_2) ? third_2 : fourth_2;
+        // pick correct index
+        case(index)
+            2'b00 : min_number = first_3;
+            2'b01 : min_number = second_3;
+            2'b10 : min_number = third_3;
+            2'b11 : min_number = fourth_3;
+            default: min_number = 0;
+        endcase
     end
     valid_out = valid_in;
 end
