@@ -7,6 +7,7 @@ module nth_smallest #(parameter MAX_NUM_SIZE = 32)
     input logic [1:0] index,
     output logic [MAX_NUM_SIZE-1:0] min_number,
     output logic [1:0] num_of_mins,
+    output logic [MAX_NUM_SIZE-1:0] sorted [3:0],
     output logic valid_out
 );
 
@@ -67,6 +68,7 @@ always_comb begin
         if(fourth_3 == min_number) four_is_min = 1;
         else four_is_min = 0;
         num_of_mins = one_is_min + two_is_min + three_is_min + four_is_min;
+        sorted = {first_3, second_3, third_3, fourth_3};
 
     end
     valid_out = valid_in;
