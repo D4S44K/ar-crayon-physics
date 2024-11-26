@@ -40,11 +40,34 @@ module draw_to_storage_conversion (
   logic [9:0] first_clockwise_y;
   logic [10:0] second_clockwise_x;
   logic [9:0] second_clockwise_y;
+  logic sqrt_valid;
+  logic sqrt_busy;
+  logic has_sqrt_run;
+  logic is_sqrt_stage_1;
+  logic is_sqrt_stage_2;
+  logic nth_busy;
+  logic nth_valid;
+  logic has_nth_run;
+  logic [20:0] prod_x;
+  logic [20:0] prod_y;
+  logic prod_valid;
+  logic is_point_1_bigger;
+  logic is_point_2_bigger;
+  logic is_point_3_bigger;
+  logic calculations_valid;
   // assign composite_x = {point_one_x, point_two_x, point_three_x, point_four_x};
   // assign composite_y = {point_one_y, point_two_y, point_three_y, point_four_y};
   assign composite_points = {point_one_x, point_one_y, point_two_x, point_two_y, point_three_x, point_three_y, point_four_x, point_four_y};
   // logic [31:0] radius;
   always_comb begin
+    if(rst_in) begin
+      valid_out <= 0;
+      sqrt_valid <= 0;
+      nth_valid <= 0;
+      has_nth_run <= 0;
+      has_sqrt_run <= 0;
+
+    end
     if(valid_in) begin
       point_one_x = draw_props[79:70];
       point_one_y = draw_props[69:60];
@@ -62,13 +85,18 @@ module draw_to_storage_conversion (
           params = 0;
           pos_x = 0;
           pos_y = 0;
-          valid_out = 1;
+          valid_out = 0;
+          is_rectangle = 0;
+          is_circle = 0;
         end
         // circle: params has radius
         2'b01: begin
           is_circle = 1;
           pos_x = (point_one_x + point_two_x) >> 2;
           pos_y = (point_one_y + point_two_y) >> 2;
+          valid_out = sqrt_valid;
+          is_rectangle = 0;
+          // if(sqrt_valid) has_sqrt_run = 1;
         end
         // line
         2'b10: begin
@@ -76,6 +104,8 @@ module draw_to_storage_conversion (
           pos_y = point_one_y;
           params = {point_two_x, point_two_y};
           valid_out = 1;
+          is_rectangle = 0;
+          is_circle = 0;
         end
         // rectangle
         // schema: pos_x and pos_y are point_one x and y, 
@@ -84,48 +114,40 @@ module draw_to_storage_conversion (
           // pos_x = point_one_x;
           // pos_y = point_one_y;
           // params = {point_two_x, point_two_y, 16'b0};
-          valid_out = 1;
+          valid_out = calculations_valid;
           pos_x = composite_min[19:10];
           pos_y = composite_min[9:0];
-          if(!first_clockwise_found && sorted_points[0][9:0] > pos_y) begin
-            first_clockwise_found = 1;
-            first_clockwise_x = sorted_points[0][19:10];
-            first_clockwise_y = sorted_points[0][9:0];
-          end 
-          else if(!second_clockwise_found && sorted_points[0][9:0] > pos_y) begin
-            second_clockwise_found = 1;
-            second_clockwise_x = sorted_points[0][19:10];
-            second_clockwise_y = sorted_points[0][9:0];
-          end 
+          is_rectangle = 0;
+          is_circle = 0;
 
-          if(!first_clockwise_found && sorted_points[1][9:0] > pos_y) begin
+          if(!first_clockwise_found && is_point_1_bigger) begin
             first_clockwise_found = 1;
             first_clockwise_x = sorted_points[1][19:10];
             first_clockwise_y = sorted_points[1][9:0];
           end 
-          else if(!second_clockwise_found && sorted_points[1][9:0] > pos_y) begin
+          else if(!second_clockwise_found && is_point_1_bigger) begin
             second_clockwise_found = 1;
             second_clockwise_x = sorted_points[1][19:10];
             second_clockwise_y = sorted_points[1][9:0];
           end
 
-          if(!first_clockwise_found && sorted_points[2][9:0] > pos_y) begin
+          if(!first_clockwise_found && is_point_2_bigger) begin
             first_clockwise_found = 1;
             first_clockwise_x = sorted_points[2][19:10];
             first_clockwise_y = sorted_points[2][9:0];
           end 
-          else if(!second_clockwise_found && sorted_points[2][9:0] > pos_y) begin
+          else if(!second_clockwise_found && is_point_2_bigger) begin
             second_clockwise_found = 1;
             second_clockwise_x = sorted_points[2][19:10];
             second_clockwise_y = sorted_points[2][9:0];
           end
 
-          if(!first_clockwise_found && sorted_points[3][9:0] > pos_y) begin
+          if(!first_clockwise_found && is_point_3_bigger) begin
             first_clockwise_found = 1;
             first_clockwise_x = sorted_points[3][19:10];
             first_clockwise_y = sorted_points[3][9:0];
           end 
-          else if(!second_clockwise_found && sorted_points[3][9:0] > pos_y) begin
+          else if(!second_clockwise_found && is_point_3_bigger) begin
             second_clockwise_found = 1;
             second_clockwise_x = sorted_points[3][19:10];
             second_clockwise_y = sorted_points[3][9:0];
@@ -133,29 +155,55 @@ module draw_to_storage_conversion (
 
           params = {$signed(first_clockwise_x - pos_x), $signed(first_clockwise_y - pos_y), $signed(second_clockwise_y-first_clockwise_y)};
         end
-        default: valid_out = 0;
+        default: begin 
+          valid_out = 0; 
+          is_rectangle = 0;
+          is_circle = 0;
+          end
       endcase
     end
   end
 
+
+// run sqrt only once
 sqrt circle_sqrt(
-  .valid_in(is_circle),
+  .valid_in(is_circle && prod_valid),
   .clk_in(clk_in),
   .rst_in(rst_in),
-  .input_val(pos_x * pos_x + pos_y * pos_y),
+  // separate into two cycles
+  .input_val(prod_x + prod_y),
   .result(params)
-  .valid_out(valid_out)
+  .valid_out(sqrt_valid),
+  .busy_out(sqrt_busy)
 );
 
+// run nth smallest only once
 nth_smallest #(.MAX_NUM_SIZE(20)) min_rect_pt(
-  .valid_in(is_rectangle),
+  .valid_in(is_rectangle && is_valid),
   .index(0),
   .numbers(composite_points),
   .min_number(composite_min),
-  .valid_out(valid_out),
+  .valid_out(nth_valid),
   .num_of_mins(num_same_x),
   .sorted(sorted_points),
+  .busy_out(nth_busy),
+  .clk_in(clk_in),
+  .rst_in(rst_in)
 );
+
+always_ff@(posedge clk_in) begin
+  if(is_circle && is_valid) begin
+    prod_x <= (pos_x - point_one_x) * (pos_x - point_one_x);
+    prod_y <= (pos_y - point_one_y) * (pos_y - point_one_y);
+    prod_valid <= is_valid;
+  end
+  else if(is_rectangle && nth_valid) begin
+    is_point_1_bigger <= sorted_points[1][9:0] > pos_y;
+    is_point_2_bigger <= sorted_points[2][9:0] > pos_y;
+    is_point_3_bigger <= sorted_points[3][9:0] > pos_y;
+    calculations_valid <= 1;
+  end
+end
 
 
 

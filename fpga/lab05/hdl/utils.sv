@@ -161,10 +161,11 @@ always_ff@(posedge clk_in) begin
         sorted[3] <= local_copy[3];
         // nth_min <= local_copy[local_index];
         case(local_index)
-            2'b00: nth_min <= local_copy[0];
-            2'b01: nth_min <= local_copy[1];
-            2'b10: nth_min <= local_copy[2];
-            2'b11: nth_min <= local_copy[3];
+            2'b00: begin nth_min <= local_copy[0]; valid_out <= 1; end
+            2'b01: begin nth_min <= local_copy[1]; valid_out <= 1; end
+            2'b10: begin nth_min <= local_copy[2]; valid_out <= 1; end
+            2'b11: begin nth_min <= local_copy[3]; valid_out <= 1; end
+            default: begin nth_min <= 0; valid_out <= 0; end
         endcase
         busy_out <= 0;
         valid_out <= 1;
