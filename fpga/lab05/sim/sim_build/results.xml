@@ -1,6 +1,6 @@
 <testsuites name="results">
   <testsuite name="all" package="all">
-    <property name="random_seed" value="1732514210" />
-    <testcase name="test_nth_smallest" classname="test_nth_smallest" file="/Users/dishakohli/6205_python/ar-crayon-physics/fpga/lab05/sim/test_nth_smallest.py" lineno="9" time="0.003329038619995117" sim_time_ns="35.001" ratio_time="10513.846186636109" />
+    <property name="random_seed" value="1732581374" />
+    <testcase name="test_nth_smallest" classname="test_nth_smallest" file="/Users/dishakohli/6205_python/ar-crayon-physics/fpga/lab05/sim/test_nth_smallest.py" lineno="9" time="0.0035200119018554688" sim_time_ns="245.001" ratio_time="69602.32147819019" />
   </testsuite>
 </testsuites>

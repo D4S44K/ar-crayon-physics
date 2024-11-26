@@ -12,6 +12,7 @@ module draw_to_storage_conversion (
     output logic [15:0] vel_x, // 16 bits
     output logic [15:0] vel_y, // 16 bits
     output logic valid_out, // 1 bit
+    output logic busy_out,
   );
   logic [10:0] point_one_x;
   logic [9:0] point_one_y;
