@@ -94,40 +94,6 @@ def get_collision(part_a, part_b, rv_x, rv_y):
         raise ValueError(f"Unsupported shape type {part_a.t} or {part_b.t}")
 
 
-# def circle_point_collision(circle, point, rv_x, rv_y):
-#     # circle-point collision, uses sqrt -> simplify?
-#     r_sum = circle.r
-#     r_sum_sq = r_sum * r_sum
-#     df_x = point.x - circle.x
-#     df_y = point.y - circle.y
-#     df_sq = df_x * df_x + df_y * df_y
-
-#     if -FLOAT_EPS < rv_x < FLOAT_EPS and -FLOAT_EPS < rv_y < FLOAT_EPS:
-#         return False, 1.1
-#     rv_sq = rv_x * rv_x + rv_y * rv_y
-
-#     # distance to go in rv's direction: rv_dist = dot(rv, df) / |rv|
-#     # time to reach that distance: t = rv_dist / |rv| = dot(rv, df) / |rv|^2
-#     dot_rv_df = rv_x * df_x + rv_y * df_y
-#     min_dist_t = dot_rv_df / rv_sq  # INSTR: div
-#     if min_dist_t < 0:  # wrong direction
-#         return False, 1.2
-
-#     # distance between centers at that time: min_dist^2 = |df|^2 - |rv_dist|^2
-#     # do they overlap at that time: min_dist^2 <= r_sum^2
-#     min_dist_sq = df_sq - dot_rv_df * dot_rv_df / rv_sq  # INSTR: div
-#     if min_dist_sq > r_sum_sq + FLOAT_EPS:  # too far apart
-#         return False, 1.3
-
-#     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
-#     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
-#     col_t = min_dist_t - sqrt(
-#         max(0, r_sum_sq / rv_sq - min_dist_sq / rv_sq)
-#     )  # INSTR: div, sqrt
-
-#     return True, col_t
-
-
 def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
     # circle-circle collision, uses sqrt
     r_sum = circle_a.r + circle_b.r
@@ -158,14 +124,6 @@ def circle_circle_collision(circle_a, circle_b, rv_x, rv_y):
     # actual collision distance: dist = rv_dist - sqrt(r_sum^2 - min_dist^2)
     # time to reach that distance: t = dist / |rv| = dot(rv, df) / |rv|^2 - sqrt(r_sum^2 - |min_dist|^2)) / |rv| = min_dist_t - sqrt(r_sum^2 - |min_dist|^2) / |rv|
     col_t = min_dist_t - ((r_sum_sq - min_dist_sq) / rv_sq).sqrt()  # INSTR: div, sqrt
-
-    print(
-        f"debug: rv {rv_x.get_float()}, {rv_y.get_float()}, df {df_x.get_float()}, {df_y.get_float()}"
-    )
-    print(f"debug: rv_sq {rv_sq.get_float()}, dot_rv_df {dot_rv_df.get_float()}")
-    print(
-        f"debug: col_t {col_t.get_float()}, min_dist_sq {min_dist_sq.get_float()}, min_dist_t {min_dist_t.get_float()}\n"
-    )
 
     return True, col_t
 

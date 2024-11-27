@@ -9,10 +9,18 @@ from simulate import (
     check_inactive,
 )
 from collision import get_earliest_collision, debug_col_time_update
+import argparse
 
 
 def main():
-    info, obj_list = load_obj_file("test/sandbox.json")
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--input", help="input file path", type=str, default="test/sandbox.json"
+    )
+    args = parser.parse_args()
+    input_file = args.input
+
+    info, obj_list = load_obj_file(input_file)
     video = ResultVideo(info["name"])
 
     for fr in range(info["frame_count"]):

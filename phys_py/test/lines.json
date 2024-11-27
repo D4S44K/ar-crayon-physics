@@ -1,13 +1,13 @@
 {
-  "name": "basic2",
-  "CoR": 0.7,
+  "name": "lines",
+  "CoR": 0.99,
   "gravity": 1.0,
   "frame_count": 90,
   "objects": [
     {
       "shape_type": "circle",
       "mass": 4.0,
-      "position": [420.0, 150.0],
+      "position": [360.0, 30.0],
       "velocity": [-5.0, 0.0],
       "static": false,
       "params": [30.0],
@@ -16,7 +16,7 @@
     {
       "shape_type": "circle",
       "mass": 1.0,
-      "position": [90.0, 210.0],
+      "position": [120.0, 110.0],
       "velocity": [5.0, -5.0],
       "static": false,
       "params": [15.0],
@@ -24,29 +24,38 @@
     },
     {
       "shape_type": "circle",
-      "mass": 1000.0,
-      "position": [300.0, 300.0],
-      "velocity": [0.0, 0.0],
-      "static": true,
-      "params": [30.0],
+      "mass": 1.0,
+      "position": [360.0, 240.0],
+      "velocity": [-10.0, -15.0],
+      "static": false,
+      "params": [10.0],
       "skip": false
     },
     {
       "shape_type": "line",
       "mass": 1000.0,
-      "position": [450.0, 300.0],
+      "position": [240.0, 130.0],
       "velocity": [0.0, 0.0],
       "static": true,
-      "params": [150.0, -20.0],
+      "params": [100.0, -30.0],
       "skip": false
     },
     {
-      "shape_type": "rect",
+      "shape_type": "line",
       "mass": 1000.0,
-      "position": [180.0, 300.0],
+      "position": [50.0, 220.0],
       "velocity": [0.0, 0.0],
       "static": true,
-      "params": [25.0, 0, 40.0],
+      "params": [200.0, 40.0],
+      "skip": false
+    },
+    {
+      "shape_type": "line",
+      "mass": 1000.0,
+      "position": [250.0, 320.0],
+      "velocity": [0.0, 0.0],
+      "static": true,
+      "params": [100.0, -40.0],
       "skip": false
     }
   ]

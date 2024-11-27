@@ -2,7 +2,7 @@
   "name": "sandbox",
   "CoR": 0.7,
   "gravity": 1.0,
-  "frame_count": 55,
+  "frame_count": 90,
   "objects": [
     {
       "shape_type": "line",
@@ -46,7 +46,7 @@
       "position": [120.0, 300.0],
       "velocity": [0.0, 0.0],
       "static": true,
-      "params": [35.0, 5.0, 80.0],
+      "params": [35.0, 0, 80.0],
       "skip": false
     },
     {
