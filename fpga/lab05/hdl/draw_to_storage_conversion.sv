@@ -3,7 +3,7 @@ module draw_to_storage_conversion (
     // output: (is_static) (id_bits) (params) (pos_y) (pos_x) (vel_x) (vel_y)
     input wire clk_in,
     input logic valid_in,
-    input logic [82:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
+    input logic [86:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
     output logic is_static, // 1 bit
     output logic [1:0] id_bits, // 2 bits
     output logic [35:0] params, // 36 bits
@@ -12,7 +12,7 @@ module draw_to_storage_conversion (
     output logic [15:0] vel_x, // 16 bits
     output logic [15:0] vel_y, // 16 bits
     output logic valid_out, // 1 bit
-    output logic busy_out,
+    output logic busy_out
   );
   logic [10:0] point_one_x;
   logic [9:0] point_one_y;
@@ -66,19 +66,21 @@ module draw_to_storage_conversion (
       nth_valid <= 0;
       has_nth_run <= 0;
       has_sqrt_run <= 0;
-
     end
     if(valid_in) begin
-      point_one_x = draw_props[79:70];
-      point_one_y = draw_props[69:60];
-      point_two_x = draw_props[59:50];
-      point_two_y = draw_props[49:40];
-      point_three_x = draw_props[39:30];
-      point_three_y = draw_props[29:20];
-      point_four_x = draw_props[19:9];
+      point_one_x = draw_props[83:73];
+      point_one_y = draw_props[72:63];
+      point_two_x = draw_props[62:52];
+      point_two_y = draw_props[51:42];
+      point_three_x = draw_props[41:31];
+      point_three_y = draw_props[30:21];
+      point_four_x = draw_props[20:10];
       point_four_y = draw_props[9:0];
-      is_static = draw_props[62:62];
-      id_bits = draw_props[61:60];
+      is_static = draw_props[86:86];
+      id_bits = draw_props[85:84];
+      busy_out = nth_busy || sqrt_busy;
+      vel_x = 0;
+      vel_y = 0;
       case(id_bits)
         // not defined
         2'b00: begin
@@ -172,7 +174,7 @@ sqrt circle_sqrt(
   .rst_in(rst_in),
   // separate into two cycles
   .input_val(prod_x + prod_y),
-  .result(params)
+  .result(params),
   .valid_out(sqrt_valid),
   .busy_out(sqrt_busy)
 );

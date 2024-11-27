@@ -12,6 +12,7 @@ async def reset(dut):
     await ClockCycles(dut.clk_in, 3)
     dut.rst_in.value = 0
     await ClockCycles(dut.clk_in, 2)
+    dut.valid_in.value = 1
 
 @cocotb.test()
 async def test_sqrt(dut):
@@ -45,7 +46,9 @@ async def test_sqrt(dut):
         await reset(dut)
 
         # await RisingEdge(dut.clk_in)
-        await ClockCycles(dut.clk_in, 100)
+        # await ClockCycles(dut.clk_in, 100)
+        await RisingEdge(dut.valid_out)
+        await FallingEdge(dut.clk_in)
         result = dut.result.value
 
         assert check_approx((int(result)/2048.0), (int(expected_output)/2048.0)), (
