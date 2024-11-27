@@ -6,14 +6,14 @@ module sqrt #(
   input valid_in,
   input wire clk_in,
   input wire rst_in,
-  input wire [31:0] input_val,  // 1 sign bit, 20 integer bits, 11 decimal bits
-  output logic [31:0] result,
+  input wire [INTEGER_BITS + FRACTIONAL_BITS:0] input_val,  // 1 sign bit, 20 integer bits, 11 decimal bits
+  output logic [INTEGER_BITS + FRACTIONAL_BITS:0] result,
   output logic valid_out,
   output logic busy_out
 );
 
-  logic [31:0] low, high, mid, square;
-  logic [31:0] closest_result;
+  logic [INTEGER_BITS + FRACTIONAL_BITS:0] low, high, mid, square;
+  logic [INTEGER_BITS + FRACTIONAL_BITS:0] closest_result;
 
   logic mid_calc;
   logic square_calc;

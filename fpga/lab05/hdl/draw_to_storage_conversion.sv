@@ -50,6 +50,7 @@ module draw_to_storage_conversion (
   logic has_nth_run;
   logic [20:0] prod_x;
   logic [20:0] prod_y;
+  logic [21:0] sqrt_result;
   logic prod_valid;
   logic is_point_1_bigger;
   logic is_point_2_bigger;
@@ -59,26 +60,34 @@ module draw_to_storage_conversion (
   // assign composite_y = {point_one_y, point_two_y, point_three_y, point_four_y};
   assign composite_points = {point_one_x, point_one_y, point_two_x, point_two_y, point_three_x, point_three_y, point_four_x, point_four_y};
   // logic [31:0] radius;
+  assign point_one_x = draw_props[83:73];
+  assign point_one_y = draw_props[72:63];
+  assign point_two_x = draw_props[62:52];
+  assign point_two_y = draw_props[51:42];
+  assign point_three_x = draw_props[41:31];
+  assign point_three_y = draw_props[30:21];
+  assign point_four_x = draw_props[20:10];
+  assign point_four_y = draw_props[9:0];
+  assign is_static = draw_props[86:86];
+  assign id_bits = draw_props[85:84];
   always_comb begin
     if(rst_in) begin
-      valid_out <= 0;
-      sqrt_valid <= 0;
-      nth_valid <= 0;
-      has_nth_run <= 0;
-      has_sqrt_run <= 0;
+      valid_out = 0;
+      has_nth_run = 0;
+      has_sqrt_run = 0;
     end
     if(valid_in) begin
-      point_one_x = draw_props[83:73];
-      point_one_y = draw_props[72:63];
-      point_two_x = draw_props[62:52];
-      point_two_y = draw_props[51:42];
-      point_three_x = draw_props[41:31];
-      point_three_y = draw_props[30:21];
-      point_four_x = draw_props[20:10];
-      point_four_y = draw_props[9:0];
-      is_static = draw_props[86:86];
-      id_bits = draw_props[85:84];
-      busy_out = nth_busy || sqrt_busy;
+      // point_one_x = draw_props[83:73];
+      // point_one_y = draw_props[72:63];
+      // point_two_x = draw_props[62:52];
+      // point_two_y = draw_props[51:42];
+      // point_three_x = draw_props[41:31];
+      // point_three_y = draw_props[30:21];
+      // point_four_x = draw_props[20:10];
+      // point_four_y = draw_props[9:0];
+      // is_static = draw_props[86:86];
+      // id_bits = draw_props[85:84];
+      busy_out = nth_busy || sqrt_busy || valid_in;
       vel_x = 0;
       vel_y = 0;
       case(id_bits)
@@ -98,6 +107,7 @@ module draw_to_storage_conversion (
           pos_y = (point_one_y + point_two_y) >> 2;
           valid_out = sqrt_valid;
           is_rectangle = 0;
+          params = {25'b0, sqrt_result[20:0]};
           // if(sqrt_valid) has_sqrt_run = 1;
         end
         // line
@@ -108,6 +118,7 @@ module draw_to_storage_conversion (
           valid_out = 1;
           is_rectangle = 0;
           is_circle = 0;
+
         end
         // rectangle
         // schema: pos_x and pos_y are point_one x and y, 
@@ -119,7 +130,6 @@ module draw_to_storage_conversion (
           valid_out = calculations_valid;
           pos_x = composite_min[19:10];
           pos_y = composite_min[9:0];
-          is_rectangle = 0;
           is_circle = 0;
 
           if(!first_clockwise_found && is_point_1_bigger) begin
@@ -168,13 +178,13 @@ module draw_to_storage_conversion (
 
 
 // run sqrt only once
-sqrt circle_sqrt(
+sqrt #(.INTEGER_BITS(21), .FRACTIONAL_BITS(0)) circle_sqrt(
   .valid_in(is_circle && prod_valid),
   .clk_in(clk_in),
   .rst_in(rst_in),
   // separate into two cycles
-  .input_val(prod_x + prod_y),
-  .result(params),
+  .input_val({1'b0, prod_x + prod_y}),
+  .result(sqrt_result),
   .valid_out(sqrt_valid),
   .busy_out(sqrt_busy)
 );
@@ -182,9 +192,9 @@ sqrt circle_sqrt(
 // run nth smallest only once
 nth_smallest #(.MAX_NUM_SIZE(20)) min_rect_pt(
   .valid_in(is_rectangle && is_valid),
-  .index(0),
+  .index(2'b0),
   .numbers(composite_points),
-  .min_number(composite_min),
+  .nth_min(composite_min),
   .valid_out(nth_valid),
   .num_of_mins(num_same_x),
   .sorted(sorted_points),
@@ -194,6 +204,29 @@ nth_smallest #(.MAX_NUM_SIZE(20)) min_rect_pt(
 );
 
 always_ff@(posedge clk_in) begin
+  $display("displaying all rect variables");
+    // input logic valid_in,
+    // input logic [86:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
+    // output logic is_static, // 1 bit
+    // output logic [1:0] id_bits, // 2 bits
+    // output logic [35:0] params, // 36 bits
+    // output logic [10:0] pos_x, // 101bits
+    // output logic [9:0] pos_y, // 10 bits
+    // output logic [15:0] vel_x, // 16 bits
+    // output logic [15:0] vel_y, // 16 bits
+    // output logic valid_out, // 1 bit
+    // output logic busy_out
+  $display("is_valid: ", valid_in);
+  $display("is_static: ", is_static);
+  $display("id_bits: " , id_bits);
+  $display("pos_x: ", pos_x);
+  $display("pos_y: ", pos_y);
+  $display("vel_x: ", vel_x);
+  $display("vel_y: ", vel_y);
+  $display("busy_out: ", busy_out);
+  $display("valid_out: ", valid_out);
+  $display("is_rectangle: ", is_rectangle);
+  $display("nth_busy: ", nth_busy);
   if(is_circle && is_valid) begin
     prod_x <= (pos_x - point_one_x) * (pos_x - point_one_x);
     prod_y <= (pos_y - point_one_y) * (pos_y - point_one_y);

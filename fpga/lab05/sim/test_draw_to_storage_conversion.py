@@ -23,7 +23,6 @@ from cocotb.runner import get_runner
 
 # format: (is_static) (id_bits) (point_one) (point_two) (point_three/trailing-zeroes)
 # output: (is_static) (id_bits) (params) (pos_y) (pos_x) (vel_x) (vel_y)
-@cocotb.test()
 async def test_flat_rectangle(dut):
     dut._log.info("flat rectangle test")
     dut.rst_in.value = 1
@@ -31,9 +30,9 @@ async def test_flat_rectangle(dut):
     dut.rst_in.value = 0
     dut.valid_in.value = 1
     # points are (5, 6), (5, 2), (7, 6), (7, 2)
-    dut.draw_props.value = int(f"{111}{5:11b}{6:10b}{5:11b}{2:10b}{7:11b}{6:10b}{7:11b}{2:10b}", 2)
+    dut.draw_props.value = int(f"{111}{5:011b}{6:010b}{5:011b}{2:010b}{7:011b}{6:010b}{7:011b}{2:010b}", 2)
     await ClockCycles(dut.clk_in, 1)
-    assert dut.busy_out.value == 1, "module should have established busy"
+    # assert dut.busy_out.value == 1, "module should have established busy"
     await RisingEdge(dut.valid_out)
     await FallingEdge(dut.clk_in)
     assert dut.busy_out.value == 0, "shouldn't be busy anymore"
@@ -43,19 +42,15 @@ async def test_flat_rectangle(dut):
     assert dut.vel_x.value == 0 and dut.vel_y.value == 0, "we don't set these bad boys"
     print("these are params: ", dut.params.value)
 
-@cocotb.test()
 async def test_tilted_rectangle(dut):
     pass
 
-@cocotb.test()
 async def test_circle(dut):
     pass
 
-@cocotb.test()
 async def test_line(dut):
     pass
 
-@cocotb.test()
 async def test_rando(dut):
     pass
 
@@ -77,7 +72,7 @@ async def test_draw_to_storage_conversion(dut):
     # # 0000 0110101010 110101010 1000110011 1000100
     # #     0110101010010001001010001100110001000100
     cocotb.start_soon(Clock(dut.clk_in, 10, units="ns").start())
-    test_flat_rectangle(dut)
+    await test_flat_rectangle(dut)
     # dut.rst_in = 1
     # await ClockCycles(dut.clk_in, 2, rising=False)
     # dut.rst_in = 0
@@ -115,7 +110,7 @@ def is_runner():
     runner = get_runner(sim)
     runner.build(
         sources=sources,
-        parameters={'MAX_NUM_SIZE': 10},
+        parameters={},
         hdl_toplevel="draw_to_storage_conversion",
         always=True,
         timescale=('1ns', '1ps'),

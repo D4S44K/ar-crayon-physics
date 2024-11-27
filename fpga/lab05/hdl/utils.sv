@@ -39,6 +39,7 @@ logic four_is_min;
 typedef enum {IDLE, ROUND_1, ROUND_2, ROUND_3, TALLYING, RELEASE} e_states; 
 e_states state;
 always_comb begin
+    $display("started comb");
     // if(valid_in && state == IDLE) begin
     //     local_copy[0] = numbers[0];
     //     local_copy[1] = numbers[1];
@@ -107,6 +108,7 @@ always_comb begin
 end
 
 always_ff@(posedge clk_in) begin
+    $display("started ff");
     if(rst_in) begin
         state <= IDLE;
         busy_out <= 0;
