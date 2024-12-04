@@ -7,8 +7,8 @@ module draw_to_storage_conversion (
     output logic is_static, // 1 bit
     output logic [1:0] id_bits, // 2 bits
     output logic [35:0] params, // 36 bits
-    output logic [10:0] pos_x, // 101bits
-    output logic [9:0] pos_y, // 10 bits
+    output logic [15:0] pos_x, // 11 bits
+    output logic [15:0] pos_y, // 10 bits
     output logic [15:0] vel_x, // 16 bits
     output logic [15:0] vel_y, // 16 bits
     output logic valid_out, // 1 bit
