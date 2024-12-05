@@ -667,95 +667,95 @@ module top_level
     .delayed_signal(ch_blue_delayed_ps8)
   );
 
-  logic [7:0] rect_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_red),
-    //.stages(4),
-    .delayed_signal(rect_red_delayed_ps9)
-  );
+  // logic [7:0] rect_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_red),
+  //   //.stages(4),
+  //   .delayed_signal(rect_red_delayed_ps9)
+  // );
 
-  logic [7:0] rect_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_green),
-    //.stages(4),
-    .delayed_signal(rect_green_delayed_ps9)
-  );
+  // logic [7:0] rect_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_green),
+  //   //.stages(4),
+  //   .delayed_signal(rect_green_delayed_ps9)
+  // );
 
-  logic [7:0] rect_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_blue),
-    //.stages(4),
-    .delayed_signal(rect_blue_delayed_ps9)
-  );
+  // logic [7:0] rect_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_blue),
+  //   //.stages(4),
+  //   .delayed_signal(rect_blue_delayed_ps9)
+  // );
 
-  logic [7:0] circle_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_red),
-    //.stages(4),
-    .delayed_signal(circle_red_delayed_ps9)
-  );
+  // logic [7:0] circle_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_red),
+  //   //.stages(4),
+  //   .delayed_signal(circle_red_delayed_ps9)
+  // );
 
-  logic [7:0] circle_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_green),
-    //.stages(4),
-    .delayed_signal(circle_green_delayed_ps9)
-  );
+  // logic [7:0] circle_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_green),
+  //   //.stages(4),
+  //   .delayed_signal(circle_green_delayed_ps9)
+  // );
 
-  logic [7:0] circle_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_blue),
-    //.stages(4),
-    .delayed_signal(circle_blue_delayed_ps9)
-  );
+  // logic [7:0] circle_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_blue),
+  //   //.stages(4),
+  //   .delayed_signal(circle_blue_delayed_ps9)
+  // );
 
-  logic [7:0] line_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_red),
-    //.stages(4),
-    .delayed_signal(line_red_delayed_ps9)
-  );
+  // logic [7:0] line_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_red),
+  //   //.stages(4),
+  //   .delayed_signal(line_red_delayed_ps9)
+  // );
 
-  logic [7:0] line_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_green),
-    //.stages(4),
-    .delayed_signal(line_green_delayed_ps9)
-  );
+  // logic [7:0] line_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_green),
+  //   //.stages(4),
+  //   .delayed_signal(line_green_delayed_ps9)
+  // );
 
-  logic [7:0] line_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_blue),
-    //.stages(4),
-    .delayed_signal(line_blue_delayed_ps9)
-  );
+  // logic [7:0] line_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_blue),
+  //   //.stages(4),
+  //   .delayed_signal(line_blue_delayed_ps9)
+  // );
 
   video_mux mvm(
     .bg_in(display_choice), //choose background
@@ -765,9 +765,9 @@ module top_level
     .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
     .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
     .crosshair_in({ch_red_delayed_ps8, ch_green_delayed_ps8, ch_blue_delayed_ps8}), //TODO: needs (PS8)
-    .rect_pixel_in({rect_red_delayed_ps9, rect_green_delayed_ps9, rect_blue_delayed_ps9}), //TODO: needs (PS9) maybe?
-    .circle_pixel_in({circle_red_delayed_ps9, circle_green_delayed_ps9, circle_blue_delayed_ps9}),
-    .line_pixel_in({line_red_delayed_ps9, line_green_delayed_ps9, line_blue_delayed_ps9}),
+    .rect_pixel_in({rect_red, rect_green, rect_blue}), //TODO: needs (PS9) maybe?
+    .circle_pixel_in({circle_red, circle_green, circle_blue}),
+    .line_pixel_in({line_red, line_green, line_blue}),
     .pixel_out({red,green,blue}) //output to tmds
   );
 
