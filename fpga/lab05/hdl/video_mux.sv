@@ -43,9 +43,9 @@ module video_mux (
   always_comb begin
     case (target_in)
       2'b00: l_2 = l_1;
-      2'b01: l_2 = (line_pixel_in >0)?line_pixel_in:l_1;
-      2'b10: l_2 = (rect_pixel_in >0)?rect_pixel_in:l_1;
-      2'b11: l_2 = (circle_pixel_in >0)?circle_pixel_in:l_1;
+      2'b01: l_2 = (circle_pixel_in >0)?circle_pixel_in:l_1;
+      2'b10: l_2 = (line_pixel_in >0)?line_pixel_in:l_1;
+      2'b11: l_2 = (rect_pixel_in >0)?rect_pixel_in:l_1;
     endcase
   end
 
