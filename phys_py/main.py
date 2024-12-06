@@ -2,7 +2,7 @@ from my_types import *
 from input import load_obj_file
 from render import render_objects
 from simulate import (
-    update_pos_vel,
+    update_all_pos_vel,
     update_collision_vel,
     update_acc,
     debug_sim_time_update,
@@ -53,9 +53,9 @@ def main():
                             collide_pair = (i, j)
                             collide_parts = (i_part, j_part)
             if collide_pair[0] == -1:
-                update_pos_vel(obj_list, time_step)
+                update_all_pos_vel(obj_list, time_step)
             else:
-                update_pos_vel(obj_list, time_step)
+                update_all_pos_vel(obj_list, time_step)
                 update_collision_vel(
                     obj_list[collide_pair[0]],
                     obj_list[collide_pair[1]],
@@ -70,7 +70,7 @@ def main():
 
         if left_time > 0.0:
             print(f"!!! Skipping to next frame: {left_time.get_float()}")
-            update_pos_vel(obj_list, left_time)
+            update_all_pos_vel(obj_list, left_time)
             debug_col_time_update(left_time)
             debug_sim_time_update(left_time)
 

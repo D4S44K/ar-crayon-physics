@@ -6,7 +6,7 @@ def float_to_fixed_int(value, signed, integer_bits, fractional_bits):
     # return integer representation of a fixed point number
     if not signed and value < 0:
         raise ValueError("Negative value not allowed for unsigned fixed point")
-    value = int(value * (2**fractional_bits))
+    value = int((value * (2**fractional_bits)) // 1)
     if value >= 2 ** (integer_bits + fractional_bits) and False:
         raise ValueError(f"Value {value} exceeds {integer_bits + fractional_bits} bits")
         print(f"Warning: value {value} exceeds {integer_bits + fractional_bits} bits")
@@ -169,6 +169,10 @@ class FixedPointDecimal:
 
     def get_float(self):
         return self.fixed_value / (2**self.fracb)
+
+    def get_int_repr(self):
+        repr_max = (1 << (self.intb + self.fracb + (1 if self.signed else 0))) - 1
+        return self.fixed_value & repr_max
 
     def convert(self, signed, integer_bits, fractional_bits):
         if signed != self.signed:

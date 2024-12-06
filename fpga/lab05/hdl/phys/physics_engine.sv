@@ -84,7 +84,7 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
       update_pos_vel upv_i(
                        .obj_dyn_in(objects[i][`OBJ_DYN_WIDTH-1:0]), // MEMORYIO
                        .time_step(time_step[`DF_DEC+1:0]),
-                       .obj_pos_out(obj_dyn_next[i][`OBJ_DYN_WIDTH-1: `OBJ_DYN_WIDTH-2*`SF])
+                       .obj_dyn_out(obj_dyn_next[i])
                      );
     end
   endgenerate

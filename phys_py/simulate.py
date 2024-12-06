@@ -27,19 +27,22 @@ def debug_set(obj_i, obj_j):
     df.to_csv("result/debug_sim.csv")
 
 
-def update_pos_vel(objects, time_step):
+def update_pos_vel(pos, vel, acc_y, time_step):
     ts = time_step.to_sfix32()  # this should have 12bit decimal
+    pos_x = pos[0].add_wrap((vel[0].to_sfix32() * ts).to_sfix16())
+    pos_y = pos[1].add_wrap((vel[1].to_sfix32() * ts).to_sfix16())
+
+    vel_x = vel[0]
+    vel_y = vel[1].add_wrap((acc_y.to_sfix32() * ts).to_sfix16())
+    return (pos_x, pos_y), (vel_x, vel_y)
+
+
+def update_all_pos_vel(objects, time_step):
+    # ts should have 12bit decimal
     for obj in objects:
-        obj.pos = (
-            obj.pos[0].add_wrap((obj.vel[0].to_sfix32() * ts).to_sfix16()),
-            obj.pos[1].add_wrap((obj.vel[1].to_sfix32() * ts).to_sfix16()),
-        )
-        obj.vel = (
-            obj.vel[0].add_wrap((obj.acc[0].to_sfix32() * ts).to_sfix16()),
-            obj.vel[1].add_wrap((obj.acc[1].to_sfix32() * ts).to_sfix16()),
-            # obj.vel[0] + (obj.acc[0] * ts).to_sfix16(),
-            # obj.vel[1] + (obj.acc[1] * ts).to_sfix16(),
-        )
+        new_pos, new_vel = update_pos_vel(obj.pos, obj.vel, obj.acc[1], time_step)
+        obj.pos = new_pos
+        obj.vel = new_vel
 
 
 def check_inactive(objects):
