@@ -8,11 +8,7 @@ module draw_line #(
   input wire [9:0]  y_in_1,
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
-  input wire place_obj,
-  output logic [10:0] line_x1,
-  output logic [9:0]  line_y1,
-  output logic [10:0] line_x2,
-  output logic [9:0]  line_y2,
+  output logic [83:0] line_coord,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
@@ -64,15 +60,9 @@ module draw_line #(
         else begin
             in_line = 0;
         end
-
-        if (place_obj) begin
-          line_x1 = x_in_1;
-          line_y1 = y_in_1;
-          line_x2 = x_in_2;
-          line_y2 = y_in_2;
-        end
   end
 
+  assign line_coord = {{x_1, y_1}, {x_2, y_2}, 42'b0};
   assign red_out   = in_line ? COLOR[23:16] : 0;
   assign green_out = in_line ? COLOR[15:8] : 0;
   assign blue_out  = in_line ? COLOR[7:0] : 0;

@@ -222,7 +222,7 @@ module top_level
   );
 
   //channel select module (select which of six color channels to mask):
-  logic [2:0] channel_sel;
+  // logic [2:0] channel_sel;
   logic [7:0] selected_channel; //selected channels
   //selected_channel could contain any of the six color channels depend on selection
 
@@ -237,13 +237,13 @@ module top_level
   logic new_com; //used to know when to update x_com and y_com ...
 
   //channel select module (select which of six color channels to mask) FOR COM_2:
-  logic [2:0] channel_sel_2;
+  // logic [2:0] channel_sel_2;
   logic [7:0] selected_channel_2; //selected channels
   //selected_channel could contain any of the six color channels depend on selection
 
   //threshold module (apply masking threshold) FOR COM_2:
-  logic [7:0] lower_threshold_2;
-  logic [7:0] upper_threshold_2;
+  // logic [7:0] lower_threshold_2;
+  // logic [7:0] upper_threshold_2;
   logic mask_2; //Whether or not thresholded pixel is 1 or 0
 
   //Center of Mass variables FOR COM_2 (tally all mask=1 pixels for a frame and calculate their center of mass)fb_red
@@ -291,9 +291,9 @@ module top_level
     .delayed_signal(fb_blue_delayed_ps1)
   );
 
-  assign channel_sel = 3'b101;
+  // assign channel_sel = 3'b101;
 
-  assign channel_sel_2 = 3'b110;
+  // assign channel_sel_2 = 3'b110;
   // * 3'b000: green
   // * 3'b001: red
   // * 3'b010: blue
@@ -304,34 +304,34 @@ module top_level
   // * 3'b111: not valid
   //Channel Select: Takes in the full RGB and YCrCb information and
   // chooses one of them to output as an 8 bit value
-  channel_select mcs(
-     .sel_in(channel_sel),
-     .r_in(fb_red_delayed_ps1),    //TODO: needs to use pipelined signal (PS1)
-     .g_in(fb_green_delayed_ps1),  //TODO: needs to use pipelined signal (PS1)
-     .b_in(fb_blue_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
-     .y_in(y),
-     .cr_in(cr),
-     .cb_in(cb),
-     .channel_out(selected_channel)
-  );
+  // channel_select mcs(
+  //    .sel_in(channel_sel),
+  //    .r_in(fb_red_delayed_ps1),    //TODO: needs to use pipelined signal (PS1)
+  //    .g_in(fb_green_delayed_ps1),  //TODO: needs to use pipelined signal (PS1)
+  //    .b_in(fb_blue_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
+  //    .y_in(y),
+  //    .cr_in(cr),
+  //    .cb_in(cb),
+  //    .channel_out(selected_channel)
+  // );
 
-  channel_select mcs_2(
-     .sel_in(channel_sel_2),
-     .r_in(fb_red_delayed_ps1),    //TODO: needs to use pipelined signal (PS1)
-     .g_in(fb_green_delayed_ps1),  //TODO: needs to use pipelined signal (PS1)
-     .b_in(fb_blue_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
-     .y_in(y),
-     .cr_in(cr),
-     .cb_in(cb),
-     .channel_out(selected_channel_2)
-  );
+  // channel_select mcs_2(
+  //    .sel_in(channel_sel_2),
+  //    .r_in(fb_red_delayed_ps1),    //TODO: needs to use pipelined signal (PS1)
+  //    .g_in(fb_green_delayed_ps1),  //TODO: needs to use pipelined signal (PS1)
+  //    .b_in(fb_blue_delayed_ps1),   //TODO: needs to use pipelined signal (PS1)
+  //    .y_in(y),
+  //    .cr_in(cr),
+  //    .cb_in(cb),
+  //    .channel_out(selected_channel_2)
+  // );
+
+  assign selected_channel = cr;
+  assign selected_channel_2 = cb;
 
   //threshold values used to determine what value  passes:
   assign lower_threshold = {4'b1010,4'b0};
   assign upper_threshold = {4'b1111,4'b0};
-
-  assign lower_threshold_2 = {4'b1010,4'b0};
-  assign upper_threshold_2 = {4'b1111,4'b0};
   //Thresholder: Takes in the full selected channedl and
   //based on upper and lower bounds provides a binary mask bit
   // * 1 if selected channel is within the bounds (inclusive)
@@ -349,8 +349,8 @@ module top_level
      .clk_in(clk_pixel),
      .rst_in(sys_rst_pixel),
      .pixel_in(selected_channel_2),
-     .lower_bound_in(lower_threshold_2),
-     .upper_bound_in(upper_threshold_2),
+     .lower_bound_in(lower_threshold),
+     .upper_bound_in(upper_threshold),
      .mask_out(mask_2) //single bit if pixel within mask.
   );
 
@@ -363,7 +363,7 @@ module top_level
                  .rst_in(sys_rst_pixel),
                  .lt_in(lower_threshold),
                  .ut_in(upper_threshold),
-                 .channel_sel_in(channel_sel),
+                 .channel_sel_in(3'b101),
                  .cat_out(ss_c),
                  .an_out({ss0_an, ss1_an})
   );
@@ -439,18 +439,15 @@ module top_level
 
   //rectangle output:
   logic [7:0] rect_red, rect_green, rect_blue;
-  logic [10:0] rect_x1, rect_x2;
-  logic [9:0] rect_y1, rect_y2;
+  logic [83:0] rect_coord;
 
   //circle output:
   logic [7:0] circle_red, circle_green, circle_blue;
-  logic [10:0] circle_x1, circle_x2;
-  logic [9:0] circle_y1, circle_y2;
+  logic [83:0] circle_coord;
 
   //line output:
   logic [7:0] line_red, line_green, line_blue;
-  logic [10:0] line_x1, line_x2;
-  logic [9:0] line_y1, line_y2;
+  logic [83:0] line_coord;
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
@@ -485,11 +482,7 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
-    .place_obj(btn[2]),
-    .rect_x1(rect_x1),
-    .rect_y1(rect_y1),
-    .rect_x2(rect_x2),
-    .rect_y2(rect_y2),
+    .rect_coord(rect_coord),
     .red_out(rect_red),
     .green_out(rect_green),
     .blue_out(rect_blue));
@@ -508,11 +501,7 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
-    .place_obj(btn[2]),
-    .circle_x1(circle_x1),
-    .circle_y1(circle_y1),
-    .circle_x2(circle_x2),
-    .circle_y2(circle_y2),
+    .circle_coord(circle_coord),
     .red_out(circle_red),
     .green_out(circle_green),
     .blue_out(circle_blue));
@@ -531,11 +520,7 @@ module top_level
     .y_in_1(y_com),
     .x_in_2(x_com_2),
     .y_in_2(y_com_2),
-    .place_obj(btn[2]),
-    .line_x1(line_x1),
-    .line_y1(line_y1),
-    .line_x2(line_x2),
-    .line_y2(line_y2),
+    .line_coord(line_coord),
     .red_out(line_red),
     .green_out(line_green),
     .blue_out(line_blue));
@@ -557,6 +542,19 @@ module top_level
       .is_valid_out(is_valid_out)
       );
 
+  // object coordinate setting logic
+  logic [86:0] obj_coord;
+  always_comb begin
+    if (btn[2]) begin
+      case (sw[7:6])
+        2'b00: obj_coord = 87'b0;
+        2'b01: obj_coord = {sw[2], sw[7:6], circle_coord};
+        2'b10: obj_coord = {sw[2], sw[7:6], line_coord};
+        2'b11: obj_coord = {sw[2], sw[7:6], rect_coord};
+        default: obj_coord = 87'b0;
+      endcase
+    end
+  end
 
   //crosshair output:
   logic [7:0] ch_red, ch_green, ch_blue;
@@ -686,95 +684,95 @@ module top_level
     .delayed_signal(ch_blue_delayed_ps8)
   );
 
-  logic [7:0] rect_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_red),
-    //.stages(4),
-    .delayed_signal(rect_red_delayed_ps9)
-  );
+  // logic [7:0] rect_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_red),
+  //   //.stages(4),
+  //   .delayed_signal(rect_red_delayed_ps9)
+  // );
 
-  logic [7:0] rect_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_green),
-    //.stages(4),
-    .delayed_signal(rect_green_delayed_ps9)
-  );
+  // logic [7:0] rect_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_green),
+  //   //.stages(4),
+  //   .delayed_signal(rect_green_delayed_ps9)
+  // );
 
-  logic [7:0] rect_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    rect_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(rect_blue),
-    //.stages(4),
-    .delayed_signal(rect_blue_delayed_ps9)
-  );
+  // logic [7:0] rect_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   rect_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(rect_blue),
+  //   //.stages(4),
+  //   .delayed_signal(rect_blue_delayed_ps9)
+  // );
 
-  logic [7:0] circle_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_red),
-    //.stages(4),
-    .delayed_signal(circle_red_delayed_ps9)
-  );
+  // logic [7:0] circle_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_red),
+  //   //.stages(4),
+  //   .delayed_signal(circle_red_delayed_ps9)
+  // );
 
-  logic [7:0] circle_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_green),
-    //.stages(4),
-    .delayed_signal(circle_green_delayed_ps9)
-  );
+  // logic [7:0] circle_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_green),
+  //   //.stages(4),
+  //   .delayed_signal(circle_green_delayed_ps9)
+  // );
 
-  logic [7:0] circle_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    circle_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(circle_blue),
-    //.stages(4),
-    .delayed_signal(circle_blue_delayed_ps9)
-  );
+  // logic [7:0] circle_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   circle_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(circle_blue),
+  //   //.stages(4),
+  //   .delayed_signal(circle_blue_delayed_ps9)
+  // );
 
-  logic [7:0] line_red_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_red_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_red),
-    //.stages(4),
-    .delayed_signal(line_red_delayed_ps9)
-  );
+  // logic [7:0] line_red_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_red_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_red),
+  //   //.stages(4),
+  //   .delayed_signal(line_red_delayed_ps9)
+  // );
 
-  logic [7:0] line_green_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_green_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_green),
-    //.stages(4),
-    .delayed_signal(line_green_delayed_ps9)
-  );
+  // logic [7:0] line_green_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_green_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_green),
+  //   //.stages(4),
+  //   .delayed_signal(line_green_delayed_ps9)
+  // );
 
-  logic [7:0] line_blue_delayed_ps9;
-  pipeline #(
-    .WIDTH(8), .STAGES(4))
-    line_blue_pipeline_ps9(
-    .clk_pixel(clk_pixel),
-    .signal(line_blue),
-    //.stages(4),
-    .delayed_signal(line_blue_delayed_ps9)
-  );
+  // logic [7:0] line_blue_delayed_ps9;
+  // pipeline #(
+  //   .WIDTH(8), .STAGES(4))
+  //   line_blue_pipeline_ps9(
+  //   .clk_pixel(clk_pixel),
+  //   .signal(line_blue),
+  //   //.stages(4),
+  //   .delayed_signal(line_blue_delayed_ps9)
+  // );
 
   video_mux mvm(
     .bg_in(display_choice), //choose background
@@ -784,9 +782,9 @@ module top_level
     .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
     .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
     .crosshair_in({ch_red_delayed_ps8, ch_green_delayed_ps8, ch_blue_delayed_ps8}), //TODO: needs (PS8)
-    .rect_pixel_in({rect_red_delayed_ps9, rect_green_delayed_ps9, rect_blue_delayed_ps9}), //TODO: needs (PS9) maybe?
-    .circle_pixel_in({circle_red_delayed_ps9, circle_green_delayed_ps9, circle_blue_delayed_ps9}),
-    .line_pixel_in({line_red_delayed_ps9, line_green_delayed_ps9, line_blue_delayed_ps9}),
+    .rect_pixel_in({rect_red, rect_green, rect_blue}), //TODO: needs (PS9) maybe?
+    .circle_pixel_in({circle_red, circle_green, circle_blue}),
+    .line_pixel_in({line_red, line_green, line_blue}),
     .pixel_out({red,green,blue}) //output to tmds
   );
 

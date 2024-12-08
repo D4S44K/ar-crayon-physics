@@ -28,15 +28,15 @@ def debug_set(obj_i, obj_j):
 
 
 def update_pos_vel(objects, time_step):
-    ts = time_step.to_sfix16()
+    ts = time_step.to_sfix32()  # this should have 12bit decimal
     for obj in objects:
         obj.pos = (
-            obj.pos[0].add_wrap((obj.vel[0] * ts).to_sfix16()),
-            obj.pos[1].add_wrap((obj.vel[1] * ts).to_sfix16()),
+            obj.pos[0].add_wrap((obj.vel[0].to_sfix32() * ts).to_sfix16()),
+            obj.pos[1].add_wrap((obj.vel[1].to_sfix32() * ts).to_sfix16()),
         )
         obj.vel = (
-            obj.vel[0].add_wrap((obj.acc[0] * ts).to_sfix16()),
-            obj.vel[1].add_wrap((obj.acc[1] * ts).to_sfix16()),
+            obj.vel[0].add_wrap((obj.acc[0].to_sfix32() * ts).to_sfix16()),
+            obj.vel[1].add_wrap((obj.acc[1].to_sfix32() * ts).to_sfix16()),
             # obj.vel[0] + (obj.acc[0] * ts).to_sfix16(),
             # obj.vel[1] + (obj.acc[1] * ts).to_sfix16(),
         )
@@ -134,24 +134,26 @@ def circle_circle_vel(obj_a, a_part, obj_b, b_part, rv_x, rv_y):
 def circle_line_vel(obj_a, a_part, obj_b, line_b, rv_x, rv_y):
     ln_a = line_b.y2 - line_b.y1
     ln_b = line_b.x1 - line_b.x2  # always positive
-    ln_sq = ln_a * ln_a + ln_b * ln_b
+    ln_sq = (ln_a * ln_a + ln_b * ln_b).to_sfix32()
     # line: Ax + By = 0, normal vector is (-A, B)
 
     # sign = 1.0 if (df_x * ln_y - df_y * ln_x) > 0 else -1.0
-    dot_rv_df = rv_x * ln_a + rv_y * ln_b  # sign??
+    dot_rv_df = (rv_x * ln_a + rv_y * ln_b).to_sfix32()  # sign??
     # dot_sign = 1.0 if dot_rv_df > 0 else -1.0
 
     unit_dist_x = (
-        (CoR * ln_a).to_sfix16() * (dot_rv_df / ln_sq).to_sfix16()
-    ).to_sfix16()
+        (((CoR * ln_a).to_sfix32() * dot_rv_df).to_sfix32() / ln_sq).to_sfix16()
+    ).to_sfix32()
     unit_dist_y = (
-        (CoR * ln_b).to_sfix16() * (dot_rv_df / ln_sq).to_sfix16()
-    ).to_sfix16()
+        (((CoR * ln_b).to_sfix32() * dot_rv_df).to_sfix32() / ln_sq).to_sfix16()
+    ).to_sfix32()
 
     m_scale_1, m_scale_2 = get_mass_coeff(obj_a, obj_b)
+    m_scale_1 = m_scale_1.to_sfix32()
+    m_scale_2 = m_scale_2.to_sfix32()
 
     obj_a.vel = (
-        obj_a.vel[0] - (m_scale_1 * unit_dist_x).to_sfix16(),
+        obj_a.vel[0] - (m_scale_1 * unit_dist_x).to_sfix16(),  # 32bit * 32bit -> 16bit
         obj_a.vel[1] - (m_scale_1 * unit_dist_y).to_sfix16(),
     )
 
