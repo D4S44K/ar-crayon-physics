@@ -1,6 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1733615138" />
-    <testcase name="test_sqrt" classname="test_sqrt" file="/Users/dishakohli/6205_python/ar-crayon-physics/fpga/lab05/sim/test_sqrt.py" lineno="17" time="0.011677742004394531" sim_time_ns="2075.001" ratio_time="177688.54622915477" />
-  </testsuite>
-</testsuites>

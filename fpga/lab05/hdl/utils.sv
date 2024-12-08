@@ -38,7 +38,7 @@ module rect_converter
     output logic [10:0] x_in_2,
     output logic [9:0] y_in_2,
     output logic busy_out,
-    output logic is_valid_out,
+    output logic is_valid_out
 );
 logic signed [15:0] dx_1;
 logic signed[15:0] dy_1;
@@ -83,7 +83,7 @@ always_ff@(posedge clk_in) begin
         has_started = 1;
         busy_out <= 1;
     end
-    else if(!is_busy_out) begin
+    else if(is_divide_done) begin
         x_in_2 <= x_in_1 + dx_1 + dx_2;
         is_valid_out <= !has_error;
         busy_out <= 0;
@@ -101,7 +101,7 @@ module line_converter
     output logic [9:0] y_in_1,
     output logic [10:0] x_in_2,
     output logic [9:0] y_in_2,
-    output wire is_valid_out,
+    output wire is_valid_out
 );
 always_comb begin
     is_static = object_props[114:114];
@@ -134,16 +134,6 @@ logic [MAX_NUM_SIZE-1:0] second_1;
 logic [MAX_NUM_SIZE-1:0] third_1;
 logic [MAX_NUM_SIZE-1:0] fourth_1;
 
-// logic [MAX_NUM_SIZE-1:0] first_2;
-// logic [MAX_NUM_SIZE-1:0] second_2;
-// logic [MAX_NUM_SIZE-1:0] third_2;
-// logic [MAX_NUM_SIZE-1:0] fourth_2; 
-
-// logic [MAX_NUM_SIZE-1:0] first_3;
-// logic [MAX_NUM_SIZE-1:0] second_3;
-// logic [MAX_NUM_SIZE-1:0] third_3;
-// logic [MAX_NUM_SIZE-1:0] fourth_3;
-
 logic [3:0][MAX_NUM_SIZE-1:0] local_copy;
 logic [1:0] local_index;
 
@@ -156,17 +146,6 @@ typedef enum {IDLE, ROUND_1, ROUND_2, ROUND_3, TALLYING, RELEASE} e_states;
 e_states state;
 always_comb begin
     $display("started comb");
-    // if(valid_in && state == IDLE) begin
-    //     local_copy[0] = numbers[0];
-    //     local_copy[1] = numbers[1];
-    //     local_copy[2] = numbers[2];
-    //     local_copy[3] = numbers[3];
-    //     local_index = index;
-    // end
-    // first_1 = local_copy[0];
-    // second_1 = local_copy[1];
-    // third_1 = local_copy[2];
-    // fourth_1 = local_copy[3];
 
     if(state == RELEASE) begin
         if(local_copy[0] == nth_min) one_is_min = 1;
@@ -180,47 +159,6 @@ always_comb begin
         num_of_mins = one_is_min + two_is_min + three_is_min + four_is_min;
         state = IDLE;
     end
-    // if(valid_in) begin
-    //     // ascending sort 1-2
-    //     first_1 = (numbers[0] < numbers[1]) ? numbers[0] : numbers[1];
-    //     second_1 = (numbers[0] > numbers[1]) ? numbers[0] : numbers[1];
-    //     // descending sort 3-4
-    //     third_1 = (numbers[2] > numbers[3]) ? numbers[2] : numbers[3];
-    //     fourth_1 = (numbers[2] < numbers[3]) ? numbers[2] : numbers[3];
-    //     // ascending sort 1-3
-    //     first_2 = (first_1 < third_1) ? first_1 : third_1;
-    //     third_2 = (first_1 > third_1) ? first_1 : third_1;
-    //     // ascending sort 2-4
-    //     second_2 = (second_1 < fourth_1) ? second_1 : fourth_1;
-    //     fourth_2 = (second_1 > fourth_1) ? second_1 : fourth_1;
-    //     // ascending sort 1-2
-    //     first_3 = (first_2 < second_2) ? first_2 : second_2;
-    //     second_3 = (first_2 > second_2) ? first_2 : second_2;
-    //     // ascending sort 3-4
-    //     third_3 = (third_2 < fourth_2) ? third_2 : fourth_2;
-    //     fourth_3 = (third_2 > fourth_2) ? third_2 : fourth_2;
-    //     // pick correct index
-    //     case(index)
-    //         2'b00 : min_number = first_3;
-    //         2'b01 : min_number = second_3;
-    //         2'b10 : min_number = third_3;
-    //         2'b11 : min_number = fourth_3;
-    //         default: min_number = 0;
-    //     endcase
-
-    //     if(first_3 == min_number) one_is_min = 1;
-    //     else one_is_min = 0;
-    //     if(second_3 == min_number) two_is_min = 1;
-    //     else two_is_min = 0;
-    //     if(third_3 == min_number) three_is_min = 1;
-    //     else three_is_min = 0;
-    //     if(fourth_3 == min_number) four_is_min = 1;
-    //     else four_is_min = 0;
-    //     num_of_mins = one_is_min + two_is_min + three_is_min + four_is_min;
-    //     sorted = {first_3, second_3, third_3, fourth_3};
-
-    // end
-    // valid_out = valid_in;
 end
 
 always_ff@(posedge clk_in) begin

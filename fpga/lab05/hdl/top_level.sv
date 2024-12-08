@@ -525,22 +525,24 @@ module top_level
     .green_out(line_green),
     .blue_out(line_blue));
 
-    object_storage bram_storage(
-      .object_props(0),
-      .clk_in(clk_in),
-      .write_valid_in(0),
-      .read_valid_in(4'b1111),
-      .current_addr(current_addresses),
-      .rst_in(rst_in),
-      .is_static(is_static),
-      .id_bits(id_bits),
-      .params(params),
-      .pos_x(pos_x),
-      .pos_y(pos_y),
-      .vel_x(vel_x),
-      .vel_y(vel_y),
-      .is_valid_out(is_valid_out)
-      );
+  object_storage obj_storage(
+    .object_props(0),
+    .clk_in(clk_in),
+    .write_valid_in(0),
+    .read_valid_in(4'b1111),
+    .current_addr(current_addresses),
+    .rst_in(rst_in),
+    .is_static(is_static),
+    .id_bits(id_bits),
+    .params(params),
+    .pos_x(pos_x),
+    .pos_y(pos_y),
+    .vel_x(vel_x),
+    .vel_y(vel_y),
+    .is_valid_out(is_valid_out)
+  );
+
+  
 
   // object coordinate setting logic
   logic [86:0] obj_coord;

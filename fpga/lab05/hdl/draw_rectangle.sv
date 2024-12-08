@@ -21,6 +21,11 @@ module draw_rectangle #(
 
   logic in_rect;
 
+  logic [83:0] rect_coord_pipeline;
+  logic [2:0][7:0] red_out_pipeline;
+  logic [2:0][7:0] green_out_pipeline;
+  logic [2:0][7:0] blue_out_pipeline;
+
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
     //   red_out <= 0;
@@ -37,11 +42,28 @@ module draw_rectangle #(
         // stage 2
         in_rect <= ((hcount_in >= x_1 && hcount_in < x_2) &&
                       (vcount_in >= y_1 && vcount_in < y_2));
+        // stage 3
+        rect_coord_pipeline[0] <= {{x_1, y_1}, {x_2, y_1}, {x_1, y_2}, {x_2, y_2}};
+        red_out_pipeline[0] <=    in_rect ? COLOR[23:16] : 0;
+        green_out_pipeline[0] <=  in_rect ? COLOR[15:8] : 0;
+        blue_out_pipeline[0] <=   in_rect ? COLOR[7:0] : 0;
+
+        // stage 4
+        rect_coord_pipeline[1] <= rect_coord_pipeline[0];
+        red_out_pipeline[1] <= red_out_pipeline[0];
+        green_out_pipeline[1] <= green_out_pipeline[0];
+        blue_out_pipeline[1] <= blue_out_pipeline[0];
+
+        // stage 5
+        rect_coord_pipeline[2] <= rect_coord_pipeline[1];
+        red_out_pipeline[2] <= red_out_pipeline[1];
+        green_out_pipeline[2] <= green_out_pipeline[1];
+        blue_out_pipeline[2] <= blue_out_pipeline[1];
     end
   end
 
-  assign rect_coord = {{x_1, y_1}, {x_2, y_1}, {x_1, y_2}, {x_2, y_2}};
-  assign red_out =    in_rect ? COLOR[23:16] : 0;
-  assign green_out =  in_rect ? COLOR[15:8] : 0;
-  assign blue_out =   in_rect ? COLOR[7:0] : 0;
+  assign rect_coord = rect_coord_pipeline[2];
+  assign red_out =    red_out_pipeline[2];
+  assign green_out =  green_out_pipeline[2];
+  assign blue_out =   blue_out_pipeline[2];
 endmodule
