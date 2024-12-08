@@ -3,17 +3,17 @@
 
 module sqrt #(
   parameter INTEGER_BITS=20, FRACTIONAL_BITS=11)(
-  input valid_in,
+  input wire valid_in,
   input wire clk_in,
   input wire rst_in,
-  input wire [INTEGER_BITS + FRACTIONAL_BITS:0] input_val,  // 1 sign bit, 20 integer bits, 11 decimal bits
-  output logic [INTEGER_BITS + FRACTIONAL_BITS:0] result,
+  input wire [31:0] input_val,  // 1 sign bit, 20 integer bits, 11 decimal bits
+  output logic [15:0] result,
   output logic valid_out,
   output logic busy_out
 );
 
-  logic [INTEGER_BITS + FRACTIONAL_BITS:0] low, high, mid, square;
-  logic [INTEGER_BITS + FRACTIONAL_BITS:0] closest_result;
+  logic [31:0] low, high, mid, square;
+  logic [31:0] closest_result;
 
   logic mid_calc;
   logic square_calc;
@@ -31,7 +31,7 @@ module sqrt #(
       busy_out <= 0;
     end
     else if(valid_out) begin valid_out <= 0; busy_out <= 0; end
-    else if(valid_in && !busy_out && input_val >= 0) begin
+    else if(valid_in & !busy_out & input_val >= 0) begin
       low <= 0;
       high <= input_val;
       result <= 0;

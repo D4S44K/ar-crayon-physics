@@ -2,11 +2,12 @@ module draw_to_storage_conversion (
     // input:  (is_static) (id_bits) (point_one) (point_two) (point_three/trailing-zeroes)
     // output: (is_static) (id_bits) (params) (pos_y) (pos_x) (vel_x) (vel_y)
     input wire clk_in,
-    input logic valid_in,
-    input logic [86:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
+    input wire valid_in,
+    input wire rst_in,
+    input wire [86:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
     output logic is_static, // 1 bit
     output logic [1:0] id_bits, // 2 bits
-    output logic [35:0] params, // 36 bits
+    output logic [47:0] params, // 36 bits
     output logic [15:0] pos_x, // 11 bits
     output logic [15:0] pos_y, // 10 bits
     output logic [15:0] vel_x, // 16 bits
@@ -107,14 +108,14 @@ module draw_to_storage_conversion (
           pos_y = (point_one_y + point_two_y) >> 2;
           valid_out = sqrt_valid;
           is_rectangle = 0;
-          params = {25'b0, sqrt_result[20:0]};
+          params = {26'b0, sqrt_result[20:0]};
           // if(sqrt_valid) has_sqrt_run = 1;
         end
         // line
         2'b10: begin
           pos_x = point_one_x;
           pos_y = point_one_y;
-          params = {point_two_x, point_two_y};
+          params = {16'b0, point_two_x, point_two_y};
           valid_out = 1;
           is_rectangle = 0;
           is_circle = 0;
@@ -178,7 +179,7 @@ module draw_to_storage_conversion (
 
 
 // run sqrt only once
-sqrt #(.INTEGER_BITS(21), .FRACTIONAL_BITS(0)) circle_sqrt(
+sqrt #(.INTEGER_BITS(20), .FRACTIONAL_BITS(11)) circle_sqrt(
   .valid_in(is_circle && prod_valid),
   .clk_in(clk_in),
   .rst_in(rst_in),

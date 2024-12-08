@@ -17,7 +17,7 @@ module object_storage (
     output logic [3:0][15:0] pos_y,
     output logic [3:0][15:0] vel_x,
     output logic [3:0][15:0] vel_y,
-    output logic [3:0] is_valid_out,
+    output logic [3:0] is_valid_out
   );
 
 // four dual port BRAMs
@@ -25,22 +25,25 @@ module object_storage (
 // msb: is object static
 // two bits: obj type (00 n/a 01 circle 10 rectangle 11 line)
   logic [102:0] storage_props; // 1 + 2 + 36 + 16 + 16 + 16 + 16 = 103
+
   logic [3:0][102:0] storage_out;
   logic [1:0] read_write_flag_buffer;
 
-  assign is_static = {storage_out[3:3][102:102], storage_out[2:2][102:102], storage_out[1:1][102:102], storage_out[0:0][102:102]};
-  assign id_bits = {storage_out[3:3][101:100], storage_out[2:2][101:100], storage_out[1:1][101:100], storage_out[0:0][101:100]};
-  assign params = {storage_out[3:3][99:64], storage_out[2:2][99:64], storage_out[1:1][99:64], storage_out[0:0][99:64]};
-  assign pos_x = {storage_out[3:3][63:48], storage_out[2:2][63:48], storage_out[1:1][63:48], storage_out[0:0][63:48]};
-  assign pos_y = {storage_out[3:3][47:32], storage_out[2:2][47:32], storage_out[1:1][47:32], storage_out[0:0][47:32]};
-  assign vel_x = {storage_out[3:3][31:16], storage_out[2:2][31:16], storage_out[1:1][31:16], storage_out[0:0][31:16]};
-  assign vel_y = {storage_out[3:3][15:0], storage_out[2:2][15:0], storage_out[1:1][15:0], storage_out[0:0][15:0]};
-  assign is_valid_out = read_write_flag_buffer[2];
+always_comb begin
+   is_static = {storage_out[3:3][102:102], storage_out[2:2][102:102], storage_out[1:1][102:102], storage_out[0:0][102:102]};
+   id_bits = {storage_out[3:3][101:100], storage_out[2:2][101:100], storage_out[1:1][101:100], storage_out[0:0][101:100]};
+   params = {storage_out[3:3][99:64], storage_out[2:2][99:64], storage_out[1:1][99:64], storage_out[0:0][99:64]};
+   pos_x = {storage_out[3:3][63:48], storage_out[2:2][63:48], storage_out[1:1][63:48], storage_out[0:0][63:48]};
+   pos_y = {storage_out[3:3][47:32], storage_out[2:2][47:32], storage_out[1:1][47:32], storage_out[0:0][47:32]};
+   vel_x = {storage_out[3:3][31:16], storage_out[2:2][31:16], storage_out[1:1][31:16], storage_out[0:0][31:16]};
+   vel_y = {storage_out[3:3][15:0], storage_out[2:2][15:0], storage_out[1:1][15:0], storage_out[0:0][15:0]};
+   is_valid_out = read_write_flag_buffer[2];
+end
 
   draw_to_storage_conversion draw_converter(
     .clk_in(clk_in),
     .valid_in(write_valid_in),
-    .draw_props(object_props[0])
+    .draw_props(object_props[0]),
     .is_static(is_static),
     .id_bits(id_bits),
     .params(params),
@@ -48,10 +51,10 @@ module object_storage (
     .pos_y(pos_y[0]),
     .vel_x(vel_x[0]),
     .vel_y(vel_y[0]),
-    .valid_out(is_valid_out),
+    .valid_out(is_valid_out)
   );
 
-  always_ff@posedge(clk_in) begin
+  always_ff@(posedge clk_in) begin
     read_write_flag_buffer[0] <= read_valid_in || write_valid_in;
     read_write_flag_buffer[1] <= read_write_flag_buffer[0];
     read_write_flag_buffer[2] <= read_write_flag_buffer[1];

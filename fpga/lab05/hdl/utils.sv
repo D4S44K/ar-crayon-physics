@@ -1,3 +1,119 @@
+module circle_converter
+(
+    input wire [114:0] object_props,
+    input wire is_valid_in,
+    output logic is_static,
+    output logic [10:0] x_in_1,
+    output logic [9:0] y_in_1,
+    output logic [10:0] x_in_2,
+    output logic [9:0] y_in_2,
+    output logic is_valid_out
+);
+logic [15:0] radius;
+logic [15:0] center_x;
+logic [15:0] center_y;
+always_comb begin
+    is_static = object_props[114:114];
+    center_x = object_props[111:96];
+    center_y = object_props[95:80];
+    radius = object_props[47:32];
+    x_in_1 = center_x - radius;
+    y_in_1 = center_y;
+    x_in_2 = center_x + radius;
+    y_in_2 = center_y;
+    is_valid_out = is_valid_in;
+end
+
+endmodule
+
+module rect_converter
+(
+    input wire clk_in,
+    input wire is_valid_in,
+    input wire rst_in,
+    input wire [114:0] object_props,
+    output logic is_static,
+    output logic [10:0] x_in_1,
+    output logic [9:0] y_in_1,
+    output logic [10:0] x_in_2,
+    output logic [9:0] y_in_2,
+    output logic busy_out,
+    output logic is_valid_out,
+);
+logic signed [15:0] dx_1;
+logic signed[15:0] dy_1;
+logic signed [15:0] dy_2;
+logic signed [15:0] dx_2;
+logic [31:0] dx_2_temp;
+logic [31:0] remainder; 
+logic is_divide_done;
+logic has_error;
+logic is_busy_out;
+always_comb begin
+    is_static = object_props[114:114];
+    x_in_1 = object_props[110:100];
+    y_in_1 = object_props[94:85];
+    dx_1 = object_props[79:64];
+    dy_1 = object_props[63:48];
+    dy_2 = object_props[47:32];
+    dx_2 = {1'b0, dx_2_temp[9:0], 5'b0};
+    y_in_2 = y_in_1 + dy_1 + dy_2;
+end
+
+divider dx_2_calc 
+(
+    .clk_in(clk_in),
+    .rst_in(rst_in),
+    .dividend_in(-dy_1 * dy_2),
+    .divisor_in(dx_1),
+    .data_valid_in(!has_started && is_valid_in),
+    .quotient_out(dx_2_temp),
+    .remainder_out(remainder),
+    .data_valid_out(is_divide_done),
+    .error_out(has_error),
+    .busy_out(is_busy_out)
+);
+
+always_ff@(posedge clk_in) begin
+    if(rst_in) begin
+        is_valid_out <= 0;
+        busy_out <= 0;
+    end
+    else if(!has_started) begin 
+        has_started = 1;
+        busy_out <= 1;
+    end
+    else if(!is_busy_out) begin
+        x_in_2 <= x_in_1 + dx_1 + dx_2;
+        is_valid_out <= !has_error;
+        busy_out <= 0;
+    end
+end
+
+endmodule
+
+module line_converter
+(
+    input wire [114:0] object_props,
+    input wire is_valid_in,
+    output logic is_static,
+    output logic [10:0] x_in_1,
+    output logic [9:0] y_in_1,
+    output logic [10:0] x_in_2,
+    output logic [9:0] y_in_2,
+    output wire is_valid_out,
+);
+always_comb begin
+    is_static = object_props[114:114];
+    x_in_1 = object_props[110:100];
+    y_in_1 = object_props[94:85];
+    x_in_2 = object_props[63:48];
+    y_in_2 = object_props[47:32];
+    is_valid_out = is_valid_in;
+end
+endmodule
+
+
 module nth_smallest #(parameter MAX_NUM_SIZE = 32) 
 (
     input logic [3:0][MAX_NUM_SIZE-1:0] numbers,
