@@ -1,8 +1,0 @@
-<testsuites name="results">
-  <testsuite name="all" package="all">
-    <property name="random_seed" value="1733689926" />
-    <testcase name="test_draw_rectangle" classname="test_draw_rectangle" file="/Users/dishakohli/6205_python/ar-crayon-physics/fpga/lab05/sim/test_draw_rectangle.py" lineno="9" time="0.0034780502319335938" sim_time_ns="0.001" ratio_time="0.2875174115711544">
-      <failure message="Test failed with RANDOM_SEED=1733689926" />
-    </testcase>
-  </testsuite>
-</testsuites>

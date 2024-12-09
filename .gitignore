@@ -4,4 +4,3 @@ phys_py/result/
 *.pyc
 .DS_Store
 **/sim_build/
-sim_build/
