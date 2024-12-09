@@ -10,6 +10,7 @@ from cocotb.runner import get_runner
 async def test_draw_rectangle(dut):
     """Cocotb test for draw_rectangle module."""
     dut._log.info("draw_rectangle test")
+    cocotb.start_soon(Clock(dut.clk_in, 10, units="ns").start())
 
     # set coordinates
     x_in_1, y_in_1 = 20, 20
@@ -43,6 +44,7 @@ async def test_draw_rectangle(dut):
         for vcount in range(128):
             dut.hcount_in.value = hcount
             dut.vcount_in.value = vcount
+            await ClockCycles(dut.clk_in, 10)
             check_color(hcount, vcount)
 
 def is_runner():

@@ -8,11 +8,7 @@ module draw_rectangle #(
   input wire [9:0]  y_in_1,
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
-  input wire place_obj,
-  output logic [10:0] rect_x1,
-  output logic [9:0]  rect_y1,
-  output logic [10:0] rect_x2,
-  output logic [9:0]  rect_y2,
+  output logic [83:0] rect_coord,
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out);
@@ -24,6 +20,8 @@ module draw_rectangle #(
   logic[9:0] y_2;
 
   logic in_rect;
+
+  logic [3:0] in_rect_pipeline;
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
@@ -39,19 +37,22 @@ module draw_rectangle #(
         y_2 <= (y_in_1 >= y_in_2) ? y_in_1 : y_in_2;
 
         // stage 2
-        in_rect <= ((hcount_in >= x_1 && hcount_in < x_2) &&
+        in_rect_pipeline[0] <= ((hcount_in >= x_1 && hcount_in < x_2) &&
                       (vcount_in >= y_1 && vcount_in < y_2));
 
-        if (place_obj) begin
-          rect_x1 <= x_in_1;
-          rect_y1 <= y_in_1;
-          rect_x2 <= x_in_2;
-          rect_y2 <= y_in_2;
-        end
+        // stage 3
+        in_rect_pipeline[1] <= in_rect_pipeline[0];
+
+        // stage 4
+        in_rect_pipeline[2] <= in_rect_pipeline[1];
+
+        // stage 5
+        in_rect_pipeline[3] <= in_rect_pipeline[2];
     end
   end
 
-  assign red_out =    in_rect ? COLOR[23:16] : 0;
-  assign green_out =  in_rect ? COLOR[15:8] : 0;
-  assign blue_out =   in_rect ? COLOR[7:0] : 0;
+  assign rect_coord = {{x_1, y_1}, {x_2, y_1}, {x_1, y_2}, {x_2, y_2}};
+  assign red_out =    in_rect_pipeline[3] ? COLOR[23:16] : 0;
+  assign green_out =  in_rect_pipeline[3] ? COLOR[15:8] : 0;
+  assign blue_out =   in_rect_pipeline[3] ? COLOR[7:0] : 0;
 endmodule
