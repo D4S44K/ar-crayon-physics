@@ -12,6 +12,75 @@ from collision import get_earliest_collision, debug_col_time_update
 import argparse
 
 
+def physics_engine_single_frame(with_collision, obj_list, frame_index=0, video=None):
+    left_time = SFIX32(1.0)
+    time_step = None
+    iterations = 0
+
+    while left_time > 0.0 and iterations < MAX_COL_ITER:
+        collide_pair = (-1, -1)
+        collide_parts = (-1, -1)
+        time_step = left_time
+        if with_collision and iterations < MAX_COL_ITER - 1:
+            for i in range(len(obj_list)):
+                if not obj_list[i].active:
+                    continue
+                for j in range(i + 1, len(obj_list)):
+                    if not obj_list[j].active:
+                        continue
+                    does_collide, (t, i_part, j_part) = get_earliest_collision(
+                        obj_list[i], obj_list[j]
+                    )
+                    if does_collide and 0.0 <= t < time_step:  # min time to collide
+                        print(
+                            f"Collision between {i}({i_part}) and {j}({j_part}) in {t.get_float()} after {debug_col_time_update(SFIX32(0.0))}"
+                        )
+                        time_step = t
+                        collide_pair = (i, j)
+                        collide_parts = (i_part, j_part)
+        if collide_pair[0] == -1:
+            update_all_pos_vel(obj_list, time_step)
+        else:
+            update_all_pos_vel(obj_list, time_step)
+            update_collision_vel(
+                obj_list[collide_pair[0]],
+                obj_list[collide_pair[1]],
+                collide_parts[0],
+                collide_parts[1],
+            )
+            # print(f"left_time = {left_time}, wil do time_step = {time_step}")
+        left_time -= time_step
+        debug_col_time_update(time_step)
+        debug_sim_time_update(time_step)
+        iterations += 1
+
+    if left_time > 0.0:
+        print(f"!!! Skipping to next frame: {left_time.get_float()}")
+        update_all_pos_vel(obj_list, left_time)
+        debug_col_time_update(left_time)
+        debug_sim_time_update(left_time)
+
+    check_inactive(obj_list)
+
+    if video is not None:
+        frame = render_objects(obj_list, frame_index)
+        video.add_frame(frame)
+    return obj_list
+
+
+def physics_engine(with_collision, obj_list, frame_count):
+    video = ResultVideo("test")
+
+    for fr in range(frame_count):
+        print(f"Frame {fr}")
+        frame = render_objects(obj_list, fr)
+        video.add_frame(frame)
+
+        obj_list = physics_engine_single_frame(with_collision, obj_list)
+
+    return obj_list
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(

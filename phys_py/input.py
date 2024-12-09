@@ -15,6 +15,32 @@ def get_type_int(type_str):
         raise ValueError(f"Unsupported shape type {type_str}")
 
 
+def load_object(obj, index):
+    if obj.get("skip", False):
+        return
+    type_int = get_type_int(obj["shape_type"])
+    mass = obj.get("mass", 1.0)
+    pos = tuple(obj["position"])
+    vel = tuple(obj["velocity"])
+    static = obj["static"]
+    params = tuple(obj["params"])
+    cur_obj = PhyiscalObject(index, type_int, mass, pos, vel, static, params)
+    return cur_obj
+
+
+def get_object(cur_obj):
+    # if cur_obj.active == False: # TODO
+    #     return {}
+    obj = {}
+    obj["static"] = cur_obj.static
+    obj["shape_type"] = ["circle", "rect", "line"][cur_obj.shape_type]
+    # obj["mass"] = cur_obj
+    obj["position"] = [cur_obj.pos[0].get_float(), cur_obj.pos[1].get_float()]
+    obj["velocity"] = [cur_obj.vel[0].get_float(), cur_obj.vel[1].get_float()]
+    obj["params"] = [x.get_float() for x in cur_obj.params]
+    return obj
+
+
 def load_obj_file(file_path):
     obj_list = []
     info = {}
@@ -29,15 +55,7 @@ def load_obj_file(file_path):
         for obj in data["objects"]:
             if obj["skip"]:
                 continue
-            type_int = get_type_int(obj["shape_type"])
-            mass = obj["mass"]
-            pos = tuple(obj["position"])
-            vel = tuple(obj["velocity"])
-            static = obj["static"]
-            params = tuple(obj["params"])
-            cur_obj = PhyiscalObject(
-                len(obj_list), type_int, mass, pos, vel, static, params
-            )
+            cur_obj = load_object(obj, len(obj_list))
             print(f"Loaded {cur_obj}")
             obj_list.append(cur_obj)
 

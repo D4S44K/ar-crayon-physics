@@ -52,7 +52,7 @@ def debug_set(obj_i, obj_j):
 def get_earliest_collision(
     obj_a, obj_b
 ):  # return (does_collide, (time_to_collide, i_part, j_part))
-    debug_set(obj_a, obj_b)
+    # debug_set(obj_a, obj_b)
     if obj_a.static and obj_b.static:
         return False, (SFIX32(0.0), 0, 0)
     # always a.type <= b.type

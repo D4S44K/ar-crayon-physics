@@ -74,8 +74,9 @@ async def test_set(dut, _pos_x, _pos_y, _vel_x, _vel_y, _time_step):
     vel_y = SFIX16(_vel_y)
     time_step = SFIX32(_time_step)
 
-    dut.obj_dyn_in.value = (
-        pos_x.get_int_repr() << 48
+    dut.obj_in.value = (
+        1 << 101
+        | pos_x.get_int_repr() << 48
         | pos_y.get_int_repr() << 32
         | vel_x.get_int_repr() << 16
         | vel_y.get_int_repr()
@@ -83,7 +84,7 @@ async def test_set(dut, _pos_x, _pos_y, _vel_x, _vel_y, _time_step):
     dut.time_step.value = time_step.get_int_repr()
     await ClockCycles(dut.sys_clk, 1)
 
-    new_dyn = dut.obj_dyn_out.value
+    new_dyn = dut.obj_out.value
     _new_pos_x, _new_pos_y, _new_vel_x, _new_vel_y = parse_dyn(new_dyn)
 
     exp_pos, exp_vel = phys_sim.update_pos_vel(

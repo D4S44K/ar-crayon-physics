@@ -14,8 +14,17 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
     input wire sys_clk,
     input wire sys_rst,
     input wire frame_start_in,
+
     output enum logic [2:0] {IDLE, LOADING, COLLISION, UPDATING, SAVING} state_out,
-    output logic frame_end_out
+    output logic frame_end_out,
+
+    output logic [3:0] load_signal_out,
+    input wire [3:0][`OBJ_WIDTH-1:0] load_object_data_in,
+    output logic [3:0][9:0] load_object_index_out,
+
+    output logic save_signal_out,
+    output logic [9:0] save_object_index_out,
+    output logic [`OBJ_WIDTH-1:0] save_object_data_out
   );
   localparam OBJ_COUNT_LOG = $clog2(OBJ_COUNT+1); // one more bit for null value = OBJ_COUNT
 
@@ -23,32 +32,49 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
   logic [7:0] iter_count; // up to 64 iterations
   logic [OBJ_COUNT_LOG:0] obj_index_i, obj_index_j;
   // logic [`OBJ_WIDTH-1:0] obj_i1, obj_i2, obj_j1, obj_j2
-  logic [`OBJ_WIDTH-1:0] objects[OBJ_COUNT-1:0];
-  logic [`OBJ_DYN_WIDTH-1:0] obj_dyn_next[OBJ_COUNT-1:0];
+  logic [OBJ_COUNT-1:0][`OBJ_WIDTH-1:0] objects;
+  logic [OBJ_COUNT-1:0][`OBJ_WIDTH-1:0] next_objects;
+  // logic [OBJ_COUNT-1:0][`OBJ_DYN_WIDTH-1:0] obj_dyn_next;
   logic [9:0] cooldown;
 
+  logic [`OBJ_WIDTH-1:0] dbg_load_obj_0, dbg_load_obj_1, dbg_load_obj_2, dbg_load_obj_3;
+  assign dbg_load_obj_0 = load_object_data_in[0];
+  assign dbg_load_obj_1 = load_object_data_in[1];
+  assign dbg_load_obj_2 = load_object_data_in[2];
+  assign dbg_load_obj_3 = load_object_data_in[3];
+
+  logic [9:0] dbg_load_index_0, dbg_load_index_1, dbg_load_index_2, dbg_load_index_3;
+  assign dbg_load_index_0 = load_object_index_out[0];
+  assign dbg_load_index_1 = load_object_index_out[1];
+  assign dbg_load_index_2 = load_object_index_out[2];
+  assign dbg_load_index_3 = load_object_index_out[3];
+
+  logic [`OBJ_WIDTH-1:0] dbg_obj;
+  assign dbg_obj = objects[0];
+
+
   // for LOADING
-  logic do_save;
-  logic [6:0] save_addr;
-  logic [3:0] do_load;
-  logic [3:0][6:0] load_addr;
-  logic [3:0] load_finished;
+  // logic do_save;
+  // logic [6:0] save_addr;
+  // logic [3:0] do_load;
+  // logic [3:0][6:0] load_addr;
+  // logic [3:0] load_finished;
 
-  logic save_is_static;
-  logic [1:0] save_id_bits;
-  logic [35:0] save_params;
-  logic [15:0] save_pos_x;
-  logic [15:0] save_pos_y;
-  logic [15:0] save_vel_x;
-  logic [15:0] save_vel_y;
+  // logic save_is_static;
+  // logic [1:0] save_id_bits;
+  // logic [35:0] save_params;
+  // logic [15:0] save_pos_x;
+  // logic [15:0] save_pos_y;
+  // logic [15:0] save_vel_x;
+  // logic [15:0] save_vel_y;
 
-  logic [3:0] loaded_is_static;
-  logic [3:0][1:0] loaded_id_bits;
-  logic [3:0][35:0] loaded_params;
-  logic [3:0][15:0] loaded_pos_x;
-  logic [3:0][15:0] loaded_pos_y;
-  logic [3:0][15:0] loaded_vel_x;
-  logic [3:0][15:0] loaded_vel_y;
+  // logic [3:0] loaded_is_static;
+  // logic [3:0][1:0] loaded_id_bits;
+  // logic [3:0][35:0] loaded_params;
+  // logic [3:0][15:0] loaded_pos_x;
+  // logic [3:0][15:0] loaded_pos_y;
+  // logic [3:0][15:0] loaded_vel_x;
+  // logic [3:0][15:0] loaded_vel_y;
 
   // object_storage memory( // TODO IO with top_level
   //                  .clk_in(sys_clk),
@@ -82,9 +108,10 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
     for (i=0; i<OBJ_COUNT; i=i+1)
     begin
       update_pos_vel upv_i(
-                       .obj_dyn_in(objects[i][`OBJ_DYN_WIDTH-1:0]), // MEMORYIO
+                       .sys_clk(sys_clk),
+                       .obj_in(objects[i]), // MEMORYIO
                        .time_step(time_step[`DF_DEC+1:0]),
-                       .obj_dyn_out(obj_dyn_next[i])
+                       .obj_out(next_objects[i])
                      );
     end
   endgenerate
@@ -107,6 +134,15 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
       begin
         objects[i] <= 0;
       end
+      save_signal_out <= 0;
+      save_object_index_out <= 0;
+      save_object_data_out <= 0;
+
+      load_signal_out <= 0;
+      for (int i=0; i<4; i=i+1)
+      begin
+        load_object_index_out[i] <= 0;
+      end
     end
     else
     begin
@@ -124,6 +160,21 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
           obj_index_i <= 0;
           obj_index_j <= 0;
           cooldown <= 0;
+
+          for (int i=0; i<OBJ_COUNT; i=i+1)
+          begin
+            objects[i] <= 0;
+          end
+          save_signal_out <= 0;
+          save_object_index_out <= 0;
+          save_object_data_out <= 0;
+
+          load_signal_out <= 0;
+          for (int i=0; i<4; i=i+1)
+          begin
+            load_object_index_out[i] <= 0;
+          end
+
 
           if (frame_start_in)
           begin
@@ -146,10 +197,14 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
             // if i'm expecting results, fetch and save
             if (obj_index_i > 0)
             begin
-              for (int i=0; i<OBJ_COUNT; i=i+1)
+              for (int i=0; i<4; i=i+1)
               begin
-                objects[obj_index_i - 4 + i] <= {loaded_is_static[i], loaded_id_bits[i], loaded_params[i], loaded_pos_x[i], loaded_pos_y[i], loaded_vel_x[i], loaded_vel_y[i]};
+                objects[obj_index_i - 4 + i] <= load_object_data_in[i];
               end
+              // for (int i=0; i<OBJ_COUNT; i=i+1)
+              // begin
+              //   objects[obj_index_i - 4 + i] <= {loaded_is_static[i], loaded_id_bits[i], loaded_params[i], loaded_pos_x[i], loaded_pos_y[i], loaded_vel_x[i], loaded_vel_y[i]};
+              // end
             end
 
             // if we've done all, move to next state. otherwise, update index
@@ -162,11 +217,17 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
             else
             begin
               // fill the memory read instructions and start waiting again
-              do_load <= 4'b1111;
-              load_addr[0] <= obj_index_i;
-              load_addr[1] <= obj_index_i + 1;
-              load_addr[2] <= obj_index_i + 2;
-              load_addr[3] <= obj_index_i + 3;
+              load_signal_out <= 4'b1111;
+              load_object_index_out[0] <= obj_index_i;
+              load_object_index_out[1] <= obj_index_i + 1;
+              load_object_index_out[2] <= obj_index_i + 2;
+              load_object_index_out[3] <= obj_index_i + 3;
+
+              // do_load <= 4'b1111;
+              // load_addr[0] <= obj_index_i;
+              // load_addr[1] <= obj_index_i + 1;
+              // load_addr[2] <= obj_index_i + 2;
+              // load_addr[3] <= obj_index_i + 3;
 
               obj_index_i <= obj_index_i + 4;
               cooldown <= 0;
@@ -235,7 +296,7 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
           begin
             for (int i=0; i<OBJ_COUNT; i=i+1)
             begin
-              objects[i] <= {objects[i][`OBJ_WIDTH-1:`OBJ_DYN_WIDTH], obj_dyn_next[i]}; // MEMORYIO
+              objects[i] <= next_objects[i];
             end
 
             if (left_time <= time_step)
@@ -259,15 +320,17 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
           // save all objects from registers to BRAM
           //  then send frame_end_out signal, and go to IDLE
 
-          if (cooldown < 4)
+          if (cooldown < 3)
           begin
             cooldown <= cooldown + 1;
+            save_signal_out <= 0;
           end
           else
           begin
             if (obj_index_i >= OBJ_COUNT)
             begin
-              //
+              save_signal_out <= 0;
+              save_object_index_out <= 0;
               frame_end_out <= 1'b1;
               state_out <= IDLE;
               cooldown <= 0;
@@ -276,15 +339,20 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
             else
             begin
               // fill the memory write instructions and start waiting again
-              do_save <= 1;
-              save_addr <= obj_index_i;
-              save_is_static <= objects[obj_index_i][0];
-              save_id_bits <= objects[obj_index_i][2:1];
-              save_params <= objects[obj_index_i][38:3];
-              save_pos_x <= objects[obj_index_i][54:39];
-              save_pos_y <= objects[obj_index_i][70:55];
-              save_vel_x <= objects[obj_index_i][86:81];
-              save_vel_y <= objects[obj_index_i][102:87];
+              // do_save <= 1;
+              // save_addr <= obj_index_i;
+
+              save_signal_out <= 1;
+              save_object_index_out <= obj_index_i;
+              save_object_data_out <= objects[obj_index_i];
+
+              // save_is_static <= objects[obj_index_i][0];
+              // save_id_bits <= objects[obj_index_i][2:1];
+              // save_params <= objects[obj_index_i][38:3];
+              // save_pos_x <= objects[obj_index_i][54:39];
+              // save_pos_y <= objects[obj_index_i][70:55];
+              // save_vel_x <= objects[obj_index_i][86:81];
+              // save_vel_y <= objects[obj_index_i][102:87];
 
               obj_index_i <= obj_index_i + 1;
               cooldown <= 0;
