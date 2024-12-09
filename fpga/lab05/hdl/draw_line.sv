@@ -34,32 +34,35 @@ module draw_line #(
   logic within_500_greater;
   logic within_500_less;
 
-
-  always_comb begin
+  always_ff @(posedge clk_in) begin
+    if (rst_in) begin
+    //   red_out <= 0;
+    //   green_out <= 0;
+    //   blue_out <= 0;
+    end else begin
         // stage 1
-        x_1 = (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
-        x_2 = (x_in_1 > x_in_2) ? x_in_1 : x_in_2;
+        x_1 <= (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
+        x_2 <= (x_in_1 > x_in_2) ? x_in_1 : x_in_2;
 
         // stage 2
-        y_1 = (x_1 == x_in_1) ? y_in_1 : y_in_2;
-        y_2 = (x_2 == x_in_2) ? y_in_2 : y_in_1;
+        y_1 <= (x_1 == x_in_1) ? y_in_1 : y_in_2;
+        y_2 <= (x_2 == x_in_2) ? y_in_2 : y_in_1;
 
-        if ((hcount_in >= x_1 && hcount_in <= x_2)) begin
-            hcount_diff = hcount_in - x_1;
-            x_diff = x_2 - x_1;
-            vcount_diff = vcount_in - y_1;
-            y_diff = y_2 - y_1;
+        // stage 3
+        hcount_diff <= hcount_in - x_1;
+        x_diff <= x_2 - x_1;
+        vcount_diff <= vcount_in - y_1;
+        y_diff <= y_2 - y_1;
 
-            slope_mul_1 = vcount_diff * x_diff;
-            slope_mul_2 = hcount_diff * y_diff;
+        // stage 4
+        slope_mul_1 <= vcount_diff * x_diff;
+        slope_mul_2 <= hcount_diff * y_diff;
 
-            within_500_greater = (slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0;
-            within_500_less = (slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0;
-            in_line = within_500_greater || within_500_less;
-        end
-        else begin
-            in_line = 0;
-        end
+        // stage 5
+        in_line <= ((hcount_in >= x_1 && hcount_in <= x_2))
+                   ? ((slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0) || ((slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0)
+                   : 0;
+    end
   end
 
   assign line_coord = {{x_1, y_1}, {x_2, y_2}, 42'b0};
