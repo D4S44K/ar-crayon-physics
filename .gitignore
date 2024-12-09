@@ -1,6 +1,7 @@
 .venv/
 phys_py/result/
-fpga/obj/
+**/obj/
 *.pyc
 .DS_Store
-**/sim_build
+**/sim_build/
+sim_build/
