@@ -6,7 +6,7 @@
 `define SFIX16(x) (x << `SF_DEC)
 `define SFIX32(x) (x << `DF_DEC)
 
-`define OBJ_WIDTH 103
+// `define OBJ_WIDTH 103
 `define OBJ_PART_WIDTH 66
 `define OBJ_DYN_WIDTH 64 // MEMORYIO: pos and vel is [63-0] bits of object
 
