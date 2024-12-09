@@ -80,7 +80,7 @@ always_ff@(posedge clk_in) begin
         busy_out <= 0;
     end
     else if(!has_started) begin 
-        has_started = 1;
+        has_started <= 1;
         busy_out <= 1;
     end
     else if(is_divide_done) begin

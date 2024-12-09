@@ -180,7 +180,7 @@ module draw_to_storage_conversion (
 
 // run sqrt only once
 sqrt #(.INTEGER_BITS(20), .FRACTIONAL_BITS(11)) circle_sqrt(
-  .valid_in(is_circle && prod_valid),
+  .is_valid(is_circle && prod_valid),
   .clk_in(clk_in),
   .rst_in(rst_in),
   // separate into two cycles
@@ -192,7 +192,7 @@ sqrt #(.INTEGER_BITS(20), .FRACTIONAL_BITS(11)) circle_sqrt(
 
 // run nth smallest only once
 nth_smallest #(.MAX_NUM_SIZE(20)) min_rect_pt(
-  .valid_in(is_rectangle && is_valid),
+  .valid_in(is_rectangle && valid_in),
   .index(2'b0),
   .numbers(composite_points),
   .nth_min(composite_min),
@@ -228,10 +228,10 @@ always_ff@(posedge clk_in) begin
   $display("valid_out: ", valid_out);
   $display("is_rectangle: ", is_rectangle);
   $display("nth_busy: ", nth_busy);
-  if(is_circle && is_valid) begin
+  if(is_circle && valid_in) begin
     prod_x <= (pos_x - point_one_x) * (pos_x - point_one_x);
     prod_y <= (pos_y - point_one_y) * (pos_y - point_one_y);
-    prod_valid <= is_valid;
+    prod_valid <= valid_in;
   end
   else if(is_rectangle && nth_valid) begin
     is_point_1_bigger <= sorted_points[1][9:0] > pos_y;

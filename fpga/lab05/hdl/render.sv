@@ -22,7 +22,9 @@ module render
     output logic valid_out
 );
 
-    enum e_states = {IDLE, PROCESSING_FIRST_SET, DONE_FIRST_SET, PROCESSING_SECOND_SET};
+    typedef enum {IDLE, PROCESSING_FIRST_SET, DONE_FIRST_SET, PROCESSING_SECOND_SET} e_states;
+    localparam STATIC_COLOR = 24'h11_11_11;
+    localparam NOT_STATIC_COLOR = 24'h77_77_77;
     e_states state;
     logic [11:0][10:0] x_in_1s;
     logic [11:0][9:0] y_in_1s;
@@ -50,7 +52,7 @@ module render
     logic is_obj_4_done;
 
     draw_circle #(.COLORS(colors[0])) ball(
-    .is_valid_in(is_shape_ready[0] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[0] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -77,7 +79,7 @@ module render
 
   circle_converter ball_converter (
     .is_static(is_static[0]),
-    .is_valid_in(id_bits[0] == b01 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[0] == b01 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[0]),
     .y_in_1(y_in_1s[0]),
     .x_in_2(x_in_2s[0]),
@@ -86,7 +88,7 @@ module render
   );
 
     draw_circle #(.COLORS(colors[1])) ball2(
-    .is_valid_in(is_shape_ready[1] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[1] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -103,7 +105,7 @@ module render
   );
 
     circle_converter ball2_converter (
-    .is_static(is_static[1] && state == IDLE || DONE_FIRST_SET),
+    .is_static(is_static[1] && state == IDLE || state == DONE_FIRST_SET),
     .is_valid_in(id_bits[1] == b01),
     .x_in_1(x_in_1s[1]),
     .y_in_1(y_in_1s[1]),
@@ -113,7 +115,7 @@ module render
   );
 
     draw_circle #(.COLORS(colors[2])) ball3(
-    .is_valid_in(is_shape_ready[2] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[2] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -131,7 +133,7 @@ module render
 
     circle_converter ball3_converter (
     .is_static(is_static[2]),
-    .is_valid_in(id_bits[2] == b01 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[2] == b01 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[2]),
     .y_in_1(y_in_1s[2]),
     .x_in_2(x_in_2s[2]),
@@ -140,7 +142,7 @@ module render
   );
 
     draw_circle #(.COLORS(colors[3])) ball4(
-    .is_valid_in(is_shape_ready[3] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[3] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -158,7 +160,7 @@ module render
 
     circle_converter ball4_converter (
     .is_static(is_static[3]),
-    .is_valid_in(id_bits[3] == b01 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[3] == b01 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[3]),
     .y_in_1(y_in_1s[3]),
     .x_in_2(x_in_2s[3]),
@@ -167,7 +169,7 @@ module render
   );
 
     draw_line #(.COLORS(colors[0])) line(
-    .is_valid_in(is_shape_ready[4] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[4] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -185,7 +187,7 @@ module render
 
     line_converter line_converter (
     .is_static(is_static[0]),
-    .is_valid_in(id_bits[0] == b10 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[0] == b10 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[4]),
     .y_in_1(y_in_1s[4]),
     .x_in_2(x_in_2s[4]),
@@ -194,7 +196,7 @@ module render
   );
 
     draw_line #(.COLORS(colors[1])) line2(
-    .is_valid_in(is_shape_ready[5] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[5] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -212,7 +214,7 @@ module render
 
     line_converter line2_converter (
     .is_static(is_static[1]),
-    .is_valid_in(id_bits[1] == b10 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[1] == b10 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[5]),
     .y_in_1(y_in_1s[5]),
     .x_in_2(x_in_2s[5]),
@@ -221,7 +223,7 @@ module render
   );
 
     draw_line #(.COLORS(colors[2])) line3(
-    .is_valid_in(is_shape_ready[6] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[6] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -239,7 +241,7 @@ module render
 
     line_converter line3_converter (
     .is_static(is_static[2]),
-    .is_valid_in(id_bits[2] == b10 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[2] == b10 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[6]),
     .y_in_1(y_in_1s[6]),
     .x_in_2(x_in_2s[6]),
@@ -248,7 +250,7 @@ module render
   );
 
     draw_line #(.COLORS(colors[3])) line4(
-    .is_valid_in(is_shape_ready[7] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[7] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -266,7 +268,7 @@ module render
 
     line_converter line4_converter (
     .is_static(is_static[3]),
-    .is_valid_in(id_bits[3] == b10 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[3] == b10 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[7]),
     .y_in_1(y_in_1s[7]),
     .x_in_2(x_in_2s[7]),
@@ -275,7 +277,7 @@ module render
   );
 
     draw_rect #(.COLORS(colors[0])) rect(
-    .is_valid_in(is_shape_ready[8] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[8] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -293,7 +295,7 @@ module render
 
     rect_converter rect_converter (
     .is_static(is_static[0]),
-    .is_valid_in(id_bits[0] == b11 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[0] == b11 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[8]),
     .y_in_1(y_in_1s[8]),
     .x_in_2(x_in_2s[8]),
@@ -302,7 +304,7 @@ module render
   );
 
     draw_rect #(.COLORS(colors[1])) rect2(
-    .is_valid_in(is_shape_ready[9] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[9] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -320,7 +322,7 @@ module render
 
     rect_converter rect2_converter (
     .is_static(is_static[1]),
-    .is_valid_in(id_bits[1] == b11 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[1] == b11 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[9]),
     .y_in_1(y_in_1s[9]),
     .x_in_2(x_in_2s[9]),
@@ -329,7 +331,7 @@ module render
   );
 
     draw_rect #(.COLORS(colors[2])) rect3(
-    .is_valid_in(is_shape_ready[10] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[10] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -347,7 +349,7 @@ module render
 
     rect_converter rect3_converter (
     .is_static(is_static[2]),
-    .is_valid_in(id_bits[2] == b11 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[2] == b11 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[10]),
     .y_in_1(y_in_1s[10]),
     .x_in_2(x_in_2s[10]),
@@ -356,7 +358,7 @@ module render
   );
 
     draw_rect #(.COLORS(colors[3])) rect4(
-    .is_valid_in(is_shape_ready[11] && state == IDLE || DONE_FIRST_SET)
+    .is_valid_in(is_shape_ready[11] && state == IDLE || state == DONE_FIRST_SET),
     .clk_in(clk_100mhz),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -374,7 +376,7 @@ module render
 
     rect_converter rect4_converter (
     .is_static(is_static[3]),
-    .is_valid_in(id_bits[3] == b11 && state == IDLE || DONE_FIRST_SET),
+    .is_valid_in(id_bits[3] == b11 && state == IDLE || state == DONE_FIRST_SET),
     .x_in_1(x_in_1s[11]),
     .y_in_1(y_in_1s[11]),
     .x_in_2(x_in_2s[11]),
@@ -383,7 +385,7 @@ module render
   );
 
     always_comb begin
-        colors[0] = is_static[0] ? 24'h11_11_11 : 24'h77_77_77;
+        colors[0] = is_static[0] ? STATIC_COLOR : NOT_STATIC_COLOR;
     end
     
     always_ff@(posedge clk_in) begin
