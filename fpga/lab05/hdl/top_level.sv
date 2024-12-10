@@ -497,6 +497,7 @@ module top_level
     .rst_in(sys_rst_pixel),
     .hcount_in(hcount_delayed_ps1),
     .vcount_in(vcount_delayed_ps1),
+    .is_valid_in(1),
     .x_in_1(x_com),
     .y_in_1(y_com),
     .x_in_2(x_com_2),
@@ -504,7 +505,8 @@ module top_level
     .circle_coord(circle_coord),
     .red_out(circle_red),
     .green_out(circle_green),
-    .blue_out(circle_blue));
+    .blue_out(circle_blue),
+    .is_valid_out());
 
 
   draw_line #(

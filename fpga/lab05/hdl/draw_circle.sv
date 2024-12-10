@@ -2,7 +2,7 @@ module draw_circle #(
   parameter WIDTH=128, HEIGHT=128, COLOR=24'hFF_FF_FF)(
   input wire clk_in,
   input wire rst_in,
-  input wire is_valid_in,
+  input wire is_valid_in,// disha
   input wire [10:0] hcount_in,
   input wire [9:0] vcount_in,
   input wire [10:0] x_in_1,
@@ -13,7 +13,7 @@ module draw_circle #(
   output logic [7:0] red_out,
   output logic [7:0] green_out,
   output logic [7:0] blue_out,
-  output logic is_valid_out);
+  output logic is_valid_out); // disha
 
   logic[10:0] x_1;
   logic[9:0] y_1;
@@ -34,25 +34,25 @@ module draw_circle #(
   logic[31:0] y_prod;
   logic[31:0] radius_prod;
 
-  logic[4:0] valid_in_pipelined;
+  logic[4:0] valid_in_pipelined;// disha
 
   always_ff @(posedge clk_in) begin
     if (rst_in) begin
     //   red_out <= 0;
     //   green_out <= 0;
     //   blue_out <= 0;
-    is_valid_out <= 0;
-    valid_in_pipelined[0] <= 0;
-    valid_in_pipelined[1] <= 0;
-    valid_in_pipelined[2] <= 0;
-    valid_in_pipelined[3] <= 0;
-    valid_in_pipelined[4] <= 0;
+    // is_valid_out <= 0;// disha
+    valid_in_pipelined[0] <= 0;// disha
+    valid_in_pipelined[1] <= 0;// disha
+    valid_in_pipelined[2] <= 0;// disha
+    valid_in_pipelined[3] <= 0;// disha
+    valid_in_pipelined[4] <= 0;// disha
     end else begin
-      valid_in_pipelined[0] <= is_valid_in;
-      valid_in_pipelined[1] <= valid_in_pipelined[0];
-      valid_in_pipelined[2] <= valid_in_pipelined[1];
-      valid_in_pipelined[3] <= valid_in_pipelined[2];
-      valid_in_pipelined[4] <= valid_in_pipelined[3];
+      valid_in_pipelined[0] <= is_valid_in;// disha
+      valid_in_pipelined[1] <= valid_in_pipelined[0];// disha
+      valid_in_pipelined[2] <= valid_in_pipelined[1];// disha
+      valid_in_pipelined[3] <= valid_in_pipelined[2];// disha
+      valid_in_pipelined[4] <= valid_in_pipelined[3];// disha
         // stage 1
         x_1 <= (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
         y_1 <= (y_in_1 <= y_in_2) ? y_in_1 : y_in_2;
@@ -83,5 +83,5 @@ module draw_circle #(
   assign red_out =    in_circle ? COLOR[23:16] : 0;
   assign green_out =  in_circle ? COLOR[15:8] : 0;
   assign blue_out =   in_circle ? COLOR[7:0] : 0;
-  assign is_valid_out = valid_in_pipelined[4];
+  assign is_valid_out = valid_in_pipelined[4];// disha
 endmodule

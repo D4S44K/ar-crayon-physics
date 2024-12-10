@@ -8,22 +8,22 @@ module object_storage (
     // reading from brams
     input logic [3:0] read_valid_in,
     // stores read/write address
-    input logic [3:0][6:0] current_addr, 
+    input logic [3:0][6:0] current_addr, //maybe change to a packed type if it isn't already
     input logic rst_in,
     input logic write_is_static,
     input logic [1:0] write_id_bits,
-    input logic [35:0] write_params,
+    input logic [35:0] write_params, //needs updating todo
     input logic [15:0] write_pos_x,
     input logic [15:0] write_pos_y,
     input logic [15:0] write_vel_x,
     input logic [15:0] write_vel_y,
-    // output logic [3:0] read_is_static,
-    // output logic [3:0][1:0] read_id_bits,
-    // output logic [3:0][35:0] read_params,
-    // output logic [3:0][15:0] read_pos_x,
-    // output logic [3:0][15:0] read_pos_y,
-    // output logic [3:0][15:0] read_vel_x,
-    // output logic [3:0][15:0] read_vel_y,
+    output logic [3:0] read_is_static,
+    output logic [3:0][1:0] read_id_bits,
+    output logic [3:0][35:0] read_params, // needs updating todo
+    output logic [3:0][15:0] read_pos_x,
+    output logic [3:0][15:0] read_pos_y,
+    output logic [3:0][15:0] read_vel_x,
+    output logic [3:0][15:0] read_vel_y,
     output logic [3:0] read_is_valid_out,
     output logic write_is_valid_out
   );
@@ -32,7 +32,7 @@ module object_storage (
 // four pos/vel BRAMs
 // msb: is object static
 // two bits: obj type (00 n/a 01 circle 10 rectangle 11 line)
-  logic [114:0] storage_props; // 1 + 2 + 36 + 16 + 16 + 16 + 16 = 103
+  logic [114:0] storage_props; // 1 + 2 + 36 + 16 + 16 + 16 + 16 = 103 // todo update
 
   logic [3:0][114:0] storage_out;
   // logic [1:0] read_write_flag_buffer;
@@ -40,13 +40,13 @@ module object_storage (
   logic is_write;
 
 // always_comb begin
-  //  read_is_static = {storage_out[3][114], storage_out[2][114], storage_out[1][114], storage_out[0][114]};
-  //  read_id_bits = {storage_out[3][113:112], storage_out[2][113:112], storage_out[1][113:112], storage_out[0][113:112]};
-  //  read_params = {storage_out[3][111:76], storage_out[2][111:76], storage_out[1][111:76], storage_out[0][111:76]};
-  //  read_pos_x = {storage_out[3][63:48], storage_out[2][63:48], storage_out[1][63:48], storage_out[0][63:48]};
-  //  read_pos_y = {storage_out[3][47:32], storage_out[2][47:32], storage_out[1][47:32], storage_out[0][47:32]};
-  //  read_vel_x = {storage_out[3][31:16], storage_out[2][31:16], storage_out[1][31:16], storage_out[0][31:16]};
-  //  read_vel_y = {storage_out[3][15:0], storage_out[2][15:0], storage_out[1][15:0], storage_out[0][15:0]};
+   read_is_static = {storage_out[3][114], storage_out[2][114], storage_out[1][114], storage_out[0][114]};
+   read_id_bits = {storage_out[3][113:112], storage_out[2][113:112], storage_out[1][113:112], storage_out[0][113:112]};
+   read_params = {storage_out[3][111:76], storage_out[2][111:76], storage_out[1][111:76], storage_out[0][111:76]};
+   read_pos_x = {storage_out[3][63:48], storage_out[2][63:48], storage_out[1][63:48], storage_out[0][63:48]};
+   read_pos_y = {storage_out[3][47:32], storage_out[2][47:32], storage_out[1][47:32], storage_out[0][47:32]};
+   read_vel_x = {storage_out[3][31:16], storage_out[2][31:16], storage_out[1][31:16], storage_out[0][31:16]};
+   read_vel_y = {storage_out[3][15:0], storage_out[2][15:0], storage_out[1][15:0], storage_out[0][15:0]};
   // //  is_valid_out = read_write_flag_buffer[1];
 // end
 
@@ -64,10 +64,7 @@ module object_storage (
   //   .valid_out(is_valid_out)
   // );
 
-  always_comb begin
-    if(write_valid_in) write_is_valid_out = 1;
-    else write_is_valid_out = 0;
-  end
+  assign write_is_valid_out = write_valid_in;
 
   always_ff@(posedge clk_in) begin
     // read_write_flag_buffer[0] <= read_valid_in || write_valid_in;
@@ -84,7 +81,9 @@ module object_storage (
     .RAM_DEPTH(8),                     // Specify RAM depth (number of entries)
     .RAM_PERFORMANCE("HIGH_PERFORMANCE") // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
   ) first_copy (
+    // read
     .addra(current_addr[0]),
+    // write
     .addrb(current_addr[0]),
     .dina(0),
     .dinb(storage_props),
@@ -92,14 +91,14 @@ module object_storage (
     .clkb(clk_in),
     .wea(0),
     .web(write_valid_in),
-    .ena(read_valid_in[0]),
-    .ena(write_valid_in),
+    .ena(1),
+    .enb(1),
     .rsta(read_valid_in[0] && rst_in),
     .rstb(write_valid_in && rst_in),
     .regcea(1),
     .regceb(1),
     .douta(storage_out[0]),
-    .doutb(storage_out[0])
+    .doutb()
   );
 
   xilinx_true_dual_port_read_first_2_clock_ram #(
@@ -116,7 +115,7 @@ module object_storage (
     .wea(0),
     .web(write_valid_in),
     .ena(read_valid_in[1]),
-    .ena(write_valid_in),
+    .enb(write_valid_in),
     .rsta(read_valid_in[1] && rst_in),
     .rstb(write_valid_in && rst_in),
     .regcea(1),
@@ -139,7 +138,7 @@ module object_storage (
     .wea(0),
     .web(write_valid_in),
     .ena(read_valid_in[2]),
-    .ena(write_valid_in),
+    .enb(write_valid_in),
     .rsta(read_valid_in[2] && rst_in),
     .rstb(write_valid_in && rst_in),
     .regcea(1),
@@ -162,7 +161,7 @@ module object_storage (
     .wea(0),
     .web(write_valid_in),
     .ena(read_valid_in[3]),
-    .ena(write_valid_in),
+    .enb(write_valid_in),
     .rsta(read_valid_in[3] && rst_in),
     .rstb(write_valid_in && rst_in),
     .regcea(1),
