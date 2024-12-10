@@ -370,7 +370,8 @@ module top_level
             );
 
 
-  logic [6:0] ss_c;
+  logic [6:0] cam_ss_c;
+  logic [3:0] cam_ss0_an, cam_ss1_an;
   //modified version of seven segment display for showing
   // thresholds and selected channel
   // special customized version
@@ -379,11 +380,15 @@ module top_level
                  .lt_in(lower_threshold),
                  .ut_in(upper_threshold),
                  .channel_sel_in(3'b101),
-                 .cat_out(ss_c),
-                 .an_out({ss0_an, ss1_an})
+                 .cat_out(cam_ss_c),
+                 .an_out({cam_ss0_an, cam_ss1_an})
                 );
-  assign ss0_c = ss_c; //control upper four digit's cathodes!
-  assign ss1_c = ss_c; //same as above but for lower four digits!
+  // assign ss0_c = ss_c; //control upper four digit's cathodes!
+  // assign ss1_c = ss_c; //same as above but for lower four digits!
+  assign ss0_c = simul_mode ? phys_ss_c : cam_ss_c;
+  assign ss1_c = simul_mode ? phys_ss_c : cam_ss_c;
+  assign ss0_an = simul_mode ? phys_ss0_an : cam_ss0_an;
+  assign ss1_an = simul_mode ? phys_ss1_an : cam_ss1_an;
 
   logic [10:0] hcount_delayed_ps3;
   pipeline #(
@@ -546,8 +551,11 @@ module top_level
               .blue_out(line_blue));
 
 
+  logic simul_mode;
+  assign simul_mode = sw[15];
 
-  // object storage RAM
+
+  // object storage RAM definition
   //  read from render and physics engine
   //  write from draw and physics engine
 
@@ -562,7 +570,7 @@ module top_level
   logic read_valid_out;
 
   object_storage storage(
-                   .clk_in(clk_100mhz),
+                   .clk_in(clk_100_passthrough),
                    .rst_in(sys_rst_pixel),
 
                    .write_valid_in(write_valid_in),
@@ -576,13 +584,12 @@ module top_level
                    .read_valid_out(read_valid_out)
                  );
 
-
-  // physics engine
+  // physics engine definition
   logic frame_start_in;
   enum logic [2:0] {IDLE, LOADING, COLLISION, UPDATING, SAVING} state_out;
   logic frame_end_out;
 
-  logic [3:0] load_signal_out;
+  logic load_signal_out;
   logic [`OBJ_ADDR_WIDTH-1:0] load_object_index_out [3:0];
   logic [`OBJ_WIDTH-1:0] load_object_data_in [3:0];
 
@@ -592,7 +599,7 @@ module top_level
 
   physics_engine engine
                  (
-                   .sys_clk(clk_100mhz),
+                   .sys_clk(clk_100_passthrough),
                    .sys_rst(sys_rst_pixel),
                    .frame_start_in(frame_start_in),
                    .state_out(state_out),
@@ -606,6 +613,110 @@ module top_level
                    .save_object_index_out(save_object_index_out),
                    .save_object_data_out(save_object_data_out)
                  );
+
+
+  // BRAM integration
+  always_ff @(posedge clk_100_passthrough) // ff for buffering
+  begin
+    if (simul_mode)
+    begin // IO from phys_engine
+      write_valid_in <= save_signal_out | create_random_obj;
+      if (save_signal_out)
+      begin
+        write_addr_in <= save_object_index_out;
+        write_object_in <= save_object_data_out | random_obj;
+      end
+
+      read_valid_in <= load_signal_out;
+      if (load_signal_out)
+      begin
+        read_addrs_in <= load_object_index_out;
+      end
+      if (read_valid_out)
+      begin
+        load_object_data_in[0] <= read_objects_out[0];
+        load_object_data_in[1] <= read_objects_out[1];
+        load_object_data_in[2] <= read_objects_out[2];
+        load_object_data_in[3] <= read_objects_out[3];
+      end
+    end
+    else
+    begin // IO from draw & render
+      write_valid_in <= 1'b0;
+      read_valid_in <= 1'b0;
+    end
+  end
+
+  // physics_engine integration
+  assign frame_start_in = simul_mode && nf_hdmi;
+
+  logic frame_ended;
+  always_ff @(posedge clk_100_passthrough)
+  begin
+    if (simul_mode)
+    begin
+      if (frame_end_out)
+      begin
+        frame_ended <= 1;
+      end
+      else if (frame_start_in)
+      begin
+        frame_ended <= 0;
+      end
+    end
+    else
+    begin
+      frame_ended <= 0;
+    end
+  end
+  logic is_memory_stable;
+  assign is_memory_stable = !simul_mode || (state_out == IDLE);
+  assign led[15] = is_memory_stable;
+
+
+
+  // debugging obj0, obj1 ypos
+  logic [7:0] obj0_pos_y, obj0_vel_y;
+  logic [3:0] phys_ss0_an, phys_ss1_an;
+  logic [6:0] phys_ss_c;
+
+  seven_segment_controller phys_ssc(.clk_in(clk_100_passthrough),
+                                    .rst_in(sys_rst_pixel),
+                                    .val_in({obj0_pos_y, obj0_vel_y}),
+                                    .cat_out(phys_ss_c),
+                                    .an_out({phys_ss0_an, phys_ss1_an}));
+
+  always_ff @(posedge clk_100_passthrough)
+  begin
+    if(save_signal_out && save_object_index_out == 0)
+    begin
+      obj0_pos_y <= save_object_data_out[46:39];
+      obj0_vel_y <= save_object_data_out[15:0];
+    end
+  end
+
+  // debugging random objects
+  logic create_random_obj;
+  logic [15:0] pos_y, vel_y; // both random
+  logic [`OBJ_WIDTH-1:0] random_obj;
+  assign pos_y = hcount_hdmi << 2;
+  assign vel_y = (hcount_hdmi[0] << 15) + (hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3);
+  always_ff @(posedge clk_100_passthrough)
+  begin
+    if(create_random_obj)
+    begin
+      random_obj <= 115'h1_0000000000a0_1900_0000_0000_0000 + (pos_y << 32) + vel_y;
+      create_random_obj <= 0;
+    end
+    else
+    begin
+      if(frame_ended && btn[3])
+      begin
+        create_random_obj <= 1;
+      end
+    end
+  end
+
 
 
   // object coordinate setting logic
@@ -1020,7 +1131,7 @@ module top_level
   assign led[0] = crw.bus_active;
   assign led[1] = cr_init_valid;
   assign led[2] = cr_init_ready;
-  assign led[15:3] = 0;
+  // assign led[15:3] = 0;
 
 endmodule // top_level
 

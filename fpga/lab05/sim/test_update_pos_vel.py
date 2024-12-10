@@ -136,8 +136,8 @@ def is_runner():
     sim = os.getenv("SIM", "icarus")
     proj_path = Path(__file__).resolve().parent.parent
     sys.path.append(str(proj_path / "sim" / "model"))
-    sources = [proj_path / "hdl" / "phys" / "physics_engine.sv"]
-    sources += [proj_path / "hdl" / "phys" / "update_pos_vel.sv"]
+    sources = [proj_path / "hdl" / "physics_engine.sv"]
+    sources += [proj_path / "hdl" / "update_pos_vel.sv"]
     sources += [proj_path / "hdl" / "xilinx_single_port_ram_read_first.v"]
     build_test_args = ["-Wall"]
     parameters = {}

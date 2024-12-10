@@ -30,7 +30,8 @@ module object_storage (
         #(
           .RAM_WIDTH(`OBJ_WIDTH),                     // Specify RAM data width
           .RAM_DEPTH(`OBJ_COUNT),                     // Specify RAM depth (number of entries)
-          .RAM_PERFORMANCE("HIGH_PERFORMANCE") // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
+          .RAM_PERFORMANCE("HIGH_PERFORMANCE"),       // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
+          .INIT_FILE("objects.mem")
         ) bram_interface (
           .addra(read_addrs_in[i]),
           .addrb(write_addr_in),

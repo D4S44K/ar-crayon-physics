@@ -11,7 +11,7 @@
 `define OBJ_PART_WIDTH 66
 `define OBJ_DYN_WIDTH 64 // MEMORYIO: pos and vel is [63-0] bits of object
 
-module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
+module physics_engine #(OBJ_COUNT=4, MAX_ITER=64)(
     input wire sys_clk,
     input wire sys_rst,
     input wire frame_start_in,
@@ -19,7 +19,7 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
     output enum logic [2:0] {IDLE, LOADING, COLLISION, UPDATING, SAVING} state_out,
     output logic frame_end_out,
 
-    output logic [3:0] load_signal_out,
+    output logic load_signal_out,
     output logic [`OBJ_ADDR_WIDTH-1:0] load_object_index_out [3:0],
     input wire [`OBJ_WIDTH-1:0] load_object_data_in [3:0],
 
@@ -218,17 +218,11 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
             else
             begin
               // fill the memory read instructions and start waiting again
-              load_signal_out <= 4'b1111;
+              load_signal_out <= 1;
               load_object_index_out[0] <= obj_index_i;
               load_object_index_out[1] <= obj_index_i + 1;
               load_object_index_out[2] <= obj_index_i + 2;
               load_object_index_out[3] <= obj_index_i + 3;
-
-              // do_load <= 4'b1111;
-              // load_addr[0] <= obj_index_i;
-              // load_addr[1] <= obj_index_i + 1;
-              // load_addr[2] <= obj_index_i + 2;
-              // load_addr[3] <= obj_index_i + 3;
 
               obj_index_i <= obj_index_i + 4;
               cooldown <= 0;

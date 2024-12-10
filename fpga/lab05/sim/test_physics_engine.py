@@ -132,7 +132,7 @@ async def run_single_frame(dut, obj_dict_list):
         await FallingEdge(dut.sys_clk)
 
     while dut.state_out.value == 1:  # LOADING
-        while dut.load_signal_out.value != 15:
+        while dut.load_signal_out.value != 1:
             await FallingEdge(dut.sys_clk)
         await FallingEdge(dut.sys_clk)
         await FallingEdge(dut.sys_clk)
@@ -269,6 +269,11 @@ async def test_dyn(dut):
             "static": True,
         }
     )
+
+    for obj in obj_dict_list:
+        obj_bits = serialize(obj)
+        print(hex(obj_bits))
+
     await init_module(dut)
     await ClockCycles(dut.sys_clk, 100)
 
@@ -306,8 +311,8 @@ def is_runner():
     sim = os.getenv("SIM", "icarus")
     proj_path = Path(__file__).resolve().parent.parent
     sys.path.append(str(proj_path / "sim" / "model"))
-    sources = [proj_path / "hdl" / "phys" / "physics_engine.sv"]
-    sources += [proj_path / "hdl" / "phys" / "update_pos_vel.sv"]
+    sources = [proj_path / "hdl" / "physics_engine.sv"]
+    sources += [proj_path / "hdl" / "update_pos_vel.sv"]
     sources += [proj_path / "hdl" / "xilinx_single_port_ram_read_first.v"]
     build_test_args = ["-Wall"]
     parameters = {}

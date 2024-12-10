@@ -2,6 +2,12 @@
 `define CLAMP(x, min, max) (x < min ? min : (x > max ? max : x))
 `define SF_MIN -2**(`SF-1)
 `define SF_MAX 2**(`SF-1)-1
+`define OBJ_DYN_WIDTH 64
+`define OBJ_WIDTH 115
+`define SF 16
+`define SF_DEC 5
+`define DF 32
+`define DF_DEC 11
 
 module update_pos_vel(
     input wire sys_clk,
