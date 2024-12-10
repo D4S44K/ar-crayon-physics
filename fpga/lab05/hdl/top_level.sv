@@ -1,6 +1,8 @@
 `timescale 1ns / 1ps
 `default_nettype none
 `define OBJ_WIDTH 115
+`define OBJ_COUNT 4
+`define OBJ_ADDR_WIDTH 8
 
 module top_level
   (
@@ -543,23 +545,66 @@ module top_level
               .green_out(line_green),
               .blue_out(line_blue));
 
-  // object_storage obj_storage(
-  //   .object_props(0),
-  //   .clk_in(clk_in),
-  //   .write_valid_in(0),
-  //   .read_valid_in(4'b1111),
-  //   .current_addr(current_addresses),
-  //   .rst_in(rst_in),
-  //   .is_static(is_static),
-  //   .id_bits(id_bits),
-  //   .params(params),
-  //   .pos_x(pos_x),
-  //   .pos_y(pos_y),
-  //   .vel_x(vel_x),
-  //   .vel_y(vel_y),
-  //   .is_valid_out(is_valid_out)
-  // );
 
+
+  // object storage RAM
+  //  read from render and physics engine
+  //  write from draw and physics engine
+
+  logic write_valid_in;
+  logic [`OBJ_ADDR_WIDTH-1:0] write_addr_in;
+  logic [`OBJ_WIDTH-1:0] write_object_in;
+  logic write_valid_out;
+
+  logic read_valid_in;
+  logic [`OBJ_ADDR_WIDTH-1:0] read_addrs_in [3:0];
+  logic [`OBJ_WIDTH-1:0] read_objects_out [3:0];
+  logic read_valid_out;
+
+  object_storage storage(
+                   .clk_in(clk_100mhz),
+                   .rst_in(sys_rst_pixel),
+
+                   .write_valid_in(write_valid_in),
+                   .write_addr_in(write_addr_in),
+                   .write_object_in(write_object_in),
+                   .write_valid_out(write_valid_out),
+
+                   .read_valid_in(read_valid_in),
+                   .read_addrs_in(read_addrs_in),
+                   .read_objects_out(read_objects_out),
+                   .read_valid_out(read_valid_out)
+                 );
+
+
+  // physics engine
+  logic frame_start_in;
+  enum logic [2:0] {IDLE, LOADING, COLLISION, UPDATING, SAVING} state_out;
+  logic frame_end_out;
+
+  logic [3:0] load_signal_out;
+  logic [`OBJ_ADDR_WIDTH-1:0] load_object_index_out [3:0];
+  logic [`OBJ_WIDTH-1:0] load_object_data_in [3:0];
+
+  logic save_signal_out;
+  logic [`OBJ_ADDR_WIDTH-1:0] save_object_index_out;
+  logic [`OBJ_WIDTH-1:0] save_object_data_out;
+
+  physics_engine (
+      .sys_clk(clk_100mhz),
+      .sys_rst(sys_rst_pixel),
+      .frame_start_in(frame_start_in),
+      .state_out(state_out),
+      .frame_end_out(frame_end_out),
+
+      .load_signal_out(load_signal_out),
+      .load_object_index_out(load_object_index_out),
+      .load_object_data_in(load_object_data_in),
+
+      .save_signal_out(save_signal_out),
+      .save_object_index_out(save_object_index_out),
+      .save_object_data_out(save_object_data_out)
+    );
 
 
   // object coordinate setting logic

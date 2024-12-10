@@ -25,22 +25,8 @@ import input as phys_input
 from my_types import ResultVideo
 from primitives import SFIX16, SFIX32
 
-# module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
-#     input wire sys_clk,
-#     input wire sys_rst,
-#     input wire frame_start_in,
-
-#     output enum logic [2:0] {IDLE, LOADING, COLLISION, UPDATING, SAVING} state_out,
-#     output logic frame_end_out,
-
-#     output logic [3:0] load_signal_out,
-#     input wire [`OBJ_WIDTH-1:0] load_object_data_in[3:0],
-#     output logic [9:0] load_object_index_out[3:0],
-
-#     output logic save_signal_out,
-#     output logic [9:0] save_object_index_out,
-#     output logic [`OBJ_WIDTH-1:0] save_object_data_out
-#   );
+OBJ_WIDTH = 115
+OBJ_ADDR_WIDTH = 8
 
 
 def get_id_bits(type_str):
@@ -89,7 +75,7 @@ def serialize(obj):
     res = 0
     res = res | is_static
     res = (res << 2) | id_bits
-    res = (res << 36) | params
+    res = (res << 48) | params
     res = (res << 16) | pos_x
     res = (res << 16) | pos_y
     res = (res << 16) | vel_x
@@ -114,7 +100,7 @@ def deserialize(obj_bits):
     obj["position"] = [parse_sfix16(obj_bits >> 16), parse_sfix16(obj_bits)]
     obj_bits = obj_bits >> 32
     obj["params"] = [parse_sfix16(obj_bits)]  # TODO
-    obj_bits = obj_bits >> 36
+    obj_bits = obj_bits >> 48
     obj["shape_type"] = get_shape_type(obj_bits & 0b11)
     obj_bits = obj_bits >> 2
     obj["static"] = obj_bits == 1
@@ -126,7 +112,9 @@ async def init_module(dut):
     cocotb.start_soon(Clock(dut.sys_clk, 10, units="ns").start())
     dut.frame_start_in.value = 0
     dut.sys_rst.value = 1
-    dut.load_object_data_in.value = 0  # all 4 values
+    # dut.load_object_data_in.value = 0  # all 4 values
+    for i in range(4):
+        dut.load_object_data_in[i].value = 0
     await ClockCycles(dut.sys_clk, 3)
     dut.sys_rst.value = 0
     await ClockCycles(dut.sys_clk, 5)
@@ -148,21 +136,14 @@ async def run_single_frame(dut, obj_dict_list):
             await FallingEdge(dut.sys_clk)
         await FallingEdge(dut.sys_clk)
         await FallingEdge(dut.sys_clk)
-        load_data_in = [0, 0, 0, 0]
         index_out = dut.load_object_index_out.value
-        load_index = []
         for i in range(4):
-            x = index_out & (2**10 - 1)
-            load_index.append(x)
-            index_out = index_out >> 10
-            if x < len(obj_dict_list):
-                obj_bits = serialize(obj_dict_list[x])
-                load_data_in[i] = obj_bits
-
-        res = 0
-        for i in range(4):
-            res = res | (load_data_in[i] << (i * 103))
-        dut.load_object_data_in.value = res
+            idx = int(index_out[3 - i])  # why reversed?
+            if idx < len(obj_dict_list):
+                obj_bits = serialize(obj_dict_list[idx])
+                dut.load_object_data_in[i].value = obj_bits
+            else:
+                dut.load_object_data_in[i].value = 0
 
     while dut.state_out.value == 2:  # COLLISION
         await FallingEdge(dut.sys_clk)
@@ -228,6 +209,9 @@ async def test_static(dut):
             # assert new_obj_dict_list[i] == exp_obj_dict_list[i]
             exp_obj = exp_obj_dict_list[i]
             new_obj = new_obj_dict_list[i]
+            # pprint(f"orig    = {obj_dict_list[i]}")
+            # pprint(f"exp_obj = {exp_obj}")
+            # pprint(f"new_obj = {new_obj}")
             assert exp_obj["static"] == new_obj["static"]
             assert exp_obj["shape_type"] == new_obj["shape_type"]
             assert exp_obj["position"] == new_obj["position"]

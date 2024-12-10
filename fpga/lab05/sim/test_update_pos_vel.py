@@ -75,7 +75,7 @@ async def test_set(dut, _pos_x, _pos_y, _vel_x, _vel_y, _time_step):
     time_step = SFIX32(_time_step)
 
     dut.obj_in.value = (
-        1 << 101
+        1 << 113
         | pos_x.get_int_repr() << 48
         | pos_y.get_int_repr() << 32
         | vel_x.get_int_repr() << 16

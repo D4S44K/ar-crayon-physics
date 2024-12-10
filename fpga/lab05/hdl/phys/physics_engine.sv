@@ -6,7 +6,8 @@
 `define SFIX16(x) (x << `SF_DEC)
 `define SFIX32(x) (x << `DF_DEC)
 
-// `define OBJ_WIDTH 103
+`define OBJ_WIDTH 115
+`define OBJ_ADDR_WIDTH 8
 `define OBJ_PART_WIDTH 66
 `define OBJ_DYN_WIDTH 64 // MEMORYIO: pos and vel is [63-0] bits of object
 
@@ -19,8 +20,8 @@ module physics_engine #(OBJ_COUNT=8, MAX_ITER=64)(
     output logic frame_end_out,
 
     output logic [3:0] load_signal_out,
-    input wire [3:0][`OBJ_WIDTH-1:0] load_object_data_in,
-    output logic [3:0][9:0] load_object_index_out,
+    output logic [`OBJ_ADDR_WIDTH-1:0] load_object_index_out [3:0],
+    input wire [`OBJ_WIDTH-1:0] load_object_data_in [3:0],
 
     output logic save_signal_out,
     output logic [9:0] save_object_index_out,
