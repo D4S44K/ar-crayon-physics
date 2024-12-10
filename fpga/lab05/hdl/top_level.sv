@@ -489,23 +489,23 @@ module top_level
              .delayed_signal(vcount_delayed_ps1)
            );
 
-  draw_rectangle #(
-                   .WIDTH(256),
-                   .HEIGHT(256),
-                   .COLOR(24'hFF_FF_FF))
-                 rectangle (
-                   .clk_in(clk_pixel),
-                   .rst_in(sys_rst_pixel),
-                   .hcount_in(hcount_delayed_ps1),
-                   .vcount_in(vcount_delayed_ps1),
-                   .x_in_1(x_com),
-                   .y_in_1(y_com),
-                   .x_in_2(x_com_2),
-                   .y_in_2(y_com_2),
-                   .rect_coord(rect_coord),
-                   .red_out(rect_red),
-                   .green_out(rect_green),
-                   .blue_out(rect_blue));
+  // draw_rectangle #(
+  //                  .WIDTH(256),
+  //                  .HEIGHT(256),
+  //                  .COLOR(24'hFF_FF_FF))
+  //                rectangle (
+  //                  .clk_in(clk_pixel),
+  //                  .rst_in(sys_rst_pixel),
+  //                  .hcount_in(hcount_delayed_ps1),
+  //                  .vcount_in(vcount_delayed_ps1),
+  //                  .x_in_1(x_com),
+  //                  .y_in_1(y_com),
+  //                  .x_in_2(x_com_2),
+  //                  .y_in_2(y_com_2),
+  //                  .rect_coord(rect_coord),
+  //                  .red_out(rect_red),
+  //                  .green_out(rect_green),
+  //                  .blue_out(rect_blue));
 
 
   draw_circle #(
@@ -590,21 +590,22 @@ module top_level
   logic [`OBJ_ADDR_WIDTH-1:0] save_object_index_out;
   logic [`OBJ_WIDTH-1:0] save_object_data_out;
 
-  physics_engine (
-      .sys_clk(clk_100mhz),
-      .sys_rst(sys_rst_pixel),
-      .frame_start_in(frame_start_in),
-      .state_out(state_out),
-      .frame_end_out(frame_end_out),
+  physics_engine engine
+                 (
+                   .sys_clk(clk_100mhz),
+                   .sys_rst(sys_rst_pixel),
+                   .frame_start_in(frame_start_in),
+                   .state_out(state_out),
+                   .frame_end_out(frame_end_out),
 
-      .load_signal_out(load_signal_out),
-      .load_object_index_out(load_object_index_out),
-      .load_object_data_in(load_object_data_in),
+                   .load_signal_out(load_signal_out),
+                   .load_object_index_out(load_object_index_out),
+                   .load_object_data_in(load_object_data_in),
 
-      .save_signal_out(save_signal_out),
-      .save_object_index_out(save_object_index_out),
-      .save_object_data_out(save_object_data_out)
-    );
+                   .save_signal_out(save_signal_out),
+                   .save_object_index_out(save_object_index_out),
+                   .save_object_data_out(save_object_data_out)
+                 );
 
 
   // object coordinate setting logic

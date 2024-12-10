@@ -1,5 +1,9 @@
 `default_nettype none
 
+`define OBJ_WIDTH 115
+`define OBJ_COUNT 4
+`define OBJ_ADDR_WIDTH 8
+
 module object_storage (
     input wire clk_in,
     input wire rst_in,
