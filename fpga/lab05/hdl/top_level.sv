@@ -440,14 +440,17 @@ module top_level
   //rectangle output:
   logic [7:0] rect_red, rect_green, rect_blue;
   logic [83:0] rect_coord;
+  logic rect_valid_out;
 
   //circle output:
   logic [7:0] circle_red, circle_green, circle_blue;
   logic [83:0] circle_coord;
+  logic circle_valid_out;
 
   //line output:
   logic [7:0] line_red, line_green, line_blue;
   logic [83:0] line_coord;
+  logic line_valid_out;
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
@@ -476,6 +479,7 @@ module top_level
     rectangle (
     .clk_in(clk_pixel),
     .rst_in(sys_rst_pixel),
+    .valid_in(1),
     .hcount_in(hcount_delayed_ps1),
     .vcount_in(vcount_delayed_ps1),
     .x_in_1(x_com),
@@ -485,7 +489,8 @@ module top_level
     .rect_coord(rect_coord),
     .red_out(rect_red),
     .green_out(rect_green),
-    .blue_out(rect_blue));
+    .blue_out(rect_blue),
+    .valid_out(rect_valid_out));
 
 
   draw_circle #(
@@ -495,6 +500,7 @@ module top_level
     circle (
     .clk_in(clk_pixel),
     .rst_in(sys_rst_pixel),
+    .valid_in(1),
     .hcount_in(hcount_delayed_ps1),
     .vcount_in(vcount_delayed_ps1),
     .x_in_1(x_com),
@@ -504,8 +510,8 @@ module top_level
     .circle_coord(circle_coord),
     .red_out(circle_red),
     .green_out(circle_green),
-    .blue_out(circle_blue));
-
+    .blue_out(circle_blue),
+    .valid_out(circle_valid_out));
 
   draw_line #(
     .WIDTH(256),
@@ -514,6 +520,7 @@ module top_level
     line (
     .clk_in(clk_pixel),
     .rst_in(sys_rst_pixel),
+    .valid_in(1),
     .hcount_in(hcount_delayed_ps1),
     .vcount_in(vcount_delayed_ps1),
     .x_in_1(x_com),
@@ -523,7 +530,8 @@ module top_level
     .line_coord(line_coord),
     .red_out(line_red),
     .green_out(line_green),
-    .blue_out(line_blue));
+    .blue_out(line_blue),
+    .valid_out(line_valid_out));
 
   // object coordinate setting logic
   logic [86:0] obj_coord;
