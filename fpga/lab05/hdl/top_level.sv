@@ -377,8 +377,8 @@ module top_level
   // special customized version
   lab05_ssc mssc(.clk_in(clk_pixel),
                  .rst_in(sys_rst_pixel),
-                 .lt_in(lower_threshold),
-                 .ut_in(upper_threshold),
+                 .lt_in(x_com),
+                 .ut_in(x_com_2),
                  .channel_sel_in(3'b101),
                  .cat_out(cam_ss_c),
                  .an_out({cam_ss0_an, cam_ss1_an})
@@ -410,6 +410,17 @@ module top_level
              .delayed_signal(vcount_delayed_ps3)
            );
 
+  logic [9:0] nf_hdmi_delayed_ps3;
+  pipeline #(
+             .WIDTH(10), .STAGES(8))
+           nf_hdmi_pipeline_ps3(
+             .clk_pixel(clk_pixel),
+             .signal(nf_hdmi),
+             //.stages(8),
+             .delayed_signal(nf_hdmi_delayed_ps3)
+           );
+
+
   //Center of Mass Calculation: (you need to do)
   //using x_com_calc and y_com_calc values
   //Center of Mass:
@@ -419,7 +430,7 @@ module top_level
                    .x_in(hcount_delayed_ps3),  //TODO: needs to use pipelined signal! (PS3)
                    .y_in(vcount_delayed_ps3), //TODO: needs to use pipelined signal! (PS3)
                    .valid_in(mask), //aka threshold
-                   .tabulate_in((nf_hdmi)),
+                   .tabulate_in((nf_hdmi_delayed_ps3)),
                    .x_out(x_com_calc),
                    .y_out(y_com_calc),
                    .valid_out(new_com)
@@ -431,7 +442,7 @@ module top_level
                    .x_in(hcount_delayed_ps3),  //TODO: needs to use pipelined signal! (PS3)
                    .y_in(vcount_delayed_ps3), //TODO: needs to use pipelined signal! (PS3)
                    .valid_in(mask_2), //aka threshold
-                   .tabulate_in((nf_hdmi)),
+                   .tabulate_in((nf_hdmi_delayed_ps3)),
                    .x_out(x_com_calc_2),
                    .y_out(y_com_calc_2),
                    .valid_out(new_com_2)
@@ -479,81 +490,78 @@ module top_level
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
-             .WIDTH(11), .STAGES(3))
-           hcount_pipeline_ps1(
-             .clk_pixel(clk_pixel),
-             .signal(hcount_hdmi),
-             //.stages(3),
-             .delayed_signal(hcount_delayed_ps1)
-           );
+    .WIDTH(11), .STAGES(3))
+    hcount_pipeline_ps1(
+    .clk_pixel(clk_pixel),
+    .signal(hcount_hdmi),
+    //.stages(3),
+    .delayed_signal(hcount_delayed_ps1)
+  );
 
   logic [9:0] vcount_delayed_ps1;
   pipeline #(
-             .WIDTH(10), .STAGES(3))
-           vcount_pipeline_ps1(
-             .clk_pixel(clk_pixel),
-             .signal(vcount_hdmi),
-             //.stages(3),
-             .delayed_signal(vcount_delayed_ps1)
-           );
-
+    .WIDTH(10), .STAGES(3))
+    vcount_pipeline_ps1(
+    .clk_pixel(clk_pixel),
+    .signal(vcount_hdmi),
+    //.stages(3),
+    .delayed_signal(vcount_delayed_ps1)
+  );
 
   draw_rectangle #(
-                   .WIDTH(256),
-                   .HEIGHT(256),
-                   .COLOR(24'hFF_FF_FF))
-                 rectangle (
-                   .clk_in(clk_pixel),
-                   .rst_in(sys_rst_pixel),
-                   .valid_in(1),
-                   .hcount_in(hcount_delayed_ps1),
-                   .vcount_in(vcount_delayed_ps1),
-                   .x_in_1(x_com),
-                   .y_in_1(y_com),
-                   .x_in_2(x_com_2),
-                   .y_in_2(y_com_2),
-                   .rect_coord(rect_coord),
-                   .in_rect(in_rect),
-                   .valid_out(rect_valid_out));
+    .WIDTH(256),
+    .HEIGHT(256),
+    .COLOR(24'hFF_FF_FF))
+    rectangle (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst_pixel),
+    .valid_in(1),
+    .hcount_in(hcount_delayed_ps1),
+    .vcount_in(vcount_delayed_ps1),
+    .x_in_1(x_com),
+    .y_in_1(y_com),
+    .x_in_2(x_com_2),
+    .y_in_2(y_com_2),
+    .rect_coord(rect_coord),
+    .in_rect(in_rect),
+    .valid_out(rect_valid_out));
 
 
   draw_circle #(
-                .WIDTH(256),
-                .HEIGHT(256),
-                .COLOR(24'hFF_FF_FF))
-              circle (
-                .clk_in(clk_pixel),
-                .rst_in(sys_rst_pixel),
-                .valid_in(1),
-                .hcount_in(hcount_delayed_ps1),
-                .vcount_in(vcount_delayed_ps1),
-                .is_valid_in(1),
-                .x_in_1(x_com),
-                .y_in_1(y_com),
-                .x_in_2(x_com_2),
-                .y_in_2(y_com_2),
-                .circle_coord(circle_coord),
-                .in_circle(in_circle),
-                .valid_out(circle_valid_out));
+    .WIDTH(256),
+    .HEIGHT(256),
+    .COLOR(24'hFF_FF_FF))
+    circle (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst_pixel),
+    .valid_in(1),
+    .hcount_in(hcount_delayed_ps1),
+    .vcount_in(vcount_delayed_ps1),
+    .x_in_1(x_com),
+    .y_in_1(y_com),
+    .x_in_2(x_com_2),
+    .y_in_2(y_com_2),
+    .circle_coord(circle_coord),
+    .in_circle(in_circle),
+    .valid_out(circle_valid_out));
 
   draw_line #(
-              .WIDTH(256),
-              .HEIGHT(256),
-              .COLOR(24'hFF_FF_FF))
-            line (
-              .clk_in(clk_pixel),
-              .rst_in(sys_rst_pixel),
-              .valid_in(1),
-              .hcount_in(hcount_delayed_ps1),
-              .vcount_in(vcount_delayed_ps1),
-              .x_in_1(x_com),
-              .y_in_1(y_com),
-              .x_in_2(x_com_2),
-              .y_in_2(y_com_2),
-              .line_coord(line_coord),
-              .in_line(in_line),
-              .valid_out(line_valid_out));
-
+    .WIDTH(256),
+    .HEIGHT(256),
+    .COLOR(24'hFF_FF_FF))
+    line (
+    .clk_in(clk_pixel),
+    .rst_in(sys_rst_pixel),
+    .valid_in(1),
+    .hcount_in(hcount_delayed_ps1),
+    .vcount_in(vcount_delayed_ps1),
+    .x_in_1(x_com),
+    .y_in_1(y_com),
+    .x_in_2(x_com_2),
+    .y_in_2(y_com_2),
+    .line_coord(line_coord),
+    .in_line(in_line),
+    .valid_out(line_valid_out));
 
   logic simul_mode;
   assign simul_mode = sw[15];
@@ -574,7 +582,7 @@ module top_level
   logic read_valid_out;
 
   object_storage storage(
-                   .clk_in(clk_100_passthrough),
+                   .clk_in(clk_pixel),
                    .rst_in(sys_rst_pixel),
 
                    .write_valid_in(write_valid_in),
@@ -603,7 +611,7 @@ module top_level
 
   physics_engine engine
                  (
-                   .sys_clk(clk_100_passthrough),
+                   .sys_clk(clk_pixel),
                    .sys_rst(sys_rst_pixel),
                    .frame_start_in(frame_start_in),
                    .state_out(state_out),
@@ -620,7 +628,7 @@ module top_level
 
 
   // BRAM integration
-  always_ff @(posedge clk_100_passthrough) // ff for buffering
+  always_ff @(posedge clk_pixel) // ff for buffering
   begin
     if (simul_mode)
     begin // IO from phys_engine
@@ -655,7 +663,7 @@ module top_level
   assign frame_start_in = simul_mode && nf_hdmi;
 
   logic frame_ended;
-  always_ff @(posedge clk_100_passthrough)
+  always_ff @(posedge clk_pixel)
   begin
     if (simul_mode)
     begin
@@ -684,13 +692,13 @@ module top_level
   logic [3:0] phys_ss0_an, phys_ss1_an;
   logic [6:0] phys_ss_c;
 
-  seven_segment_controller phys_ssc(.clk_in(clk_100_passthrough),
+  seven_segment_controller phys_ssc(.clk_in(clk_pixel),
                                     .rst_in(sys_rst_pixel),
                                     .val_in({obj0_pos_y, obj0_vel_y}),
                                     .cat_out(phys_ss_c),
                                     .an_out({phys_ss0_an, phys_ss1_an}));
 
-  always_ff @(posedge clk_100_passthrough)
+  always_ff @(posedge clk_pixel)
   begin
     if(save_signal_out && save_object_index_out == 0)
     begin
@@ -705,7 +713,7 @@ module top_level
   logic [`OBJ_WIDTH-1:0] random_obj;
   assign pos_y = hcount_hdmi << 2;
   assign vel_y = (hcount_hdmi[0] << 15) + (hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3);
-  always_ff @(posedge clk_100_passthrough)
+  always_ff @(posedge clk_pixel)
   begin
     if(create_random_obj)
     begin
@@ -743,18 +751,6 @@ module top_level
       endcase
     end
   end
-
-  //crosshair output:
-  // logic [7:0] ch_red, ch_green, ch_blue;
-
-  //Create Crosshair patter on center of mass:
-  //0 cycle latency
-  //TODO: Should be using output of (PS3)
-  // always_comb begin
-  //   ch_red   = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-  //   ch_green = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-  //   ch_blue  = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-  // end
 
 
   // HDMI video signal generator
@@ -841,36 +837,6 @@ module top_level
              //.stages(1),
              .delayed_signal(selected_channel_delayed_ps5)
            );
-
-  // logic [7:0] ch_red_delayed_ps8;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(8))
-  //   ch_red_pipeline_ps8(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(ch_red),
-  //   //.stages(8),
-  //   .delayed_signal(ch_red_delayed_ps8)
-  // );
-
-  // logic [7:0] ch_green_delayed_ps8;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(8))
-  //   ch_green_pipeline_ps8(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(ch_green),
-  //   //.stages(8),
-  //   .delayed_signal(ch_green_delayed_ps8)
-  // );
-
-  // logic [7:0] ch_blue_delayed_ps8;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(8))
-  //   ch_blue_pipeline_ps8(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(ch_blue),
-  //   //.stages(8),
-  //   .delayed_signal(ch_blue_delayed_ps8)
-  // );
 
   video_mux mvm(
               .bg_in(display_choice), //choose background

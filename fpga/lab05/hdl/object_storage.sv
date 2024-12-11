@@ -53,9 +53,5 @@ module object_storage (
     end
   endgenerate
 
-  <<<<<<< HEAD
  endmodule
 `default_nettype wire
- =======
- // endmodule
- >>>>>>> disha-temp

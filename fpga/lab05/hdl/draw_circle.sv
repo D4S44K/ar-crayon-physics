@@ -39,18 +39,7 @@ module draw_circle #(
     //   red_out <= 0;
     //   green_out <= 0;
     //   blue_out <= 0;
-    // is_valid_out <= 0;// disha
-    valid_in_pipelined[0] <= 0;// disha
-    valid_in_pipelined[1] <= 0;// disha
-    valid_in_pipelined[2] <= 0;// disha
-    valid_in_pipelined[3] <= 0;// disha
-    valid_in_pipelined[4] <= 0;// disha
     end else begin
-      valid_in_pipelined[0] <= is_valid_in;// disha
-      valid_in_pipelined[1] <= valid_in_pipelined[0];// disha
-      valid_in_pipelined[2] <= valid_in_pipelined[1];// disha
-      valid_in_pipelined[3] <= valid_in_pipelined[2];// disha
-      valid_in_pipelined[4] <= valid_in_pipelined[3];// disha
         // stage 1
         x_1 <= (x_in_1 <= x_in_2) ? x_in_1 : x_in_2;
         y_1 <= (y_in_1 <= y_in_2) ? y_in_1 : y_in_2;
