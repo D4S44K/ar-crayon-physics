@@ -43,7 +43,7 @@ module render
     
 
     draw_circle  ball(
-    .is_valid_in(is_shape_ready[0]),
+    .valid_in(is_shape_ready[0]),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -54,7 +54,7 @@ module render
     .y_in_2(y_in_2s[0]),
     .circle_coord(obj_coord[0]),
     .in_circle(in_shape_bits[0]),
-    .is_valid_out(is_shape_drawn[0])
+    .valid_out(is_shape_drawn[0])
   );
 
   circle_converter ball_converter (
@@ -68,7 +68,7 @@ module render
   );
 
     draw_circle  ball2(
-    .is_valid_in(is_shape_ready[1]),
+    .valid_in(is_shape_ready[1]),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -79,7 +79,7 @@ module render
     .y_in_2(y_in_2s[1]),
     .circle_coord(obj_coord[1]),
     .in_circle(in_shape_bits[1]),
-    .is_valid_out(is_shape_drawn[1])
+    .valid_out(is_shape_drawn[1])
   );
 
     circle_converter ball2_converter (
@@ -93,7 +93,7 @@ module render
   );
 
     draw_circle  ball3(
-    .is_valid_in(is_shape_ready[2]),
+    .valid_in(is_shape_ready[2]),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -104,7 +104,7 @@ module render
     .y_in_2(y_in_2s[2]),
     .circle_coord(obj_coord[2]),
     .in_circle(in_shape_bits[2]),
-    .is_valid_out(is_shape_drawn[2])
+    .valid_out(is_shape_drawn[2])
   );
 
     circle_converter ball3_converter (
@@ -118,7 +118,7 @@ module render
   );
 
     draw_circle  ball4(
-    .is_valid_in(is_shape_ready[3]),
+    .valid_in(is_shape_ready[3]),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -129,7 +129,7 @@ module render
     .y_in_2(y_in_2s[3]),
     .circle_coord(obj_coord[3]),
     .in_circle(in_shape_bits[3]),
-    .is_valid_out(is_shape_drawn[3])
+    .valid_out(is_shape_drawn[3])
   );
 
     circle_converter ball4_converter (
@@ -143,7 +143,7 @@ module render
   );
 
     draw_line  line(
-    .is_valid_in(is_shape_ready[4] ),
+    .valid_in(is_shape_ready[4] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -154,7 +154,7 @@ module render
     .y_in_2(y_in_2s[4]),
     .line_coord(obj_coord[4]),
     .in_line(in_shape_bits[1]),
-    .is_valid_out(is_shape_drawn[4])
+    .valid_out(is_shape_drawn[4])
   );
 
     line_converter line_converter (
@@ -168,7 +168,7 @@ module render
   );
 
     draw_line  line2(
-    .is_valid_in(is_shape_ready[5] ),
+    .valid_in(is_shape_ready[5] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -179,7 +179,7 @@ module render
     .y_in_2(y_in_2s[5]),
     .line_coord(obj_coord[5]),
     .in_line(in_shape_bits[5]),
-    .is_valid_out(is_shape_drawn[5])
+    .valid_out(is_shape_drawn[5])
   );
 
     line_converter line2_converter (
@@ -193,7 +193,7 @@ module render
   );
 
     draw_line  line3(
-    .is_valid_in(is_shape_ready[6] ),
+    .valid_in(is_shape_ready[6] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -204,7 +204,7 @@ module render
     .y_in_2(y_in_2s[6]),
     .line_coord(obj_coord[6]),
     .in_line(in_shape_bits[6]),
-    .is_valid_out(is_shape_drawn[6])
+    .valid_out(is_shape_drawn[6])
   );
 
     line_converter line3_converter (
@@ -218,7 +218,7 @@ module render
   );
 
     draw_line  line4(
-    .is_valid_in(is_shape_ready[7] ),
+    .valid_in(is_shape_ready[7] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -229,7 +229,7 @@ module render
     .y_in_2(y_in_2s[7]),
     .line_coord(obj_coord[7]),
     .in_line(in_shape_bits[7]),
-    .is_valid_out(is_shape_drawn[7])
+    .valid_out(is_shape_drawn[7])
   );
 
     line_converter line4_converter (
@@ -243,7 +243,7 @@ module render
   );
 
     draw_rect  rect(
-    .is_valid_in(is_shape_ready[8] ),
+    .valid_in(is_shape_ready[8] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -254,7 +254,7 @@ module render
     .y_in_2(y_in_2s[8]),
     .rect_coord(obj_coord[8]),
     .in_rect(in_shape_bits[8]),
-    .is_valid_out(is_shape_drawn[8])
+    .valid_out(is_shape_drawn[8])
   );
 
     rect_converter rect_converter (
@@ -268,7 +268,7 @@ module render
   );
 
     draw_rect  rect2(
-    .is_valid_in(is_shape_ready[9] ),
+    .valid_in(is_shape_ready[9] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -279,7 +279,7 @@ module render
     .y_in_2(y_in_2s[9]),
     .rect_coord(obj_coord[9]),
     .in_rect(in_shape_bits[9]),
-    .is_valid_out(is_shape_drawn[9])
+    .valid_out(is_shape_drawn[9])
   );
 
     rect_converter rect2_converter (
@@ -293,7 +293,7 @@ module render
   );
 
     draw_rect  rect3(
-    .is_valid_in(is_shape_ready[10] ),
+    .valid_in(is_shape_ready[10] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -304,7 +304,7 @@ module render
     .y_in_2(y_in_2s[10]),
     .rect_coord(obj_coord[10]),
     .in_rect(in_shape_bits[10]),
-    .is_valid_out(is_shape_drawn[10])
+    .valid_out(is_shape_drawn[10])
   );
 
     rect_converter rect3_converter (
@@ -318,7 +318,7 @@ module render
   );
 
     draw_rect  rect4(
-    .is_valid_in(is_shape_ready[11] ),
+    .valid_in(is_shape_ready[11] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
     .hcount_in(hcount_in),
@@ -329,7 +329,7 @@ module render
     .y_in_2(y_in_2s[11]),
     .rect_coord(obj_coord[11]),
     .in_rect(in_shape_bits[11]),
-    .is_valid_out(is_shape_drawn[11])
+    .valid_out(is_shape_drawn[11])
   );
 
     rect_converter rect4_converter (
