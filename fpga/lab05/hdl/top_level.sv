@@ -369,6 +369,16 @@ module top_level
               .mask_out(mask_2) //single bit if pixel within mask.
             );
 
+  // logic [26:0] nf_count;
+  // evt_counter #(
+  //       .MAX_COUNT(1280 * 720 >> 3)
+  // ) count_nf(
+  //       .clk_in(clk_pixel),
+  //       .rst_in(sys_rst_pixel),
+  //       .evt_in(nf_hdmi),
+  //       .count_out(nf_count)
+  //   );
+
 
   logic [6:0] cam_ss_c;
   logic [3:0] cam_ss0_an, cam_ss1_an;
@@ -410,9 +420,9 @@ module top_level
              .delayed_signal(vcount_delayed_ps3)
            );
 
-  logic [9:0] nf_hdmi_delayed_ps3;
+  logic nf_hdmi_delayed_ps3;
   pipeline #(
-             .WIDTH(10), .STAGES(8))
+             .WIDTH(1), .STAGES(8))
            nf_hdmi_pipeline_ps3(
              .clk_pixel(clk_pixel),
              .signal(nf_hdmi),

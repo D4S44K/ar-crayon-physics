@@ -1,4 +1,5 @@
 `default_nettype none
+
 module center_of_mass (
                          input wire clk_in,
                          input wire rst_in,
@@ -64,8 +65,8 @@ module center_of_mass (
           if (tabulate_in && pixel_count > 0) begin
             state <= DIVIDE;
             start_div <= 1'b1;
-            valid_out <= 1'b0;
           end
+          valid_out <= 1'b0;
         end
 
         DIVIDE: begin
@@ -73,16 +74,13 @@ module center_of_mass (
           if (data_valid_div_x) begin
             x_out <= x_quotient[10:0];
             data_valid_div_x_tracker <= 1;
-            if (data_valid_div_y_tracker) begin
-              state <= DONE;
-            end
           end
           if (data_valid_div_y) begin
             y_out <= y_quotient[9:0];
             data_valid_div_y_tracker <= 1;
-            if (data_valid_div_x_tracker) begin
+          end
+          if (data_valid_div_x_tracker & data_valid_div_y_tracker) begin
               state <= DONE;
-            end
           end
         end
 
