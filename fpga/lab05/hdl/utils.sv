@@ -1,26 +1,31 @@
 module circle_converter
 (
-    input wire [114:0] object_props,
+    // input wire [114:0] object_props,
+    input wire [15:0] pos_x,
+    input wire [15:0] pos_y,
+    input wire [47:0] params,
     input wire is_valid_in,
-    output logic is_static,
     output logic [10:0] x_in_1,
     output logic [9:0] y_in_1,
     output logic [10:0] x_in_2,
     output logic [9:0] y_in_2,
     output logic is_valid_out
 );
+// logic [15:0] radius;
+// logic [15:0] center_x;
+// logic [15:0] center_y;
+// assign is_static = object_props[114];
+// assign center_x = object_props[111:96];
+// assign center_y = object_props[95:80];
+// assign radius = object_props[47:32];
 logic [15:0] radius;
-logic [15:0] center_x;
-logic [15:0] center_y;
+assign radius = params[15:0];
+
 always_comb begin
-    is_static = object_props[114:114];
-    center_x = object_props[111:96];
-    center_y = object_props[95:80];
-    radius = object_props[47:32];
-    x_in_1 = center_x - radius;
-    y_in_1 = center_y;
-    x_in_2 = center_x + radius;
-    y_in_2 = center_y;
+    x_in_1 = pos_x - radius;
+    y_in_1 = pos_y;
+    x_in_2 = pos_x + radius;
+    y_in_2 = pos_y;
     is_valid_out = is_valid_in;
 end
 
@@ -28,11 +33,14 @@ endmodule
 
 module rect_converter
 (
-    input wire clk_in,
+    // input wire clk_in,
     input wire is_valid_in,
-    input wire rst_in,
-    input wire [114:0] object_props,
-    output logic is_static,
+    // input wire rst_in,
+    // input wire [114:0] object_props,
+    // output logic is_static,
+    input [15:0] pos_x,
+    input [15:0] pos_y,
+    input [47:0] params,
     output logic [10:0] x_in_1,
     output logic [9:0] y_in_1,
     output logic [10:0] x_in_2,
@@ -43,19 +51,24 @@ module rect_converter
 logic signed [15:0] dx_1;
 logic signed[15:0] dy_1;
 logic signed [15:0] dy_2;
-logic signed [15:0] dx_2;
-logic [31:0] dx_2_temp;
-logic [31:0] remainder; 
-logic is_divide_done;
-logic has_error;
-logic is_busy_out;
+// logic signed [15:0] dx_2;
+// logic [31:0] dx_2_temp;
+// logic [31:0] remainder; 
+// logic is_divide_done;
+// logic has_error;
+// logic is_busy_out;
+// assign is_static = object_props[114];
+// assign x_in_1 = object_props[110:100];
+assign x_in_1 = pos_x;
+assign y_in_1 = pos_y;
+assign dx_1 = params[47:32];
+assign dy_1 = params[31:16];
+assign dy_2 = params[15:0];
+// assign y_in_1 = object_props[94:85];
+// assign dx_1 = object_props[79:64];
+// assign dy_1 = object_props[63:48];
+// assign dy_2 = object_props[47:32];
 always_comb begin
-    is_static = object_props[114:114];
-    x_in_1 = object_props[110:100];
-    y_in_1 = object_props[94:85];
-    dx_1 = object_props[79:64];
-    dy_1 = object_props[63:48];
-    dy_2 = object_props[47:32];
     // dx_2 = {1'b0, dx_2_temp[9:0], 5'b0};
     y_in_2 = y_in_1 + dy_1 + dy_2;
     x_in_2 = x_in_1 + dx_1;
@@ -95,23 +108,36 @@ endmodule
 
 module line_converter
 (
-    input wire [114:0] object_props,
+    // input wire [114:0] object_props
+    input wire [15:0] pos_x,
+    input wire [15:0] pos_y,
+    input wire [47:0] params,
     input wire is_valid_in,
-    output logic is_static,
+    // output logic is_static,
     output logic [10:0] x_in_1,
     output logic [9:0] y_in_1,
     output logic [10:0] x_in_2,
     output logic [9:0] y_in_2,
     output logic is_valid_out
 );
-always_comb begin
-    is_static = object_props[114:114];
-    x_in_1 = object_props[110:100];
-    y_in_1 = object_props[94:85];
-    x_in_2 = object_props[63:48];
-    y_in_2 = object_props[47:32];
-    is_valid_out = is_valid_in;
-end
+// assign is_static = object_props[114:114];
+// assign x_in_1 = object_props[110:100];
+// assign y_in_1 = object_props[94:85];
+// assign x_in_2 = object_props[63:48];
+// assign y_in_2 = object_props[47:32];
+assign x_in_1 = pos_x;
+assign y_in_1 = pos_y;
+assign y_in_2 = params[15:0];
+assign x_in_2 = params[31:16];
+assign is_valid_out = is_valid_in;
+// always_comb begin
+//     is_static = object_props[114:114];
+//     x_in_1 = object_props[110:100];
+//     y_in_1 = object_props[94:85];
+//     x_in_2 = object_props[63:48];
+//     y_in_2 = object_props[47:32];
+//     is_valid_out = is_valid_in;
+// end
 endmodule
 
 

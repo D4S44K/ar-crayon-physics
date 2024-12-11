@@ -5,13 +5,11 @@ module render
     input wire rst_in,
     // parameters for up to four objects at a time being passed in from object storage
     input wire [3:0] is_static,
-    input wire [3:0][6:0] current_addresses,
+    // input wire [3:0][6:0] current_addresses,
     input wire [3:0][1:0] id_bits,
-    input wire [3:0][35:0] params,
+    input wire [3:0][47:0] params,
     input wire [3:0][15:0] pos_x,
     input wire [3:0][15:0] pos_y,
-    input wire [3:0][15:0] vel_x,
-    input wire [3:0][15:0] vel_y,
 
     // pixel coordinate that we are querying
     input wire [10:0] hcount_in,
@@ -58,8 +56,11 @@ module render
   );
 
   circle_converter ball_converter (
-    .is_static(is_static[0]),
+    // .is_static(is_static[0]),
     .is_valid_in(id_bits[0] == 2'b01 && valid_in),
+    .pos_x(pos_x[0]),
+    .pos_y(pos_y[0]),
+    .params(params[0]),
     .x_in_1(x_in_1s[0]),
     .y_in_1(y_in_1s[0]),
     .x_in_2(x_in_2s[0]),
@@ -83,8 +84,11 @@ module render
   );
 
     circle_converter ball2_converter (
-    .is_static(is_static[1] && valid_in),
-    .is_valid_in(id_bits[1] == 2'b01),
+    // .is_static(is_static[1]),
+    .is_valid_in(id_bits[1] == 2'b01 && valid_in),
+    .pos_x(pos_x[1]),
+    .pos_y(pos_y[1]),
+    .params(params[1]),
     .x_in_1(x_in_1s[1]),
     .y_in_1(y_in_1s[1]),
     .x_in_2(x_in_2s[1]),
@@ -108,8 +112,11 @@ module render
   );
 
     circle_converter ball3_converter (
-    .is_static(is_static[2]),
+    // .is_static(is_static[2]),
     .is_valid_in(id_bits[2] == 2'b01 && valid_in),
+    .pos_x(pos_x[2]),
+    .pos_y(pos_y[2]),
+    .params(params[2]),
     .x_in_1(x_in_1s[2]),
     .y_in_1(y_in_1s[2]),
     .x_in_2(x_in_2s[2]),
@@ -133,13 +140,16 @@ module render
   );
 
     circle_converter ball4_converter (
-    .is_static(is_static[3]),
+    // .is_static(is_static[3]),
     .is_valid_in(id_bits[3] == 2'b01 && valid_in),
+    .pos_x(pos_x[3]),
+    .pos_y(pos_y[3]),
+    .params(params[3]),
     .x_in_1(x_in_1s[3]),
     .y_in_1(y_in_1s[3]),
     .x_in_2(x_in_2s[3]),
     .y_in_2(y_in_2s[3]),
-    .is_valid_out(is_shape_drawn[3])
+    .is_valid_out(is_shape_ready[3])
   );
 
     draw_line  line(
@@ -153,13 +163,16 @@ module render
     .x_in_2(x_in_2s[4]),
     .y_in_2(y_in_2s[4]),
     .line_coord(obj_coord[4]),
-    .in_line(in_shape_bits[1]),
+    .in_line(in_shape_bits[4]),
     .valid_out(is_shape_drawn[4])
   );
 
     line_converter line_converter (
-    .is_static(is_static[0]),
-    .is_valid_in(id_bits[0] == 2'b10 ),
+    // .is_static(is_static[0]),
+    .is_valid_in(id_bits[0] == 2'b10 && valid_in),
+    .pos_x(pos_x[0]),
+    .pos_y(pos_y[0]),
+    .params(params[0]),
     .x_in_1(x_in_1s[4]),
     .y_in_1(y_in_1s[4]),
     .x_in_2(x_in_2s[4]),
@@ -183,8 +196,11 @@ module render
   );
 
     line_converter line2_converter (
-    .is_static(is_static[1]),
-    .is_valid_in(id_bits[1] == 2'b10 ),
+    // .is_static(is_static[1]),
+    .is_valid_in(id_bits[1] == 2'b10 && valid_in),
+    .pos_x(pos_x[1]),
+    .pos_y(pos_y[1]),
+    .params(params[1]),
     .x_in_1(x_in_1s[5]),
     .y_in_1(y_in_1s[5]),
     .x_in_2(x_in_2s[5]),
@@ -208,8 +224,11 @@ module render
   );
 
     line_converter line3_converter (
-    .is_static(is_static[2]),
-    .is_valid_in(id_bits[2] == 2'b10 ),
+    // .is_static(is_static[2]),
+    .is_valid_in(id_bits[2] == 2'b10 && valid_in),
+    .pos_x(pos_x[2]),
+    .pos_y(pos_y[2]),
+    .params(params[2]),
     .x_in_1(x_in_1s[6]),
     .y_in_1(y_in_1s[6]),
     .x_in_2(x_in_2s[6]),
@@ -233,8 +252,11 @@ module render
   );
 
     line_converter line4_converter (
-    .is_static(is_static[3]),
-    .is_valid_in(id_bits[3] == 2'b10 ),
+    // .is_static(is_static[3]),
+    .is_valid_in(id_bits[3] == 2'b10 && valid_in),
+    .pos_x(pos_x[3]),
+    .pos_y(pos_y[3]),
+    .params(params[3]),
     .x_in_1(x_in_1s[7]),
     .y_in_1(y_in_1s[7]),
     .x_in_2(x_in_2s[7]),
@@ -242,7 +264,7 @@ module render
     .is_valid_out(is_shape_ready[7])
   );
 
-    draw_rect  rect(
+    draw_rectangle  rect(
     .valid_in(is_shape_ready[8] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
@@ -258,8 +280,11 @@ module render
   );
 
     rect_converter rect_converter (
-    .is_static(is_static[0]),
-    .is_valid_in(id_bits[0] ==2'b11 ),
+    // .is_static(is_static[0]),
+    .is_valid_in(id_bits[0] ==2'b11 && valid_in),
+    .pos_x(pos_x[0]),
+    .pos_y(pos_y[0]),
+    .params(params[0]),
     .x_in_1(x_in_1s[8]),
     .y_in_1(y_in_1s[8]),
     .x_in_2(x_in_2s[8]),
@@ -267,7 +292,7 @@ module render
     .is_valid_out(is_shape_ready[8])
   );
 
-    draw_rect  rect2(
+    draw_rectangle  rect2(
     .valid_in(is_shape_ready[9] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
@@ -283,8 +308,11 @@ module render
   );
 
     rect_converter rect2_converter (
-    .is_static(is_static[1]),
-    .is_valid_in(id_bits[1] ==2'b11 ),
+    // .is_static(is_static[1]),
+    .is_valid_in(id_bits[1] == 2'b11 && valid_in),
+    .pos_x(pos_x[1]),
+    .pos_y(pos_y[1]),
+    .params(params[1]),
     .x_in_1(x_in_1s[9]),
     .y_in_1(y_in_1s[9]),
     .x_in_2(x_in_2s[9]),
@@ -292,7 +320,7 @@ module render
     .is_valid_out(is_shape_ready[9])
   );
 
-    draw_rect  rect3(
+    draw_rectangle  rect3(
     .valid_in(is_shape_ready[10] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
@@ -308,8 +336,11 @@ module render
   );
 
     rect_converter rect3_converter (
-    .is_static(is_static[2]),
-    .is_valid_in(id_bits[2] ==2'b11 ),
+    // .is_static(is_static[2]),
+    .is_valid_in(id_bits[2] ==2'b11 && valid_in),
+    .pos_x(pos_x[2]),
+    .pos_y(pos_y[2]),
+    .params(params[2]),
     .x_in_1(x_in_1s[10]),
     .y_in_1(y_in_1s[10]),
     .x_in_2(x_in_2s[10]),
@@ -317,7 +348,7 @@ module render
     .is_valid_out(is_shape_ready[10])
   );
 
-    draw_rect  rect4(
+    draw_rectangle  rect4(
     .valid_in(is_shape_ready[11] ),
     .clk_in(clk_in ),
     .rst_in(rst_in),
@@ -333,8 +364,11 @@ module render
   );
 
     rect_converter rect4_converter (
-    .is_static(is_static[3]),
-    .is_valid_in(id_bits[3] == 2'b11 ),
+    // .is_static(is_static[3]),
+    .is_valid_in(id_bits[3] == 2'b11 && valid_in),
+    .pos_x(pos_x[3]),
+    .pos_y(pos_y[3]),
+    .params(params[3]),
     .x_in_1(x_in_1s[11]),
     .y_in_1(y_in_1s[11]),
     .x_in_2(x_in_2s[11]),
@@ -346,8 +380,8 @@ module render
     logic [4:0][18:0] held_write_address;
     logic [18:0] cycle_delay_write_address;
     // logic [4:0][3:0] held_valid;
-    logic [5:0][1:0] held_id_bits_set_1;
-    logic [4:0][1:0] held_id_bits_set_2;
+    logic [5:0][3:0][1:0] held_id_bits_set_1;
+    logic [4:0][3:0][1:0] held_id_bits_set_2;
     logic [5:0][3:0] held_static_bits_set_1;
     logic [4:0][3:0] held_static_bits_set_2;
     logic [4:0] held_is_second_set;
@@ -374,6 +408,10 @@ module render
             held_in_shape_bits <= 0;
             is_second_set <= 0;
             held_is_second_set <= 0;
+            held_id_bits_set_1 <= 0;
+            held_id_bits_set_2 <= 0;
+            held_static_bits_set_1 <= 0;
+            held_static_bits_set_2 <= 0;
         end
         else if(valid_in) begin
             is_second_set <= !is_second_set;
@@ -386,17 +424,18 @@ module render
                 held_static_bits_set_2[i + 1] <= held_static_bits_set_2[i];
             end
             held_is_second_set[0] <= is_second_set;
-            if(!is_second_set) held_id_bits_set_1[0] <= id_bits[0];
-            else held_id_bits_set_2[0] <= id_bits[0];
+            if(!is_second_set) held_id_bits_set_1[0] <= id_bits;
+            else held_id_bits_set_2[0] <= id_bits;
             if(is_second_set) held_static_bits_set_2[0] <= is_static;
             else held_static_bits_set_1[0] <= is_static;
             held_static_bits_set_1[5] <= held_static_bits_set_1[4];
+            held_id_bits_set_1[5] <= held_id_bits_set_1[4];
             held_write_address[0] <= (hcount_in >> 1) + (640 * (vcount_in >> 1));
             
             if(!held_is_second_set[4]) begin
                 cycle_delay_write_address <= held_write_address[4];
                 for(integer obj_num = 0; obj_num < 4; obj_num = obj_num + 1) begin
-                    case(id_bits[obj_num])
+                    case(held_id_bits_set_1[5][obj_num])
                         2'b00: held_in_shape_bits[obj_num] <= 0;
                         2'b01: held_in_shape_bits[obj_num] <= in_shape_bits[obj_num];
                         2'b10: held_in_shape_bits[obj_num] <= in_shape_bits[obj_num + 4];
@@ -404,20 +443,22 @@ module render
                         default: held_in_shape_bits[obj_num] <= 0;
                     endcase
                 end
+                valid_out <= 0;
 
             end
             else begin
-            if(held_in_shape_bits[0]) color_bits <= held_static_bits_set_1[0] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(held_in_shape_bits[1]) color_bits <= held_static_bits_set_1[1] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(held_in_shape_bits[2]) color_bits <= held_static_bits_set_1[2] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(held_in_shape_bits[3]) color_bits <= held_static_bits_set_1[3] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(current_in_shape_bits[0]) color_bits <= held_static_bits_set_2[0] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(current_in_shape_bits[1]) color_bits <= held_static_bits_set_2[1] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(current_in_shape_bits[2]) color_bits <= held_static_bits_set_2[2] ? STATIC_COLOR : NOT_STATIC_COLOR;
-            else if(current_in_shape_bits[3]) color_bits <= held_static_bits_set_2[3] ? STATIC_COLOR : NOT_STATIC_COLOR;
-               valid_out <= 1;
-               write_address <= cycle_delay_write_address;
-                
+              if(held_in_shape_bits[0]) color_bits <= held_static_bits_set_1[0] ? 2'b10 : 2'b01;
+              else if(held_in_shape_bits[1]) color_bits <= held_static_bits_set_1[1] ? 2'b10 : 2'b01;
+              else if(held_in_shape_bits[2]) color_bits <= held_static_bits_set_1[2] ? 2'b10 : 2'b01;
+              else if(held_in_shape_bits[3]) color_bits <= held_static_bits_set_1[3] ? 2'b10 : 2'b01;
+              else if(current_in_shape_bits[0]) color_bits <= held_static_bits_set_2[0] ? 2'b10 : 2'b01;
+              else if(current_in_shape_bits[1]) color_bits <= held_static_bits_set_2[1] ? 2'b10 : 2'b01;
+              else if(current_in_shape_bits[2]) color_bits <= held_static_bits_set_2[2] ? 2'b10 : 2'b01;
+              else if(current_in_shape_bits[3]) color_bits <= held_static_bits_set_2[3] ? 2'b10 : 2'b01;
+              else color_bits <= 2'b11;
+              valid_out <= 1;
+              write_address <= cycle_delay_write_address;
+            
             end
 
         end
