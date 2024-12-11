@@ -1,7 +1,7 @@
 `timescale 1ns / 1ps
 `default_nettype none
 `define OBJ_WIDTH 115
-`define OBJ_COUNT 4
+`define OBJ_COUNT 8
 `define OBJ_ADDR_WIDTH 8
 
 module top_level
@@ -105,7 +105,7 @@ module top_level
 
   // your pixel_reconstruct module, from the exercise!
   // hook it up to buffered inputs.
-  pixel_reconstruct
+  pixel_reconstruct pixel_constructor
     (.clk_in(clk_camera),
      .rst_in(sys_rst_camera),
      .camera_pclk_in(cam_pclk_buf[0]),
@@ -637,9 +637,14 @@ module top_level
                  );
 
 
+  logic is_obj_first_half;
   // BRAM integration
   always_ff @(posedge clk_pixel) // ff for buffering
   begin
+
+    if(sys_rst_pixel) is_obj_first_half <= 0;
+    else is_obj_first_half <= !is_obj_first_half;
+
     if (simul_mode)
     begin // IO from phys_engine
       write_valid_in <= save_signal_out | create_random_obj;
@@ -648,7 +653,25 @@ module top_level
         write_addr_in <= save_object_index_out;
         write_object_in <= save_object_data_out | random_obj;
       end
+    end
+    else
+    begin // IO from draw & render
+      write_valid_in <= 1'b0;
+      // read_valid_in <= 1'b0;
+    end
 
+    if(is_memory_stable) begin
+      // render reads
+      if(is_obj_first_half) begin
+        read_addrs_in <= {8'b0, 8'b1, 8'b10, 8'b11};
+      end
+      else begin
+        read_addrs_in <= {8'b100, 8'b101, 8'b110, 8'b111};
+      end
+      
+    end
+    else begin
+      // physics
       read_valid_in <= load_signal_out;
       if (load_signal_out)
       begin
@@ -661,11 +684,6 @@ module top_level
         load_object_data_in[2] <= read_objects_out[2];
         load_object_data_in[3] <= read_objects_out[3];
       end
-    end
-    else
-    begin // IO from draw & render
-      write_valid_in <= 1'b0;
-      read_valid_in <= 1'b0;
     end
   end
 
@@ -777,6 +795,95 @@ module top_level
                   .fc_out(frame_count_hdmi)
                 );
 
+    // input wire clk_in,
+    // input wire valid_in,
+    // input wire rst_in,
+    // // parameters for up to four objects at a time being passed in from object storage
+    // input wire [3:0] is_static,
+    // // input wire [3:0][6:0] current_addresses,
+    // input wire [3:0][1:0] id_bits,
+    // input wire [3:0][47:0] params,
+    // input wire [3:0][15:0] pos_x,
+    // input wire [3:0][15:0] pos_y,
+
+    // // pixel coordinate that we are querying
+    // input wire [10:0] hcount_in,
+    // input wire [9:0] vcount_in,
+
+    // // resulting color
+    // output logic [1:0] color_bits,
+
+    // // write location to frame buffer
+    // output logic [18:0] write_address,
+
+    // // output logic busy_out, // todo remove
+    // output logic valid_out
+
+  logic [3:0] render_input_is_static;
+  logic [3:0][1:0] render_input_id_bits;
+  logic [3:0][47:0] render_input_params;
+  logic [3:0][15:0] render_input_pos_x;
+  logic [3:0][15:0] render_input_pos_y;
+  logic [1:0] render_output_color_bits;
+  logic [18:0] render_output_write_address;
+  logic render_output_valid_out;
+
+genvar render_index;
+generate
+  for(render_index = 0; render_index <= 3; render_index = render_index + 1) begin
+    assign {render_input_is_static[render_index], 
+            render_input_id_bits[render_index], 
+            render_input_pos_x[render_index], 
+            render_input_pos_y[render_index], 
+            render_input_params[render_index]} 
+            = read_objects_out[render_index];
+  end
+endgenerate
+
+  render render_objects
+  (
+    .clk_in(clk_pixel),
+    .valid_in(active_draw_hdmi && is_memory_stable),
+    .rst_in(sys_rst_pixel),
+    .is_static(render_input_is_static),
+    .id_bits(render_input_id_bits),
+    .pos_x(render_input_pos_x),
+    .pos_y(render_input_pos_y),
+    .params(render_input_params),
+    .hcount_in(hcount_hdmi),
+    .vcount_in(vcount_hdmi),
+    .color_bits(render_output_color_bits),
+    .write_address(render_output_write_address),
+    .valid_out(render_output_valid_out)
+  );
+
+    logic [1:0] frame_buff_output;
+    // port a for writing from render
+    // port b for reading to hdmi
+    xilinx_true_dual_port_read_first_2_clock_ram #(
+    .RAM_WIDTH(2),                       // Specify RAM data width
+    .RAM_DEPTH(640*480),                     // Specify RAM depth (number of entries)
+    .RAM_PERFORMANCE("HIGH_PERFORMANCE"), // Select "HIGH_PERFORMANCE" or "LOW_LATENCY"
+    .INIT_FILE("")                        // Specify name/location of RAM initialization file if using one (leave blank if not)
+    ) render_frame_buffer (
+    .addra(render_output_write_address),   // Port A address bus, width determined from RAM_DEPTH
+    .addrb((hcount_hdmi >> 1) + 640 * (vcount_hdmi >> 1)),   // Port B address bus, width determined from RAM_DEPTH
+    .dina(render_output_color_bits),     // Port A RAM input data, width determined from RAM_WIDTH
+    .dinb(),     // Port B RAM input data, width determined from RAM_WIDTH
+    .clka(clk_pixel),     // Port A clock
+    .clkb(clk_pixel),     // Port B clock
+    .wea(render_output_valid_out),       // Port A write enable
+    .web(0),       // Port B write enable
+    .ena(1),       // Port A RAM Enable, for additional power savings, disable port when not in use
+    .enb(1),       // Port B RAM Enable, for additional power savings, disable port when not in use
+    .rsta(sys_rst_pixel),     // Port A output reset (does not affect memory contents)
+    .rstb(sys_rst_pixel),     // Port B output reset (does not affect memory contents)
+    .regcea(1), // Port A output register enable
+    .regceb(), // Port B output register enable
+    .douta(),   // Port A RAM output data, width determined from RAM_WIDTH
+    .doutb(frame_buff_output)    // Port B RAM output data, width determined from RAM_WIDTH
+  );
+
 
   // Video Mux: select from the different display modes based on switch values
   //used with switches for display selections
@@ -848,13 +955,30 @@ module top_level
              .delayed_signal(selected_channel_delayed_ps5)
            );
 
+
+/*
+module video_mux (
+  // input wire [1:0] bg_in, //regular video
+  input wire [1:0] target_in, //regular video
+  // input wire [23:0] camera_pixel_in, //16 bits from camera 5:6:5
+  // input wire [7:0] camera_y_in,  //y channel of ycrcb camera conversion
+  // input wire [7:0] channel_in, //the channel from selection module
+  // input wire thresholded_pixel_in, //
+  input wire [1:0] frame_buff_out,
+  input wire rect_pixel_in,
+  input wire circle_pixel_in,
+  input wire line_pixel_in,
+  output logic [23:0] pixel_out
+);
+*/
   video_mux mvm(
-              .bg_in(display_choice), //choose background
+              // .bg_in(display_choice), //choose background
               .target_in(target_choice), //choose target
-              .camera_pixel_in({fb_red_delayed_ps2, fb_green_delayed_ps2, fb_blue_delayed_ps2}), //TODO: needs (PS2)
-              .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
-              .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
-              .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
+              // .camera_pixel_in({fb_red_delayed_ps2, fb_green_delayed_ps2, fb_blue_delayed_ps2}), //TODO: needs (PS2)
+              // .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
+              // .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
+              // .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
+              .frame_buff_out(),
               .rect_pixel_in(in_rect), //TODO: needs (PS9) maybe?
               .circle_pixel_in(in_circle),
               .line_pixel_in(in_line),
