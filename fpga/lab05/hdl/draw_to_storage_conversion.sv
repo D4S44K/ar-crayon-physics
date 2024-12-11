@@ -4,7 +4,7 @@ module draw_to_storage_conversion (
     input wire clk_in,
     input wire valid_in,
     input wire rst_in,
-    input wire [86:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
+    input wire [112:0] draw_props, // 63 bits (actually, let's do 83 bits, using all four rectangle points)
     output logic is_static, // 1 bit
     output logic [1:0] id_bits, // 2 bits
     output logic [47:0] params, // 36 bits
@@ -71,111 +71,185 @@ module draw_to_storage_conversion (
   assign point_four_y = draw_props[9:0];
   assign is_static = draw_props[86:86];
   assign id_bits = draw_props[85:84];
-  always_comb begin
-    if(rst_in) begin
-      valid_out = 0;
-      has_nth_run = 0;
-      has_sqrt_run = 0;
-    end
-    if(valid_in) begin
-      // point_one_x = draw_props[83:73];
-      // point_one_y = draw_props[72:63];
-      // point_two_x = draw_props[62:52];
-      // point_two_y = draw_props[51:42];
-      // point_three_x = draw_props[41:31];
-      // point_three_y = draw_props[30:21];
-      // point_four_x = draw_props[20:10];
-      // point_four_y = draw_props[9:0];
-      // is_static = draw_props[86:86];
-      // id_bits = draw_props[85:84];
-      busy_out = nth_busy || sqrt_busy || valid_in;
-      vel_x = 0;
-      vel_y = 0;
-      case(id_bits)
-        // not defined
-        2'b00: begin
-          params = 0;
-          pos_x = 0;
-          pos_y = 0;
-          valid_out = 0;
-          is_rectangle = 0;
-          is_circle = 0;
-        end
-        // circle: params has radius
-        2'b01: begin
-          is_circle = 1;
-          pos_x = (point_one_x + point_two_x) >> 2;
-          pos_y = (point_one_y + point_two_y) >> 2;
-          valid_out = sqrt_valid;
-          is_rectangle = 0;
-          params = {26'b0, sqrt_result[20:0]};
+
+always_ff@(posedge clk_in) begin
+  if(rst_in) begin
+    valid_out <= 0;
+    has_nth_run <= 0;
+    has_sqrt_run <= 0;
+    is_circle <= 0;
+    is_rectangle <= 0;
+  end
+  else if(valid_in) begin
+    busy_out <= nth_busy | sqrt_busy | valid_in;
+    vel_x <= 0;
+    vel_y <= 0;
+    case(id_bits)
+      2'b00: begin
+           params <= 0;
+          pos_x <= 0;
+          pos_y <= 0;
+          valid_out <= 0;
+      end
+      2'b01: begin
+          is_circle <= 1;
+          pos_x <= (point_one_x + point_two_x) >> 2;
+          pos_y <= (point_one_y + point_two_y) >> 2;
+          valid_out <= sqrt_valid;
+          params <= {26'b0, sqrt_result[20:0]};
           // if(sqrt_valid) has_sqrt_run = 1;
         end
-        // line
         2'b10: begin
-          pos_x = point_one_x;
-          pos_y = point_one_y;
-          params = {16'b0, point_two_x, point_two_y};
-          valid_out = 1;
-          is_rectangle = 0;
-          is_circle = 0;
-
+          pos_x <= point_one_x;
+          pos_y <= point_one_y;
+          params <= {16'b0, point_two_x, point_two_y};
+          valid_out <= 1;
         end
-        // rectangle
-        // schema: pos_x and pos_y are point_one x and y, 
-        2'b11: begin
-          is_rectangle = 1;
-          // pos_x = point_one_x;
-          // pos_y = point_one_y;
-          // params = {point_two_x, point_two_y, 16'b0};
-          valid_out = calculations_valid;
-          pos_x = composite_min[19:10];
-          pos_y = composite_min[9:0];
-          is_circle = 0;
+        // 2'b11: begin
+        //   is_rectangle = 1;
+        //   // pos_x = point_one_x;
+        //   // pos_y = point_one_y;
+        //   // params = {point_two_x, point_two_y, 16'b0};
+        //   valid_out <= calculations_valid;
+        //   pos_x = composite_min[19:10];
+        //   pos_y = composite_min[9:0];
+        //   is_circle = 0;
 
-          if(!first_clockwise_found && is_point_1_bigger) begin
-            first_clockwise_found = 1;
-            first_clockwise_x = sorted_points[1][19:10];
-            first_clockwise_y = sorted_points[1][9:0];
-          end 
-          else if(!second_clockwise_found && is_point_1_bigger) begin
-            second_clockwise_found = 1;
-            second_clockwise_x = sorted_points[1][19:10];
-            second_clockwise_y = sorted_points[1][9:0];
-          end
+        //   if(!first_clockwise_found && is_point_1_bigger) begin
+        //     first_clockwise_found = 1;
+        //     first_clockwise_x = sorted_points[1][19:10];
+        //     first_clockwise_y = sorted_points[1][9:0];
+        //   end 
+        //   else if(!second_clockwise_found && is_point_1_bigger) begin
+        //     second_clockwise_found = 1;
+        //     second_clockwise_x = sorted_points[1][19:10];
+        //     second_clockwise_y = sorted_points[1][9:0];
+        //   end
 
-          if(!first_clockwise_found && is_point_2_bigger) begin
-            first_clockwise_found = 1;
-            first_clockwise_x = sorted_points[2][19:10];
-            first_clockwise_y = sorted_points[2][9:0];
-          end 
-          else if(!second_clockwise_found && is_point_2_bigger) begin
-            second_clockwise_found = 1;
-            second_clockwise_x = sorted_points[2][19:10];
-            second_clockwise_y = sorted_points[2][9:0];
-          end
+        //   if(!first_clockwise_found && is_point_2_bigger) begin
+        //     first_clockwise_found = 1;
+        //     first_clockwise_x = sorted_points[2][19:10];
+        //     first_clockwise_y = sorted_points[2][9:0];
+        //   end 
+        //   else if(!second_clockwise_found && is_point_2_bigger) begin
+        //     second_clockwise_found = 1;
+        //     second_clockwise_x = sorted_points[2][19:10];
+        //     second_clockwise_y = sorted_points[2][9:0];
+        //   end
 
-          if(!first_clockwise_found && is_point_3_bigger) begin
-            first_clockwise_found = 1;
-            first_clockwise_x = sorted_points[3][19:10];
-            first_clockwise_y = sorted_points[3][9:0];
-          end 
-          else if(!second_clockwise_found && is_point_3_bigger) begin
-            second_clockwise_found = 1;
-            second_clockwise_x = sorted_points[3][19:10];
-            second_clockwise_y = sorted_points[3][9:0];
-          end
+        //   if(!first_clockwise_found && is_point_3_bigger) begin
+        //     first_clockwise_found = 1;
+        //     first_clockwise_x = sorted_points[3][19:10];
+        //     first_clockwise_y = sorted_points[3][9:0];
+        //   end 
+        //   else if(!second_clockwise_found && is_point_3_bigger) begin
+        //     second_clockwise_found = 1;
+        //     second_clockwise_x = sorted_points[3][19:10];
+        //     second_clockwise_y = sorted_points[3][9:0];
+        //   end
 
-          params = {$signed(first_clockwise_x - pos_x), $signed(first_clockwise_y - pos_y), $signed(second_clockwise_y-first_clockwise_y)};
-        end
-        default: begin 
-          valid_out = 0; 
-          is_rectangle = 0;
-          is_circle = 0;
-          end
-      endcase
-    end
+        //   params = {$signed(first_clockwise_x - pos_x), $signed(first_clockwise_y - pos_y), $signed(second_clockwise_y-first_clockwise_y)};
+        // end
+    endcase
   end
+end
+
+
+  // always_comb begin
+  //   if(rst_in) begin
+  //     valid_out = 0;
+  //     has_nth_run = 0;
+  //     has_sqrt_run = 0;
+  //   end
+  //   if(valid_in) begin
+  //     busy_out = nth_busy || sqrt_busy || valid_in;
+  //     vel_x = 0;
+  //     vel_y = 0;
+  //     case(id_bits)
+  //       // not defined
+  //       2'b00: begin
+  //         params = 0;
+  //         pos_x = 0;
+  //         pos_y = 0;
+  //         valid_out = 0;
+  //         is_rectangle = 0;
+  //         is_circle = 0;
+  //       end
+  //       // circle: params has radius
+  //       2'b01: begin
+  //         is_circle = 1;
+  //         pos_x = (point_one_x + point_two_x) >> 2;
+  //         pos_y = (point_one_y + point_two_y) >> 2;
+  //         valid_out = sqrt_valid;
+  //         is_rectangle = 0;
+  //         params = {26'b0, sqrt_result[20:0]};
+  //         // if(sqrt_valid) has_sqrt_run = 1;
+  //       end
+  //       // line
+  //       2'b10: begin
+  //         pos_x = point_one_x;
+  //         pos_y = point_one_y;
+  //         params = {16'b0, point_two_x, point_two_y};
+  //         valid_out = 1;
+  //         is_rectangle = 0;
+  //         is_circle = 0;
+
+  //       end
+  //       // rectangle
+  //       // schema: pos_x and pos_y are point_one x and y, 
+  //       2'b11: begin
+  //         is_rectangle = 1;
+  //         // pos_x = point_one_x;
+  //         // pos_y = point_one_y;
+  //         // params = {point_two_x, point_two_y, 16'b0};
+  //         valid_out = calculations_valid;
+  //         pos_x = composite_min[19:10];
+  //         pos_y = composite_min[9:0];
+  //         is_circle = 0;
+
+  //         if(!first_clockwise_found && is_point_1_bigger) begin
+  //           first_clockwise_found = 1;
+  //           first_clockwise_x = sorted_points[1][19:10];
+  //           first_clockwise_y = sorted_points[1][9:0];
+  //         end 
+  //         else if(!second_clockwise_found && is_point_1_bigger) begin
+  //           second_clockwise_found = 1;
+  //           second_clockwise_x = sorted_points[1][19:10];
+  //           second_clockwise_y = sorted_points[1][9:0];
+  //         end
+
+  //         if(!first_clockwise_found && is_point_2_bigger) begin
+  //           first_clockwise_found = 1;
+  //           first_clockwise_x = sorted_points[2][19:10];
+  //           first_clockwise_y = sorted_points[2][9:0];
+  //         end 
+  //         else if(!second_clockwise_found && is_point_2_bigger) begin
+  //           second_clockwise_found = 1;
+  //           second_clockwise_x = sorted_points[2][19:10];
+  //           second_clockwise_y = sorted_points[2][9:0];
+  //         end
+
+  //         if(!first_clockwise_found && is_point_3_bigger) begin
+  //           first_clockwise_found = 1;
+  //           first_clockwise_x = sorted_points[3][19:10];
+  //           first_clockwise_y = sorted_points[3][9:0];
+  //         end 
+  //         else if(!second_clockwise_found && is_point_3_bigger) begin
+  //           second_clockwise_found = 1;
+  //           second_clockwise_x = sorted_points[3][19:10];
+  //           second_clockwise_y = sorted_points[3][9:0];
+  //         end
+
+  //         params = {$signed(first_clockwise_x - pos_x), $signed(first_clockwise_y - pos_y), $signed(second_clockwise_y-first_clockwise_y)};
+  //       end
+  //       default: begin 
+  //         valid_out = 0; 
+  //         is_rectangle = 0;
+  //         is_circle = 0;
+  //         end
+  //     endcase
+  //   end
+  // end
 
 
 // run sqrt only once
@@ -233,12 +307,12 @@ always_ff@(posedge clk_in) begin
     prod_y <= (pos_y - point_one_y) * (pos_y - point_one_y);
     prod_valid <= valid_in;
   end
-  else if(is_rectangle && nth_valid) begin
-    is_point_1_bigger <= sorted_points[1][9:0] > pos_y;
-    is_point_2_bigger <= sorted_points[2][9:0] > pos_y;
-    is_point_3_bigger <= sorted_points[3][9:0] > pos_y;
-    calculations_valid <= 1;
-  end
+  // else if(is_rectangle && nth_valid) begin
+  //   is_point_1_bigger <= sorted_points[1][9:0] > pos_y;
+  //   is_point_2_bigger <= sorted_points[2][9:0] > pos_y;
+  //   is_point_3_bigger <= sorted_points[3][9:0] > pos_y;
+  //   calculations_valid <= 1;
+  // end
 end
 
 
