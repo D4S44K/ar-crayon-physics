@@ -10,9 +10,7 @@ module draw_circle #(
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
   output logic [83:0] circle_coord,
-  output logic [7:0] red_out,
-  output logic [7:0] green_out,
-  output logic [7:0] blue_out,
+  output logic in_circle,
   output logic valid_out);
 
   logic[10:0] x_1;
@@ -28,7 +26,7 @@ module draw_circle #(
   logic[10:0] x_diff;
   logic[9:0] y_diff;
 
-  logic in_circle;
+  logic in_circle_pipeline;
 
   logic[31:0] x_prod;
   logic[31:0] y_prod;
@@ -72,15 +70,13 @@ module draw_circle #(
         valid_out_pipeline[3] <= valid_out_pipeline[2];
 
         // stage 5
-        in_circle <= (x_prod + y_prod <= radius_prod);
+        in_circle_pipeline <= (x_prod + y_prod <= radius_prod);
 
         valid_out_pipeline[4] <= valid_out_pipeline[3];
     end
   end
 
   assign circle_coord = {{x_1, y_1}, {x_2, y_2}, 42'b0};
-  assign red_out =    in_circle ? COLOR[23:16] : 0;
-  assign green_out =  in_circle ? COLOR[15:8] : 0;
-  assign blue_out =   in_circle ? COLOR[7:0] : 0;
+  assign in_circle = in_circle_pipeline;
   assign valid_out = valid_out_pipeline[4];
 endmodule

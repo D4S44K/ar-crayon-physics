@@ -10,9 +10,7 @@ module draw_line #(
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
   output logic [83:0] line_coord,
-  output logic [7:0] red_out,
-  output logic [7:0] green_out,
-  output logic [7:0] blue_out,
+  output logic in_line,
   output logic valid_out);
 
   logic[10:0] x_1;
@@ -21,8 +19,7 @@ module draw_line #(
   logic[10:0] x_2;
   logic[9:0] y_2;
 
-  logic in_line;
-
+  logic in_line_pipeline;
 
   logic signed[11:0] hcount_diff;
   logic signed[10:0] vcount_diff;
@@ -71,7 +68,7 @@ module draw_line #(
         valid_out_pipeline[3] <= valid_out_pipeline[2];
 
         // stage 5
-        in_line <= ((hcount_in >= x_1 && hcount_in <= x_2))
+        in_line_pipeline <= ((hcount_in >= x_1 && hcount_in <= x_2))
                    ? ((slope_mul_1 >= slope_mul_2) ? slope_mul_1 - 500 <= slope_mul_2 : 0) || ((slope_mul_1 <= slope_mul_2) ? slope_mul_1 + 500 >= slope_mul_2 : 0)
                    : 0;
 
@@ -80,8 +77,6 @@ module draw_line #(
   end
 
   assign line_coord = {{x_1, y_1}, {x_2, y_2}, 42'b0};
-  assign red_out   = in_line ? COLOR[23:16] : 0;
-  assign green_out = in_line ? COLOR[15:8] : 0;
-  assign blue_out  = in_line ? COLOR[7:0] : 0;
+  assign in_line = in_line_pipeline;
   assign valid_out = valid_out_pipeline[4];
 endmodule

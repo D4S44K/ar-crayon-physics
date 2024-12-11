@@ -10,9 +10,7 @@ module draw_rectangle #(
   input wire [10:0] x_in_2,
   input wire [9:0]  y_in_2,
   output logic [83:0] rect_coord,
-  output logic [7:0] red_out,
-  output logic [7:0] green_out,
-  output logic [7:0] blue_out,
+  output logic in_rect,
   output logic valid_out);
 
   logic[10:0] x_1;
@@ -20,8 +18,6 @@ module draw_rectangle #(
 
   logic[10:0] x_2;
   logic[9:0] y_2;
-
-  logic in_rect;
 
   logic [3:0] in_rect_pipeline;
   logic [4:0] valid_out_pipeline;
@@ -65,8 +61,6 @@ module draw_rectangle #(
   end
 
   assign rect_coord = {{x_1, y_1}, {x_2, y_1}, {x_1, y_2}, {x_2, y_2}};
-  assign red_out =    in_rect_pipeline[3] ? COLOR[23:16] : 0;
-  assign green_out =  in_rect_pipeline[3] ? COLOR[15:8] : 0;
-  assign blue_out =   in_rect_pipeline[3] ? COLOR[7:0] : 0;
+  assign in_rect = in_rect_pipeline[3];
   assign valid_out = valid_out_pipeline[4];
 endmodule
