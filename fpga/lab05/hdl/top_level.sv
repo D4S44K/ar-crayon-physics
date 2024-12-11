@@ -463,16 +463,19 @@ module top_level
   end
 
   //rectangle output:
-  logic [7:0] rect_red, rect_green, rect_blue;
+  logic in_rect;
   logic [83:0] rect_coord;
+  logic rect_valid_out;
 
   //circle output:
-  logic [7:0] circle_red, circle_green, circle_blue;
+  logic in_circle;
   logic [83:0] circle_coord;
+  logic circle_valid_out;
 
   //line output:
-  logic [7:0] line_red, line_green, line_blue;
+  logic in_line;
   logic [83:0] line_coord;
+  logic line_valid_out;
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
@@ -494,23 +497,24 @@ module top_level
              .delayed_signal(vcount_delayed_ps1)
            );
 
-  // draw_rectangle #(
-  //                  .WIDTH(256),
-  //                  .HEIGHT(256),
-  //                  .COLOR(24'hFF_FF_FF))
-  //                rectangle (
-  //                  .clk_in(clk_pixel),
-  //                  .rst_in(sys_rst_pixel),
-  //                  .hcount_in(hcount_delayed_ps1),
-  //                  .vcount_in(vcount_delayed_ps1),
-  //                  .x_in_1(x_com),
-  //                  .y_in_1(y_com),
-  //                  .x_in_2(x_com_2),
-  //                  .y_in_2(y_com_2),
-  //                  .rect_coord(rect_coord),
-  //                  .red_out(rect_red),
-  //                  .green_out(rect_green),
-  //                  .blue_out(rect_blue));
+
+  draw_rectangle #(
+                   .WIDTH(256),
+                   .HEIGHT(256),
+                   .COLOR(24'hFF_FF_FF))
+                 rectangle (
+                   .clk_in(clk_pixel),
+                   .rst_in(sys_rst_pixel),
+                   .valid_in(1),
+                   .hcount_in(hcount_delayed_ps1),
+                   .vcount_in(vcount_delayed_ps1),
+                   .x_in_1(x_com),
+                   .y_in_1(y_com),
+                   .x_in_2(x_com_2),
+                   .y_in_2(y_com_2),
+                   .rect_coord(rect_coord),
+                   .in_rect(in_rect),
+                   .valid_out(rect_valid_out));
 
 
   draw_circle #(
@@ -520,17 +524,17 @@ module top_level
               circle (
                 .clk_in(clk_pixel),
                 .rst_in(sys_rst_pixel),
+                .valid_in(1),
                 .hcount_in(hcount_delayed_ps1),
                 .vcount_in(vcount_delayed_ps1),
+                .is_valid_in(1),
                 .x_in_1(x_com),
                 .y_in_1(y_com),
                 .x_in_2(x_com_2),
                 .y_in_2(y_com_2),
                 .circle_coord(circle_coord),
-                .red_out(circle_red),
-                .green_out(circle_green),
-                .blue_out(circle_blue));
-
+                .in_circle(in_circle),
+                .valid_out(circle_valid_out));
 
   draw_line #(
               .WIDTH(256),
@@ -539,6 +543,7 @@ module top_level
             line (
               .clk_in(clk_pixel),
               .rst_in(sys_rst_pixel),
+              .valid_in(1),
               .hcount_in(hcount_delayed_ps1),
               .vcount_in(vcount_delayed_ps1),
               .x_in_1(x_com),
@@ -546,9 +551,8 @@ module top_level
               .x_in_2(x_com_2),
               .y_in_2(y_com_2),
               .line_coord(line_coord),
-              .red_out(line_red),
-              .green_out(line_green),
-              .blue_out(line_blue));
+              .in_line(in_line),
+              .valid_out(line_valid_out));
 
 
   logic simul_mode;
@@ -741,17 +745,16 @@ module top_level
   end
 
   //crosshair output:
-  logic [7:0] ch_red, ch_green, ch_blue;
+  // logic [7:0] ch_red, ch_green, ch_blue;
 
   //Create Crosshair patter on center of mass:
   //0 cycle latency
   //TODO: Should be using output of (PS3)
-  always_comb
-  begin
-    ch_red   = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-    ch_green = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-    ch_blue  = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
-  end
+  // always_comb begin
+  //   ch_red   = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
+  //   ch_green = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
+  //   ch_blue  = ((vcount_delayed_ps3==y_com) || (hcount_delayed_ps3==x_com) || (vcount_delayed_ps3==y_com_2) || (hcount_delayed_ps3==x_com_2))?8'hFF:8'h00;
+  // end
 
 
   // HDMI video signal generator
@@ -839,124 +842,34 @@ module top_level
              .delayed_signal(selected_channel_delayed_ps5)
            );
 
-  logic [7:0] ch_red_delayed_ps8;
-  pipeline #(
-             .WIDTH(8), .STAGES(8))
-           ch_red_pipeline_ps8(
-             .clk_pixel(clk_pixel),
-             .signal(ch_red),
-             //.stages(8),
-             .delayed_signal(ch_red_delayed_ps8)
-           );
-
-  logic [7:0] ch_green_delayed_ps8;
-  pipeline #(
-             .WIDTH(8), .STAGES(8))
-           ch_green_pipeline_ps8(
-             .clk_pixel(clk_pixel),
-             .signal(ch_green),
-             //.stages(8),
-             .delayed_signal(ch_green_delayed_ps8)
-           );
-
-  logic [7:0] ch_blue_delayed_ps8;
-  pipeline #(
-             .WIDTH(8), .STAGES(8))
-           ch_blue_pipeline_ps8(
-             .clk_pixel(clk_pixel),
-             .signal(ch_blue),
-             //.stages(8),
-             .delayed_signal(ch_blue_delayed_ps8)
-           );
-
-  // logic [7:0] rect_red_delayed_ps9;
+  // logic [7:0] ch_red_delayed_ps8;
   // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   rect_red_pipeline_ps9(
+  //   .WIDTH(8), .STAGES(8))
+  //   ch_red_pipeline_ps8(
   //   .clk_pixel(clk_pixel),
-  //   .signal(rect_red),
-  //   //.stages(4),
-  //   .delayed_signal(rect_red_delayed_ps9)
+  //   .signal(ch_red),
+  //   //.stages(8),
+  //   .delayed_signal(ch_red_delayed_ps8)
   // );
 
-  // logic [7:0] rect_green_delayed_ps9;
+  // logic [7:0] ch_green_delayed_ps8;
   // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   rect_green_pipeline_ps9(
+  //   .WIDTH(8), .STAGES(8))
+  //   ch_green_pipeline_ps8(
   //   .clk_pixel(clk_pixel),
-  //   .signal(rect_green),
-  //   //.stages(4),
-  //   .delayed_signal(rect_green_delayed_ps9)
+  //   .signal(ch_green),
+  //   //.stages(8),
+  //   .delayed_signal(ch_green_delayed_ps8)
   // );
 
-  // logic [7:0] rect_blue_delayed_ps9;
+  // logic [7:0] ch_blue_delayed_ps8;
   // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   rect_blue_pipeline_ps9(
+  //   .WIDTH(8), .STAGES(8))
+  //   ch_blue_pipeline_ps8(
   //   .clk_pixel(clk_pixel),
-  //   .signal(rect_blue),
-  //   //.stages(4),
-  //   .delayed_signal(rect_blue_delayed_ps9)
-  // );
-
-  // logic [7:0] circle_red_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   circle_red_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(circle_red),
-  //   //.stages(4),
-  //   .delayed_signal(circle_red_delayed_ps9)
-  // );
-
-  // logic [7:0] circle_green_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   circle_green_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(circle_green),
-  //   //.stages(4),
-  //   .delayed_signal(circle_green_delayed_ps9)
-  // );
-
-  // logic [7:0] circle_blue_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   circle_blue_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(circle_blue),
-  //   //.stages(4),
-  //   .delayed_signal(circle_blue_delayed_ps9)
-  // );
-
-  // logic [7:0] line_red_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   line_red_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(line_red),
-  //   //.stages(4),
-  //   .delayed_signal(line_red_delayed_ps9)
-  // );
-
-  // logic [7:0] line_green_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   line_green_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(line_green),
-  //   //.stages(4),
-  //   .delayed_signal(line_green_delayed_ps9)
-  // );
-
-  // logic [7:0] line_blue_delayed_ps9;
-  // pipeline #(
-  //   .WIDTH(8), .STAGES(4))
-  //   line_blue_pipeline_ps9(
-  //   .clk_pixel(clk_pixel),
-  //   .signal(line_blue),
-  //   //.stages(4),
-  //   .delayed_signal(line_blue_delayed_ps9)
+  //   .signal(ch_blue),
+  //   //.stages(8),
+  //   .delayed_signal(ch_blue_delayed_ps8)
   // );
 
   video_mux mvm(
@@ -966,10 +879,9 @@ module top_level
               .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
               .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
               .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
-              .crosshair_in({ch_red_delayed_ps8, ch_green_delayed_ps8, ch_blue_delayed_ps8}), //TODO: needs (PS8)
-              .rect_pixel_in({rect_red, rect_green, rect_blue}), //TODO: needs (PS9) maybe?
-              .circle_pixel_in({circle_red, circle_green, circle_blue}),
-              .line_pixel_in({line_red, line_green, line_blue}),
+              .rect_pixel_in(in_rect), //TODO: needs (PS9) maybe?
+              .circle_pixel_in(in_circle),
+              .line_pixel_in(in_line),
               .pixel_out({red,green,blue}) //output to tmds
             );
 
