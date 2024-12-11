@@ -500,78 +500,78 @@ module top_level
 
   logic [10:0] hcount_delayed_ps1;
   pipeline #(
-    .WIDTH(11), .STAGES(3))
-    hcount_pipeline_ps1(
-    .clk_pixel(clk_pixel),
-    .signal(hcount_hdmi),
-    //.stages(3),
-    .delayed_signal(hcount_delayed_ps1)
-  );
+             .WIDTH(11), .STAGES(3))
+           hcount_pipeline_ps1(
+             .clk_pixel(clk_pixel),
+             .signal(hcount_hdmi),
+             //.stages(3),
+             .delayed_signal(hcount_delayed_ps1)
+           );
 
   logic [9:0] vcount_delayed_ps1;
   pipeline #(
-    .WIDTH(10), .STAGES(3))
-    vcount_pipeline_ps1(
-    .clk_pixel(clk_pixel),
-    .signal(vcount_hdmi),
-    //.stages(3),
-    .delayed_signal(vcount_delayed_ps1)
-  );
+             .WIDTH(10), .STAGES(3))
+           vcount_pipeline_ps1(
+             .clk_pixel(clk_pixel),
+             .signal(vcount_hdmi),
+             //.stages(3),
+             .delayed_signal(vcount_delayed_ps1)
+           );
 
   draw_rectangle #(
-    .WIDTH(256),
-    .HEIGHT(256),
-    .COLOR(24'hFF_FF_FF))
-    rectangle (
-    .clk_in(clk_pixel),
-    .rst_in(sys_rst_pixel),
-    .valid_in(1),
-    .hcount_in(hcount_delayed_ps1),
-    .vcount_in(vcount_delayed_ps1),
-    .x_in_1(x_com),
-    .y_in_1(y_com),
-    .x_in_2(x_com_2),
-    .y_in_2(y_com_2),
-    .rect_coord(rect_coord),
-    .in_rect(in_rect),
-    .valid_out(rect_valid_out));
+                   .WIDTH(256),
+                   .HEIGHT(256),
+                   .COLOR(24'hFF_FF_FF))
+                 rectangle (
+                   .clk_in(clk_pixel),
+                   .rst_in(sys_rst_pixel),
+                   .valid_in(1),
+                   .hcount_in(hcount_delayed_ps1),
+                   .vcount_in(vcount_delayed_ps1),
+                   .x_in_1(x_com),
+                   .y_in_1(y_com),
+                   .x_in_2(x_com_2),
+                   .y_in_2(y_com_2),
+                   .rect_coord(rect_coord),
+                   .in_rect(in_rect),
+                   .valid_out(rect_valid_out));
 
 
   draw_circle #(
-    .WIDTH(256),
-    .HEIGHT(256),
-    .COLOR(24'hFF_FF_FF))
-    circle (
-    .clk_in(clk_pixel),
-    .rst_in(sys_rst_pixel),
-    .valid_in(1),
-    .hcount_in(hcount_delayed_ps1),
-    .vcount_in(vcount_delayed_ps1),
-    .x_in_1(x_com),
-    .y_in_1(y_com),
-    .x_in_2(x_com_2),
-    .y_in_2(y_com_2),
-    .circle_coord(circle_coord),
-    .in_circle(in_circle),
-    .valid_out(circle_valid_out));
+                .WIDTH(256),
+                .HEIGHT(256),
+                .COLOR(24'hFF_FF_FF))
+              circle (
+                .clk_in(clk_pixel),
+                .rst_in(sys_rst_pixel),
+                .valid_in(1),
+                .hcount_in(hcount_delayed_ps1),
+                .vcount_in(vcount_delayed_ps1),
+                .x_in_1(x_com),
+                .y_in_1(y_com),
+                .x_in_2(x_com_2),
+                .y_in_2(y_com_2),
+                .circle_coord(circle_coord),
+                .in_circle(in_circle),
+                .valid_out(circle_valid_out));
 
   draw_line #(
-    .WIDTH(256),
-    .HEIGHT(256),
-    .COLOR(24'hFF_FF_FF))
-    line (
-    .clk_in(clk_pixel),
-    .rst_in(sys_rst_pixel),
-    .valid_in(1),
-    .hcount_in(hcount_delayed_ps1),
-    .vcount_in(vcount_delayed_ps1),
-    .x_in_1(x_com),
-    .y_in_1(y_com),
-    .x_in_2(x_com_2),
-    .y_in_2(y_com_2),
-    .line_coord(line_coord),
-    .in_line(in_line),
-    .valid_out(line_valid_out));
+              .WIDTH(256),
+              .HEIGHT(256),
+              .COLOR(24'hFF_FF_FF))
+            line (
+              .clk_in(clk_pixel),
+              .rst_in(sys_rst_pixel),
+              .valid_in(1),
+              .hcount_in(hcount_delayed_ps1),
+              .vcount_in(vcount_delayed_ps1),
+              .x_in_1(x_com),
+              .y_in_1(y_com),
+              .x_in_2(x_com_2),
+              .y_in_2(y_com_2),
+              .line_coord(line_coord),
+              .in_line(in_line),
+              .valid_out(line_valid_out));
 
   logic simul_mode;
   assign simul_mode = sw[15];
@@ -651,7 +651,12 @@ module top_level
       if (save_signal_out)
       begin
         write_addr_in <= save_object_index_out;
-        write_object_in <= save_object_data_out | random_obj;
+        write_object_in <= save_object_data_out;
+      end
+      else if (create_random_obj)
+      begin
+        write_addr_in <= 0;
+        write_object_in <= random_obj;
       end
     end
     else
@@ -675,7 +680,10 @@ module top_level
       read_valid_in <= load_signal_out;
       if (load_signal_out)
       begin
-        read_addrs_in <= load_object_index_out;
+        read_addrs_in[0] <= load_object_index_out[0];
+        read_addrs_in[1] <= load_object_index_out[1];
+        read_addrs_in[2] <= load_object_index_out[2];
+        read_addrs_in[3] <= load_object_index_out[3];
       end
       if (read_valid_out)
       begin
@@ -688,35 +696,17 @@ module top_level
   end
 
   // physics_engine integration
-  assign frame_start_in = simul_mode && nf_hdmi;
+  assign frame_start_in = simul_mode && nf_hdmi && (frame_count_hdmi[3:0] == 0); // slower framerate
 
-  logic frame_ended;
-  always_ff @(posedge clk_pixel)
-  begin
-    if (simul_mode)
-    begin
-      if (frame_end_out)
-      begin
-        frame_ended <= 1;
-      end
-      else if (frame_start_in)
-      begin
-        frame_ended <= 0;
-      end
-    end
-    else
-    begin
-      frame_ended <= 0;
-    end
-  end
   logic is_memory_stable;
   assign is_memory_stable = !simul_mode || (state_out == IDLE);
   assign led[15] = is_memory_stable;
-
+  assign led[14] = simul_mode;
+  assign led[13] = create_random_obj;
 
 
   // debugging obj0, obj1 ypos
-  logic [7:0] obj0_pos_y, obj0_vel_y;
+  logic [15:0] obj0_pos_y, obj0_vel_y;
   logic [3:0] phys_ss0_an, phys_ss1_an;
   logic [6:0] phys_ss_c;
 
@@ -726,34 +716,63 @@ module top_level
                                     .cat_out(phys_ss_c),
                                     .an_out({phys_ss0_an, phys_ss1_an}));
 
+
+  logic frame_toggle;
   always_ff @(posedge clk_pixel)
   begin
-    if(save_signal_out && save_object_index_out == 0)
+    if(sys_rst_pixel)
     begin
-      obj0_pos_y <= save_object_data_out[46:39];
-      obj0_vel_y <= save_object_data_out[15:0];
+      frame_toggle <= 1'b0;
+    end
+    else
+      if(frame_start_in)
+      begin
+        frame_toggle <= ~frame_toggle;
+      end
+  end
+  assign led[12] = frame_toggle;
+
+
+  always_ff @(posedge clk_pixel)
+  begin
+    if(write_valid_in && write_addr_in == 0)
+    begin
+      obj0_pos_y <= write_object_in[47:32];
+      obj0_vel_y <= write_object_in[15:0];
     end
   end
 
+  logic [15:0] prev_pos_y, prev_vel_y;
+  always_ff @(posedge clk_pixel)
+  begin
+    if (sys_rst_pixel)
+    begin
+      prev_pos_y <= 0;
+      prev_vel_y <= 0;
+    end
+    else
+    begin
+      if (create_random_obj)
+      begin
+        prev_pos_y <= pos_y;
+        prev_vel_y <= vel_y;
+      end
+    end
+  end
+
+
   // debugging random objects
   logic create_random_obj;
+  assign create_random_obj = btn[3];
   logic [15:0] pos_y, vel_y; // both random
   logic [`OBJ_WIDTH-1:0] random_obj;
   assign pos_y = hcount_hdmi << 2;
-  assign vel_y = (hcount_hdmi[0] << 15) + (hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3);
+  assign vel_y = ~((hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3));
   always_ff @(posedge clk_pixel)
   begin
     if(create_random_obj)
     begin
       random_obj <= 115'h1_0000000000a0_1900_0000_0000_0000 + (pos_y << 32) + vel_y;
-      create_random_obj <= 0;
-    end
-    else
-    begin
-      if(frame_ended && btn[3])
-      begin
-        create_random_obj <= 1;
-      end
     end
   end
 

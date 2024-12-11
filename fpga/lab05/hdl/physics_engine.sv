@@ -192,6 +192,7 @@ module physics_engine #(OBJ_COUNT=4, MAX_ITER=64)(
           if (cooldown < 4)
           begin
             cooldown <= cooldown + 1;
+            load_signal_out <= 0;
           end
           else
           begin

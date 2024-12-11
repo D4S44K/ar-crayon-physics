@@ -21,6 +21,21 @@ module object_storage (
 
   // {is_static, id_bits, params, pos_x, pos_y, vel_x, vel_y};
 
+  pipeline #(
+             .WIDTH(1), .STAGES(2))
+           read_signal_pipeline(
+             .clk_pixel(clk_in),
+             .signal(read_valid_in),
+             .delayed_signal(read_valid_out)
+           );
+  pipeline #(
+             .WIDTH(1), .STAGES(2))
+           write_signal_pipeline(
+             .clk_pixel(clk_in),
+             .signal(write_valid_in),
+             .delayed_signal(write_valid_out)
+           );
+
   genvar i;
   generate
     for(i = 0; i < 4; i = i + 1)
@@ -53,5 +68,5 @@ module object_storage (
     end
   endgenerate
 
- endmodule
+endmodule
 `default_nettype wire

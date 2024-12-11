@@ -133,7 +133,11 @@ async def run_single_frame(dut, obj_dict_list):
 
     while dut.state_out.value == 1:  # LOADING
         while dut.load_signal_out.value != 1:
+            if dut.state_out.value != 0:
+                break
             await FallingEdge(dut.sys_clk)
+        if dut.state_out.value != 1:
+            break
         await FallingEdge(dut.sys_clk)
         await FallingEdge(dut.sys_clk)
         index_out = dut.load_object_index_out.value
