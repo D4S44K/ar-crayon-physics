@@ -34,10 +34,10 @@ localparam NON_STATIC_COLOR = 24'h00FF00;
   logic [23:0] l_1;
   always_comb begin
     case (frame_buff_out)
-      2'b00: l_1 = 24'hFFFFFF;
+      2'b00: l_1 = 24'h000000;
       2'b01: l_1 = NON_STATIC_COLOR;
       2'b10: l_1 = STATIC_COLOR;
-      2'b11: l_1 = 24'hFFFFFF;
+      2'b11: l_1 = 24'h000000;
     endcase
     // case (bg_in)
       // 2'b00: l_1 = camera_pixel_in;

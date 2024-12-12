@@ -64,6 +64,7 @@ assign y_in_1 = pos_y;
 assign dx_1 = params[47:32];
 assign dy_1 = params[31:16];
 assign dy_2 = params[15:0];
+assign is_valid_out = is_valid_in;
 // assign y_in_1 = object_props[94:85];
 // assign dx_1 = object_props[79:64];
 // assign dy_1 = object_props[63:48];

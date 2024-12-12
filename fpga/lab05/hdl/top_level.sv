@@ -862,7 +862,7 @@ endgenerate
   render render_objects
   (
     .clk_in(clk_pixel),
-    .valid_in(active_draw_hdmi && is_memory_stable),
+    .valid_in(active_draw_hdmi && is_memory_stable && !vcount_hdmi[0]),
     .rst_in(sys_rst_pixel),
     .is_static(render_input_is_static),
     .id_bits(render_input_id_bits),
@@ -997,7 +997,7 @@ module video_mux (
               // .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
               // .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
               // .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
-              .frame_buff_out(),
+              .frame_buff_out(frame_buff_output), //output from frame buffer
               .rect_pixel_in(in_rect), //TODO: needs (PS9) maybe?
               .circle_pixel_in(in_circle),
               .line_pixel_in(in_line),
