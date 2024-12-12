@@ -739,6 +739,10 @@ module top_level
     begin
       obj0_pos_y <= write_object_in[47:32];
       obj0_vel_y <= write_object_in[15:0];
+
+      dbg_params <= write_object_in[111:64];
+      dbg_pos_x <= write_object_in[63:48];
+      dbg_pos_y <= write_object_in[47:32];
     end
   end
 
@@ -859,22 +863,65 @@ generate
   end
 endgenerate
 
-  render render_objects
-  (
+  logic dbg_valid_in;
+  logic dbg_valid_out;
+  logic [15:0] dbg_pos_x, dbg_pos_y;
+  logic [47:0] dbg_params;
+  logic [1:0] dbg_id_bits;
+
+  logic dbg_is_shape_ready;
+  logic dbg_is_shape_drawn;
+  logic [10:0] dbg_x_in_1s, dbg_x_in_2s;
+  logic [9:0] dbg_y_in_1s, dbg_y_in_2s;
+  logic [83:0] dbg_obj_coord;
+  logic dbg_in_shape_bits;
+
+  assign dbg_valid_in = nf_hdmi;
+
+  circle_converter dbg_ball_converter (
+      .is_valid_in(dbg_id_bits == 2'b01 && dbg_valid_in),
+      .pos_x(dbg_pos_x),
+      .pos_y(dbg_pos_y),
+      .params(dbg_params),
+      .x_in_1(dbg_x_in_1s),
+      .y_in_1(dbg_y_in_1s),
+      .x_in_2(dbg_x_in_2s),
+      .y_in_2(dbg_y_in_2s),
+      .is_valid_out(dbg_is_shape_ready)
+    );
+
+  draw_circle dbg_ball(
+    .valid_in(dbg_is_shape_ready),
     .clk_in(clk_pixel),
-    .valid_in(active_draw_hdmi && is_memory_stable && !vcount_hdmi[0]),
     .rst_in(sys_rst_pixel),
-    .is_static(render_input_is_static),
-    .id_bits(render_input_id_bits),
-    .pos_x(render_input_pos_x),
-    .pos_y(render_input_pos_y),
-    .params(render_input_params),
     .hcount_in(hcount_hdmi),
     .vcount_in(vcount_hdmi),
-    .color_bits(render_output_color_bits),
-    .write_address(render_output_write_address),
-    .valid_out(render_output_valid_out)
+    .x_in_1(dbg_x_in_1s),
+    .y_in_1(dbg_y_in_1s),
+    .x_in_2(dbg_x_in_2s),
+    .y_in_2(dbg_y_in_2s),
+    .circle_coord(dbg_obj_coord),
+    .in_circle(dbg_in_shape_bits),
+    .valid_out(dbg_is_shape_drawn)
   );
+
+
+  // render render_objects
+  // (
+  //   .clk_in(clk_pixel),
+  //   .valid_in(active_draw_hdmi && is_memory_stable && !vcount_hdmi[0]),
+  //   .rst_in(sys_rst_pixel),
+  //   .is_static(render_input_is_static),
+  //   .id_bits(render_input_id_bits),
+  //   .pos_x(render_input_pos_x),
+  //   .pos_y(render_input_pos_y),
+  //   .params(render_input_params),
+  //   .hcount_in(hcount_hdmi),
+  //   .vcount_in(vcount_hdmi),
+  //   .color_bits(render_output_color_bits),
+  //   .write_address(render_output_write_address),
+  //   .valid_out(render_output_valid_out)
+  // );
 
     logic [1:0] frame_buff_output;
     // port a for writing from render
@@ -997,7 +1044,7 @@ module video_mux (
               // .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
               // .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
               // .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
-              .frame_buff_out(frame_buff_output), //output from frame buffer
+              .frame_buff_out(dbg_in_shape_bits), //output from frame buffer
               .rect_pixel_in(in_rect), //TODO: needs (PS9) maybe?
               .circle_pixel_in(in_circle),
               .line_pixel_in(in_line),
