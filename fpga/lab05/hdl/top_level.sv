@@ -3,6 +3,7 @@
 `define OBJ_WIDTH 115
 `define OBJ_COUNT 8
 `define OBJ_ADDR_WIDTH 8
+`define CLAMP(x, min, max) (x < min ? min : (x > max ? max : x))
 
 module top_level
   (
@@ -655,7 +656,7 @@ module top_level
       end
       else if (create_random_obj)
       begin
-        write_addr_in <= 0;
+        write_addr_in <= rd_idx;
         write_object_in <= random_obj;
       end
     end
@@ -696,7 +697,7 @@ module top_level
   end
 
   // physics_engine integration
-  assign frame_start_in = simul_mode && nf_hdmi && (frame_count_hdmi[3:0] == 0); // slower framerate
+  assign frame_start_in = simul_mode && nf_hdmi && (!sw[14] || frame_count_hdmi[3:0] == 0); // slower framerate
 
   logic is_memory_stable;
   assign is_memory_stable = !simul_mode || (state_out == IDLE);
@@ -739,46 +740,71 @@ module top_level
     begin
       obj0_pos_y <= write_object_in[47:32];
       obj0_vel_y <= write_object_in[15:0];
-
-      dbg_params <= write_object_in[111:64];
-      dbg_pos_x <= write_object_in[63:48];
-      dbg_pos_y <= write_object_in[47:32];
     end
   end
 
-  logic [15:0] prev_pos_y, prev_vel_y;
-  always_ff @(posedge clk_pixel)
-  begin
-    if (sys_rst_pixel)
-    begin
-      prev_pos_y <= 0;
-      prev_vel_y <= 0;
-    end
-    else
-    begin
-      if (create_random_obj)
-      begin
-        prev_pos_y <= pos_y;
-        prev_vel_y <= vel_y;
-      end
-    end
-  end
+  // logic [15:0] prev_pos_y, prev_vel_y;
+  // always_ff @(posedge clk_pixel)
+  // begin
+  //   if (sys_rst_pixel)
+  //   begin
+  //     prev_pos_y <= 0;
+  //     prev_vel_y <= 0;
+  //   end
+  //   else
+  //   begin
+  //     if (create_random_obj)
+  //     begin
+  //       prev_pos_y <= pos_y;
+  //       prev_vel_y <= vel_y;
+  //     end
+  //   end
+  // end
 
 
   // debugging random objects
   logic create_random_obj;
   assign create_random_obj = btn[3];
-  logic [15:0] pos_y, vel_y; // both random
+
+  logic [15:0] rd_pos_xs[`OBJ_COUNT:0], rd_pos_ys[`OBJ_COUNT:0], rd_vel_xs[`OBJ_COUNT:0], rd_vel_ys[`OBJ_COUNT:0], rd_rads[`OBJ_COUNT:0];
+  logic rd_is_static[`OBJ_COUNT:0];
   logic [`OBJ_WIDTH-1:0] random_obj;
-  assign pos_y = hcount_hdmi << 2;
-  assign vel_y = ~((hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3));
+
+  logic [2:0] rd_idx;
+  logic [15:0] sd1, sd2;
+  localparam RNG_A = 7603, RNG_C = 1557, RNG_MASK = 16'hFFFF;
+  assign sd1 = (RNG_A * hcount_hdmi) & RNG_MASK + RNG_C;
+  assign sd2 = (RNG_A * (vcount_hdmi ^ hcount_hdmi[3:0])) & RNG_MASK + RNG_C;
+
   always_ff @(posedge clk_pixel)
   begin
     if(create_random_obj)
     begin
-      random_obj <= 115'h1_0000000000a0_1900_0000_0000_0000 + (pos_y << 32) + vel_y;
+      rd_pos_xs[rd_idx] <= {4'b0, sd1[11:0]};
+      rd_pos_ys[rd_idx] <= {4'b0, ((RNG_A * sd1 + RNG_C) & RNG_MASK)};
+      rd_vel_xs[rd_idx] <= {sd2[0], 5'b0, sd2[10:1]};
+      rd_vel_ys[rd_idx] <= {sd2[13], 8'b0, sd2[15:11]};
+      rd_rads[rd_idx] <= (sd1[7:0] ^ sd2[7:0]) & 16'h3FF + 16'h080;
+      rd_is_static[rd_idx] <= (sd1[3] == 1'b1 && sd2[3] == 1'b1);
+
+      random_obj <= 115'h1_000000000000_0000_0000_0000_0000 ^ (rd_is_static[rd_idx] << 112) ^ (rd_rads[rd_idx] << 64) ^ (rd_pos_xs[rd_idx] << 48) ^ (rd_pos_ys[rd_idx] << 32) ^ (rd_vel_xs[rd_idx] << 16) ^ rd_vel_ys[rd_idx];
+
+      rd_idx <= rd_idx + 1;
     end
   end
+  
+
+  // logic [15:0] pos_y, vel_y; // both random
+  // logic [`OBJ_WIDTH-1:0] random_obj;
+  // assign pos_y = hcount_hdmi << 2;
+  // assign vel_y = ~((hcount_hdmi[3:0] << 5) + (vcount_hdmi >> 3));
+  // always_ff @(posedge clk_pixel)
+  // begin
+  //   if(create_random_obj)
+  //   begin
+  //     random_obj <= 115'h1_000000000a00_1900_0000_00a0_0000 + (pos_y << 32) + vel_y;
+  //   end
+  // end
 
 
 
@@ -864,46 +890,57 @@ generate
 endgenerate
 
   logic dbg_valid_in;
-  logic dbg_valid_out;
-  logic [15:0] dbg_pos_x, dbg_pos_y;
-  logic [47:0] dbg_params;
-  logic [1:0] dbg_id_bits;
+  // logic [15:0] dbg_pos_x [3:0];
+  // logic [15:0] dbg_pos_y [3:0];
+  logic [47:0] dbg_params [3:0];
+  logic [1:0] dbg_id_bits [3:0];
 
-  logic dbg_is_shape_ready;
-  logic dbg_is_shape_drawn;
-  logic [10:0] dbg_x_in_1s, dbg_x_in_2s;
-  logic [9:0] dbg_y_in_1s, dbg_y_in_2s;
-  logic [83:0] dbg_obj_coord;
-  logic dbg_in_shape_bits;
+  logic dbg_is_shape_ready [3:0];
+  logic dbg_is_shape_drawn [3:0];
+  logic [10:0] dbg_x_in_1s [3:0];
+  logic [10:0] dbg_x_in_2s [3:0];
+  logic [9:0] dbg_y_in_1s [3:0];
+  logic [9:0] dbg_y_in_2s [3:0];
+  logic [83:0] dbg_obj_coord [3:0];
+  logic dbg_in_shape_bits [3:0];
 
   assign dbg_valid_in = nf_hdmi;
 
-  circle_converter dbg_ball_converter (
-      .is_valid_in(dbg_id_bits == 2'b01 && dbg_valid_in),
-      .pos_x(dbg_pos_x),
-      .pos_y(dbg_pos_y),
-      .params(dbg_params),
-      .x_in_1(dbg_x_in_1s),
-      .y_in_1(dbg_y_in_1s),
-      .x_in_2(dbg_x_in_2s),
-      .y_in_2(dbg_y_in_2s),
-      .is_valid_out(dbg_is_shape_ready)
-    );
+  genvar dbg_i;
+  generate 
+    for(dbg_i=0; dbg_i<4; dbg_i=dbg_i+1) begin
+      circle_converter dbg_ball_converter (
+          .is_valid_in(dbg_id_bits[dbg_i] == 2'b01 && dbg_valid_in),
+          .pos_x(rd_pos_xs[dbg_i]),
+          .pos_y(rd_pos_ys[dbg_i]),
+          .params({32'b0, rd_rads[dbg_i]}),
+          .x_in_1(dbg_x_in_1s[dbg_i]),
+          .y_in_1(dbg_y_in_1s[dbg_i]),
+          .x_in_2(dbg_x_in_2s[dbg_i]),
+          .y_in_2(dbg_y_in_2s[dbg_i]),
+          .is_valid_out(dbg_is_shape_ready[dbg_i])
+        );
 
-  draw_circle dbg_ball(
-    .valid_in(dbg_is_shape_ready),
-    .clk_in(clk_pixel),
-    .rst_in(sys_rst_pixel),
-    .hcount_in(hcount_hdmi),
-    .vcount_in(vcount_hdmi),
-    .x_in_1(dbg_x_in_1s),
-    .y_in_1(dbg_y_in_1s),
-    .x_in_2(dbg_x_in_2s),
-    .y_in_2(dbg_y_in_2s),
-    .circle_coord(dbg_obj_coord),
-    .in_circle(dbg_in_shape_bits),
-    .valid_out(dbg_is_shape_drawn)
-  );
+      draw_circle dbg_ball(
+        .valid_in(dbg_is_shape_ready[dbg_i]),
+        .clk_in(clk_pixel),
+        .rst_in(sys_rst_pixel),
+        .hcount_in(hcount_hdmi),
+        .vcount_in(vcount_hdmi),
+        .x_in_1(dbg_x_in_1s[dbg_i]),
+        .y_in_1(dbg_y_in_1s[dbg_i]),
+        .x_in_2(dbg_x_in_2s[dbg_i]),
+        .y_in_2(dbg_y_in_2s[dbg_i]),
+        .circle_coord(dbg_obj_coord[dbg_i]),
+        .in_circle(dbg_in_shape_bits[dbg_i]),
+        .valid_out(dbg_is_shape_drawn[dbg_i])
+      );
+    end
+  endgenerate
+
+  logic [1:0] dbg_merged_bits, dbg_color_bits;
+  assign dbg_merged_bits = dbg_in_shape_bits[0] | dbg_in_shape_bits[1] | dbg_in_shape_bits[2] | dbg_in_shape_bits[3];
+  assign dbg_color_bits = (dbg_merged_bits == 2'b11) ? 2'b01 : dbg_merged_bits;
 
 
   // render render_objects
@@ -1044,7 +1081,7 @@ module video_mux (
               // .camera_y_in(y_delayed_ps6), //luminance TODO: needs (PS6)
               // .channel_in(selected_channel_delayed_ps5), //current channel being drawn TODO: needs (PS5)
               // .thresholded_pixel_in(mask), //one bit mask signal TODO: needs (PS4)
-              .frame_buff_out(dbg_in_shape_bits), //output from frame buffer
+              .frame_buff_out(dbg_color_bits), //output from frame buffer
               .rect_pixel_in(in_rect), //TODO: needs (PS9) maybe?
               .circle_pixel_in(in_circle),
               .line_pixel_in(in_line),

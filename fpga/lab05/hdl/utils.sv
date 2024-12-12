@@ -1,8 +1,11 @@
+`define SCALE 6
+`define CLAMP(x, min, max) (x < min ? min : (x > max ? max : x))
+
 module circle_converter
 (
     // input wire [114:0] object_props,
-    input wire [15:0] pos_x,
-    input wire [15:0] pos_y,
+    input wire signed [15:0] pos_x,
+    input wire signed [15:0] pos_y,
     input wire [47:0] params,
     input wire is_valid_in,
     output logic [10:0] x_in_1,
@@ -18,14 +21,14 @@ module circle_converter
 // assign center_x = object_props[111:96];
 // assign center_y = object_props[95:80];
 // assign radius = object_props[47:32];
-logic [15:0] radius;
+logic signed [15:0] radius;
 assign radius = params[15:0];
 
 always_comb begin
-    x_in_1 = pos_x - radius;
-    y_in_1 = pos_y;
-    x_in_2 = pos_x + radius;
-    y_in_2 = pos_y;
+    x_in_1 = `CLAMP((pos_x - radius) >>> `SCALE, 0, 1280);
+    y_in_1 = `CLAMP((pos_y) >>> `SCALE, 0, 720);
+    x_in_2 = `CLAMP((pos_x + radius) >>> `SCALE, 0, 1280);
+    y_in_2 = `CLAMP((pos_y) >>> `SCALE, 0, 720);
     is_valid_out = is_valid_in;
 end
 
